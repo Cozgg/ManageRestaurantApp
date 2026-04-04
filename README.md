@@ -32,8 +32,8 @@ Dự án phần mềm hỗ trợ đặt bàn, quản lý thực đơn và trải
 
 1. **Clone dự án:**
    ` ` `bash
-   git clone [[URL_REPO_CỦA_BẠN](https://github.com/canhhuynh220805/ManageRestaurantApp.git)]
-   cd [RestaurantApp]
+   git clone (https://github.com/canhhuynh220805/ManageRestaurantApp.git)
+   cd RestaurantApp
    ` ` `
 2. **Thiết lập Cơ sở dữ liệu:**
    * Tạo database trên MySQL.
