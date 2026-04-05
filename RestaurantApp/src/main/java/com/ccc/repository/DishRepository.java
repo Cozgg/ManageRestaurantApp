@@ -4,13 +4,14 @@
  */
 package com.ccc.repository;
 
-import com.ccc.pojo.User;
+import com.ccc.pojo.Dish;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Admin
  */
-public interface UserRepository {
-    User getUserByUsername(String username);
-    User addUser(User u);
+public interface DishRepository {
+    List<Dish> getDishs(Map<String, String> params);
 }

@@ -52,6 +52,7 @@ public class WebAppContextConfigs implements WebMvcConfigurer{
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/js/**").addResourceLocations("classpath:/static/js/");
+        registry.addResourceHandler("/style/**").addResourceLocations("classpath:/static/style/");
     }
     
 }

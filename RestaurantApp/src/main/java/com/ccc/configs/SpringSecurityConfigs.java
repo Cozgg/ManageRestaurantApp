@@ -12,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -26,15 +27,15 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableTransactionManagement
 @ComponentScan(
         basePackages = {
-            "com.dht.controllers",
-            "com.dht.repository",
-            "com.dht.service"
+            "com.ccc.controllers",
+            "com.ccc.repository",
+            "com.ccc.service"
         }
 )
 public class SpringSecurityConfigs {
 
-//    @Autowired
-//    private UserDetailsService userDetailsService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -65,9 +66,9 @@ public class SpringSecurityConfigs {
     public Cloudinary cloudinary() {
         Cloudinary cloudinary
                 = new Cloudinary(ObjectUtils.asMap(
-                        "cloud_name", "dxxwcby8l",
-                        "api_key", "792844686918347",
-                        "api_secret", "T8ys_Z9zaKSqmKWa4K1RY6DXUJg",
+                        "cloud_name", "dpl8syyb9",
+                        "api_key", "423338349327346",
+                        "api_secret", "zfwveRcXlclSOKM7mqSU2j0421c",
                         "secure", true));
         return cloudinary;
     }

@@ -4,13 +4,13 @@
  */
 package com.ccc.repository;
 
-import com.ccc.pojo.User;
+import com.ccc.pojo.Category;
+import java.util.List;
 
 /**
  *
  * @author Admin
  */
-public interface UserRepository {
-    User getUserByUsername(String username);
-    User addUser(User u);
+public interface CategoryRepository {
+    List<Category> getCates();
 }
