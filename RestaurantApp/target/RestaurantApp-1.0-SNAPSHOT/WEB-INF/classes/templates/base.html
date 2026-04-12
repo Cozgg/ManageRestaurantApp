@@ -27,6 +27,9 @@
                             <li class="nav-item" th:each="c: ${categories}">
                                 <a class="nav-link" href="#" th:text="${c.name}"></a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/admin/users}">Quản lý người dùng</a>
+                            </li>
                             <li class="nav-item ms-lg-4 mt-3 mt-lg-0">
                                 <a class="btn btn-outline-warning rounded-pill px-4 fw-medium" th:href="@{/logout}">Đăng xuất</a>
                             </li>

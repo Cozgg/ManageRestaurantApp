@@ -5,6 +5,7 @@
 package com.ccc.repository;
 
 import com.ccc.pojo.User;
+import java.util.List;
 
 /**
  *
@@ -13,4 +14,6 @@ import com.ccc.pojo.User;
 public interface UserRepository {
     User getUserByUsername(String username);
     User addUser(User u);
+    List<User> getUsers();
+    User getUserById(int userId);
 }

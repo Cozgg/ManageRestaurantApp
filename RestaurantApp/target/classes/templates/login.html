@@ -7,20 +7,47 @@
 <body>
     <div th:replace="base :: header"></div>
 
-    <section class="container">
-        <form method="post" th:action="@{/login}">
-            <div class="form-floating mb-3 mt-3">
-                <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" name="username" />
-                <label for="username">Tên đăng nhập</label>
+    <section class="container d-flex align-items-center justify-content-center min-vh-100" style="background-color: #f8f9fa;">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-4 p-sm-5">
+
+                    <div class="text-center mb-4">
+                        <h3 style="color: #e67e22; font-family: 'Playfair Display', serif;" class="fw-bold">
+                            🍽️ eRestaurant
+                        </h3>
+                        <p class="text-muted small">Đăng nhập hệ thống quản trị</p>
+                    </div>
+
+                    <div th:if="${param.error}" class="alert alert-danger text-center small py-2 rounded-3 shadow-sm">
+                        Tên đăng nhập hoặc mật khẩu không chính xác!
+                    </div>
+
+                    <div th:if="${param.logout}" class="alert alert-success text-center small py-2 rounded-3 shadow-sm">
+                        Bạn đã đăng xuất thành công.
+                    </div>
+
+                    <form method="post" th:action="@{/login}">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control rounded-3" id="username" placeholder="Tên đăng nhập" name="username" required />
+                            <label for="username" class="text-muted">Tên đăng nhập</label>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input type="password" class="form-control rounded-3" id="password" placeholder="Mật khẩu" name="password" required />
+                            <label for="password" class="text-muted">Mật khẩu</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100 rounded-pill fw-bold py-2 shadow-sm fs-6 text-dark mt-2">
+                            ĐĂNG NHẬP
+                        </button>
+                    </form>
+
+                </div>
             </div>
-            <div class="form-floating mb-3 mt-3">
-                <input type="password" class="form-control" id="password" placeholder="Mật khẩu" name="password" />
-                <label for="username">Mật khẩu</label>
-            </div>
-            <div class="form-floating mb-3 mt-3">
-                <button class="btn btn-success">Đăng nhập</button>
-            </div>
-        </form>
+
+        </div>
     </section>
 
     <div th:replace="base :: footer"></div>

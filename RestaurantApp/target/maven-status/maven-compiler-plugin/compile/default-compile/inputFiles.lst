@@ -8,6 +8,7 @@ D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\controllers\ApiUserCo
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\controllers\HomeController.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\controllers\UserController.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\formatters\CategoryFormatter.java
+D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\formatters\UserRoleFormatter.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\pojo\Category.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\pojo\Dish.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\pojo\OrderDetail.java
@@ -16,6 +17,7 @@ D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\pojo\Rating.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\pojo\Reservation.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\pojo\RestaurantTable.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\pojo\User.java
+D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\pojo\UserRole.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\repository\CategoryRepository.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\repository\DishRepository.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\repository\impl\CategoryRepositoryImpl.java
@@ -30,3 +32,4 @@ D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\service\impl\Category
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\service\impl\DishServiceImpl.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\service\impl\UserServiceImpl.java
 D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\service\UserService.java
+D:\ManageRestaurantApp\RestaurantApp\src\main\java\com\ccc\utils\JwtUtils.java

@@ -7,6 +7,8 @@ package com.ccc.pojo;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -74,7 +76,8 @@ public class User implements Serializable {
     private String avatar;
     @Size(max = 10)
     @Column(name = "user_role")
-    private String userRole;
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
     @OneToMany(mappedBy = "userId")
     private Set<Dish> dishSet;
     @OneToMany(mappedBy = "userId")
@@ -156,11 +159,11 @@ public class User implements Serializable {
         this.avatar = avatar;
     }
 
-    public String getUserRole() {
+    public UserRole getUserRole() {
         return userRole;
     }
 
-    public void setUserRole(String userRole) {
+    public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
     }
 

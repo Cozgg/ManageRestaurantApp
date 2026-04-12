@@ -9,6 +9,7 @@ com\ccc\service\impl\DishServiceImpl.class
 com\ccc\pojo\Category.class
 com\ccc\pojo\Dish.class
 com\ccc\configs\SpringSecurityConfigs.class
+com\ccc\pojo\UserRole.class
 com\ccc\configs\DispatcherServletInit.class
 com\ccc\service\impl\CategoryServiceImpl.class
 com\ccc\repository\CategoryRepository.class
@@ -25,7 +26,9 @@ com\ccc\controllers\ApiUserController.class
 com\ccc\pojo\RestaurantTable.class
 com\ccc\configs\WebAppContextConfigs.class
 com\ccc\service\impl\UserServiceImpl.class
+com\ccc\utils\JwtUtils.class
 com\ccc\restaurantapp\JakartaRestConfiguration.class
+com\ccc\formatters\UserRoleFormatter.class
 com\ccc\pojo\User.class
 com\ccc\configs\SecurityWebApplicationInitializer.class
 com\ccc\service\DishService.class

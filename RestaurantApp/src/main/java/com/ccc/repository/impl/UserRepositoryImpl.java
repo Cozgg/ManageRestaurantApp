@@ -6,6 +6,7 @@ package com.ccc.repository.impl;
 
 import com.ccc.pojo.User;
 import com.ccc.repository.UserRepository;
+import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,18 +20,18 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class UserRepositoryImpl implements UserRepository{
-    
+public class UserRepositoryImpl implements UserRepository {
+
     @Autowired
     private LocalSessionFactoryBean factory;
-    
+
     @Override
     public User getUserByUsername(String username) {
         Session session = this.factory.getObject().getCurrentSession();
-        
+
         Query q = session.createNamedQuery("User.findByUsername", User.class);
         q.setParameter("username", username);
-        return (User)q.getSingleResult();
+        return (User) q.getSingleResult();
     }
 
     @Override
@@ -39,5 +40,19 @@ public class UserRepositoryImpl implements UserRepository{
         s.persist(u);
         return u;
     }
-    
+
+    @Override
+    public List<User> getUsers() {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query q = s.createNamedQuery("User.findAll", User.class);
+        return q.getResultList();
+    }
+
+    @Override
+    public User getUserById(int userId) {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query q = s.createNamedQuery("User.findById", User.class);
+        return (User) q.getSingleResult();
+    }
+
 }

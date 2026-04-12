@@ -5,12 +5,15 @@
 package com.ccc.service.impl;
 
 import com.ccc.pojo.User;
+import com.ccc.pojo.UserRole;
 import com.ccc.repository.UserRepository;
 import com.ccc.service.UserService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -54,7 +57,7 @@ public class UserServiceImpl implements UserService{
         u.setUsername(params.get("username"));
         u.setPassword(passwordEncoder.encode(params.get("password")));
         String userRole = params.getOrDefault("userRole", "ROLE_USER");
-        u.setUserRole(userRole);
+        u.setUserRole(UserRole.valueOf(userRole));
         
         if (!avatar.isEmpty()) {
             try {
@@ -68,6 +71,20 @@ public class UserServiceImpl implements UserService{
 
         return this.userRepo.addUser(u);
     }
+    
+    @Override
+    public User addUser(User u) {
+        if (!u.getAvatar().isEmpty()) {
+            try {
+                Map res = this.cloudinary.uploader().upload(u.getAvatar().getBytes(),
+                        ObjectUtils.asMap("resource_type", "auto"));
+                u.setAvatar(res.get("secure_url").toString());
+            } catch (IOException ex) {
+                Logger.getLogger(UserServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return this.userRepo.addUser(u);
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -77,11 +94,27 @@ public class UserServiceImpl implements UserService{
         }
         
         Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority(u.getUserRole()));
+        authorities.add(new SimpleGrantedAuthority(String.valueOf(u.getUserRole())));
         
         return new org.springframework.security.core.userdetails.User(u.getUsername(),
                 u.getPassword(), authorities);
     }
+
+    @Override
+    public List<User> getUsers() {
+        return this.userRepo.getUsers();
+    }
+
+    @Override
+    public User getUserById(int userId) {
+        return this.userRepo.getUserById(userId);
+    }
+
+    @Override
+    public List<UserRole> getUserRoles() {
+        return Arrays.asList(UserRole.values());
+    }
+
     
     
     
