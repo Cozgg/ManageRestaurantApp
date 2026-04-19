@@ -4,6 +4,7 @@
  */
 package com.ccc.service.impl;
 
+import com.ccc.dto.UserDto;
 import com.ccc.pojo.User;
 import com.ccc.pojo.UserRole;
 import com.ccc.repository.UserRepository;
@@ -73,10 +74,18 @@ public class UserServiceImpl implements UserService{
     }
     
     @Override
-    public User addUser(User u) {
-        if (!u.getAvatar().isEmpty()) {
+    public User addUser(UserDto udto) {
+        User u = new User();
+        u.setFirstName(udto.getFirstName());
+        u.setLastName(udto.getLastName());
+        u.setPhone(udto.getPhone());
+        u.setUsername(udto.getUsername());
+        u.setPassword(passwordEncoder.encode(udto.getPassword()));
+        String userRole = udto.getUserRole();
+        u.setUserRole(UserRole.valueOf(userRole));
+        if (!udto.getAvatar().isEmpty()) {
             try {
-                Map res = this.cloudinary.uploader().upload(u.getAvatar().getBytes(),
+                Map res = this.cloudinary.uploader().upload(udto.getAvatar().getBytes(),
                         ObjectUtils.asMap("resource_type", "auto"));
                 u.setAvatar(res.get("secure_url").toString());
             } catch (IOException ex) {
@@ -114,8 +123,10 @@ public class UserServiceImpl implements UserService{
     public List<UserRole> getUserRoles() {
         return Arrays.asList(UserRole.values());
     }
-
     
-    
+    @Override
+    public boolean authenticate(String username, String password) {
+        return this.userRepo.authenticate(username, password);
+    }
     
 }

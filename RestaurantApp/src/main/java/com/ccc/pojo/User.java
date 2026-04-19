@@ -4,6 +4,8 @@
  */
 package com.ccc.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +39,7 @@ import java.util.Set;
     @NamedQuery(name = "User.findByPhone", query = "SELECT u FROM User u WHERE u.phone = :phone"),
     @NamedQuery(name = "User.findByAvatar", query = "SELECT u FROM User u WHERE u.avatar = :avatar"),
     @NamedQuery(name = "User.findByUserRole", query = "SELECT u FROM User u WHERE u.userRole = :userRole")})
+@JsonIgnoreProperties(value = {"dishSet", "ratingSet", "reservationSet", "ordersSet"})
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -52,6 +55,7 @@ public class User implements Serializable {
     private String username;
     @Size(max = 255)
     @Column(name = "password")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     @Basic(optional = false)
     @NotNull

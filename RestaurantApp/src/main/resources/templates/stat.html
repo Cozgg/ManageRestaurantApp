@@ -1,0 +1,60 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Trang chủ Thống kê</title>
+    <th:block th:replace="~{base :: css}"></th:block>
+</head>
+<body>
+    <div th:replace="~{base :: header}"></div>
+
+    <section class="container mt-4 mb-5">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-black text-white py-3">
+                <h5 class="mb-0" style="color: #e67e22; font-family: 'Playfair Display', serif;">
+                    📊 Thống kê doanh thu
+                </h5>
+                <div class="btn-group shadow-sm" role="group">
+                    <input type="radio" class="btn-check" name="statType" id="typeRevenue" value="REVENUE" checked>
+                    <label class="btn btn-outline-warning border-0 px-3" for="typeRevenue">Doanh thu</label>
+
+                    <input type="radio" class="btn-check" name="statType" id="typeDishes" value="DISHES">
+                    <label class="btn btn-outline-warning border-0 px-3" for="typeDishes">Món ăn bán chạy</label>
+
+                    <input type="radio" class="btn-check" name="statType" id="typeReservations" value="RESERVATIONS">
+                    <label class="btn btn-outline-warning border-0 px-3" for="typeReservations">Đặt bàn</label>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form id="statForm" class="row g-3 mb-4 align-items-end bg-light p-3 rounded">
+                    <div class="col-md-4">
+                        <label for="timeFilter" class="form-label fw-bold text-muted">Thống kê theo:</label>
+                        <select id="timeFilter" class="form-select border-warning">
+                            <option value="MONTH" selected>Theo Tháng</option>
+                            <option value="QUARTER">Theo Quý</option>
+                            <option value="YEAR">Theo Năm</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="yearFilter" class="form-label fw-bold text-muted">Chọn năm:</label>
+                        <input type="number" id="yearFilter" class="form-control border-warning" value="2026" min="2000" max="2100">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-warning fw-bold px-4 w-100 shadow-sm">
+                            LỌC DỮ LIỆU
+                        </button>
+                    </div>
+                </form>
+
+                <div style="position: relative; height: 400px; width: 100%;">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div th:replace="~{base :: footer}"></div>
+    <script th:src="@{/js/script.js}"></script>
+
+</body>
+</html>

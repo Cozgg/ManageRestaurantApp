@@ -4,6 +4,7 @@
  */
 package com.ccc.controllers;
 
+import com.ccc.dto.UserDto;
 import com.ccc.pojo.User;
 import com.ccc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class UserController {
     
     @GetMapping("/users/create")
     public String createUserView(Model model){
-        model.addAttribute("user", new User());
+        model.addAttribute("userDto", new UserDto());
         model.addAttribute("roles", this.userService.getUserRoles());
         return "users";
     }
@@ -51,7 +52,7 @@ public class UserController {
     }
     
     @PostMapping("/users")
-    public String createUser(@ModelAttribute(value = "user") User u){
+    public String createUser(@ModelAttribute(value = "userDto") UserDto u){
         this.userService.addUser(u);
         return "redirect:/admin/users";
     }

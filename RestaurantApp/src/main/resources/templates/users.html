@@ -15,7 +15,7 @@
                 </h5>
             </div>
 
-            <form method="post" th:object="${user}" th:action="@{/admin/users}" enctype="multipart/form-data">
+            <form method="post" th:object="${userDto}" th:action="@{/admin/users}" enctype="multipart/form-data">
                 <div class="mb-3 mt-3">
                     <label for="firstName" class="form-label">Tên người dùng: </label>
                     <input type="text" class="form-control" id="firstName" placeholder="Nhập tên người dùng" th:field="*{firstName}" />
@@ -29,7 +29,7 @@
                 </div>
                 <div class="mb-3 mt-3">
                     <label for="password" class="form-label">Mật khẩu: </label>
-                    <input type="text" class="form-control" id="name" placeholder="Nhập mật khẩu" th:field="*{password}" />
+                    <input type="password" class="form-control" id="password" placeholder="Nhập mật khẩu" th:field="*{password}" />
                 </div>
                 <div class="mb-3 mt-3">
                     <label for="phone" class="form-label">Số điện thoại: </label>

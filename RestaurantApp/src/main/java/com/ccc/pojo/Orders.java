@@ -4,9 +4,14 @@
  */
 package com.ccc.pojo;
 
+import com.ccc.payment.PaymentMethod;
+import com.ccc.payment.PaymentStrategy;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +24,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
@@ -38,6 +44,7 @@ import java.util.Set;
     @NamedQuery(name = "Orders.findByTotalPrice", query = "SELECT o FROM Orders o WHERE o.totalPrice = :totalPrice"),
     @NamedQuery(name = "Orders.findByStatusPay", query = "SELECT o FROM Orders o WHERE o.statusPay = :statusPay"),
     @NamedQuery(name = "Orders.findByStatusOrder", query = "SELECT o FROM Orders o WHERE o.statusOrder = :statusOrder")})
+@JsonIgnoreProperties(value = {"orderDetailSet"})
 public class Orders implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -50,8 +57,9 @@ public class Orders implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
     @Size(max = 8)
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_method")
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
     @Column(name = "total_price")
     private Integer totalPrice;
     @Size(max = 9)
@@ -68,7 +76,13 @@ public class Orders implements Serializable {
     private User userId;
     @OneToMany(mappedBy = "orderId")
     private Set<OrderDetail> orderDetailSet;
-
+    @Transient
+    private PaymentStrategy payStrategy;
+    
+    public void setStrategy(PaymentStrategy p){
+        this.payStrategy = p;
+        this.paymentMethod =  p.pay();
+    }
     public Orders() {
     }
 
@@ -93,10 +107,10 @@ public class Orders implements Serializable {
     }
 
     public String getPaymentMethod() {
-        return paymentMethod;
+        return paymentMethod.toString();
     }
 
-    public void setPaymentMethod(String paymentMethod) {
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
     }
 

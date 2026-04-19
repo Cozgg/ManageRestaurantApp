@@ -4,6 +4,7 @@
  */
 package com.ccc.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,6 +46,7 @@ public class RestaurantTable implements Serializable {
     @Size(min = 1, max = 10)
     @Column(name = "table_number")
     private String tableNumber;
+    @JsonIgnore
     @OneToMany(mappedBy = "tableId")
     private Set<Reservation> reservationSet;
 
