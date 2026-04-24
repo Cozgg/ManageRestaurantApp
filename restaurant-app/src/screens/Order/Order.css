@@ -1,0 +1,63 @@
+
+/* Hiệu ứng nổi lên khi di chuột vào món ăn */
+.cart-item-card {
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+}
+
+.cart-item-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+  border-left: 4px solid #198754; /* Màu xanh success của Bootstrap */
+}
+
+/* Ẩn mũi tên tăng/giảm mặc định xấu xí của thẻ input number */
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.qty-input {
+  -moz-appearance: textfield;
+  width: 50px !important;
+  background-color: #f8f9fa;
+  border: none !important;
+}
+
+/* Nút tăng giảm số lượng */
+.btn-qty {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% !important;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.btn-qty:hover:not(:disabled) {
+  background-color: #198754;
+  color: white;
+  border-color: #198754;
+}
+
+/* Khối tính tiền bên phải (Sticky) */
+.summary-card {
+  position: sticky;
+  top: 100px; 
+  border-radius: 1rem;
+  z-index: 1020; /* Thêm dòng này để toàn bộ Card nổi lên trên Footer */
+}
+
+/* Hiệu ứng nhấp nháy nhẹ cho nút Thanh toán */
+.btn-checkout {
+  background: linear-gradient(135deg, #27ae60, #1e8449);
+  border: none;
+  transition: transform 0.2s;
+}
+
+.btn-checkout:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+}

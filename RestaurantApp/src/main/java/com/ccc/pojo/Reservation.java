@@ -39,6 +39,14 @@ import java.util.Date;
     @NamedQuery(name = "Reservation.findByStatus", query = "SELECT r FROM Reservation r WHERE r.status = :status")})
 public class Reservation implements Serializable {
 
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "number_people")
+    private int numberPeople;
+    @Size(max = 9)
+    @Column(name = "status")
+    private String status;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,13 +62,6 @@ public class Reservation implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "number_people")
-    private int numberPeople;
-    @Size(max = 9)
-    @Column(name = "status")
-    private String status;
     @JoinColumn(name = "table_id", referencedColumnName = "id")
     @ManyToOne
     private RestaurantTable tableId;
@@ -122,13 +123,6 @@ public class Reservation implements Serializable {
         this.numberPeople = numberPeople;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public RestaurantTable getTableId() {
         return tableId;
@@ -177,6 +171,15 @@ public class Reservation implements Serializable {
     @Override
     public String toString() {
         return "com.ccc.pojo.Reservation[ id=" + id + " ]";
+    }
+
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
     
 }

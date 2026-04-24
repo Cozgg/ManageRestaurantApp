@@ -7,6 +7,7 @@ com\ccc\pojo\Dish.class
 com\ccc\repository\OrderRepository.class
 com\ccc\configs\SpringSecurityConfigs.class
 com\ccc\payment\MomoStrategy.class
+com\ccc\dto\CategoryDto.class
 com\ccc\payment\ZaloStrategy.class
 com\ccc\service\impl\CategoryServiceImpl.class
 com\ccc\repository\CategoryRepository.class
@@ -31,9 +32,11 @@ com\ccc\repository\impl\DishRepositoryImpl.class
 com\ccc\configs\HibernateConfigs.class
 com\ccc\pojo\Category.class
 com\ccc\controllers\ApiOrderController.class
+com\ccc\controllers\ApiDishController.class
 com\ccc\controllers\ApiCategoryController.class
 com\ccc\pojo\UserRole.class
 com\ccc\repository\StatRepository.class
+com\ccc\dto\DishDto.class
 com\ccc\configs\DispatcherServletInit.class
 com\ccc\pojo\Reservation.class
 com\ccc\restaurantapp\resources\JakartaEE11Resource.class

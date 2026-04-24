@@ -4,6 +4,7 @@
  */
 package com.ccc.controllers;
 
+import com.ccc.dto.CategoryDto;
 import com.ccc.pojo.Category;
 import com.ccc.service.CategoryService;
 import java.util.List;
@@ -26,7 +27,7 @@ public class ApiCategoryController {
     private CategoryService cateService;
     
     @GetMapping("/categories")
-    public ResponseEntity<List<Category>> list(){
+    public ResponseEntity<List<CategoryDto>> list(){
         return new ResponseEntity<>(this.cateService.getCates(), HttpStatus.OK);
     }
 }

@@ -36,23 +36,24 @@ import java.util.Date;
     @NamedQuery(name = "Rating.findByCreatedAt", query = "SELECT r FROM Rating r WHERE r.createdAt = :createdAt")})
 public class Rating implements Serializable {
 
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "point")
+    private int point;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "content")
+    private String content;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "point")
-    private int point;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "content")
-    private String content;
     @JoinColumn(name = "dish_id", referencedColumnName = "id")
     @ManyToOne
     private Dish dishId;
@@ -80,13 +81,6 @@ public class Rating implements Serializable {
         this.id = id;
     }
 
-    public int getPoint() {
-        return point;
-    }
-
-    public void setPoint(int point) {
-        this.point = point;
-    }
 
     public Date getCreatedAt() {
         return createdAt;
@@ -96,13 +90,6 @@ public class Rating implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
 
     public Dish getDishId() {
         return dishId;
@@ -143,6 +130,22 @@ public class Rating implements Serializable {
     @Override
     public String toString() {
         return "com.ccc.pojo.Rating[ id=" + id + " ]";
+    }
+
+    public int getPoint() {
+        return point;
+    }
+
+    public void setPoint(int point) {
+        this.point = point;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
     
 }

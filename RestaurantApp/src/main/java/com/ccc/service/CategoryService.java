@@ -4,6 +4,7 @@
  */
 package com.ccc.service;
 
+import com.ccc.dto.CategoryDto;
 import com.ccc.pojo.Category;
 import java.util.List;
 
@@ -12,5 +13,5 @@ import java.util.List;
  * @author Admin
  */
 public interface CategoryService {
-    List<Category> getCates();
+    List<CategoryDto> getCates();
 }

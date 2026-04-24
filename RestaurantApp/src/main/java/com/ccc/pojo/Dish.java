@@ -34,15 +34,9 @@ import java.util.Set;
     @NamedQuery(name = "Dish.findByName", query = "SELECT d FROM Dish d WHERE d.name = :name"),
     @NamedQuery(name = "Dish.findByImage", query = "SELECT d FROM Dish d WHERE d.image = :image"),
     @NamedQuery(name = "Dish.findByPrice", query = "SELECT d FROM Dish d WHERE d.price = :price"),
-    @NamedQuery(name = "Dish.findByTimePrepate", query = "SELECT d FROM Dish d WHERE d.timePrepate = :timePrepate")})
+    @NamedQuery(name = "Dish.findByTimePrepare", query = "SELECT d FROM Dish d WHERE d.timePrepare = :timePrepare")})
 public class Dish implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
@@ -59,18 +53,25 @@ public class Dish implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "image")
     private String image;
-    @Column(name = "price")
-    private Integer price;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "time_prepate")
-    private int timePrepate;
+    @Column(name = "time_prepare")
+    private int timePrepare;
     @Basic(optional = false)
     @NotNull
     @Lob
     @Size(min = 1, max = 65535)
     @Column(name = "material")
     private String material;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
+    @Column(name = "price")
+    private Integer price;
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     @ManyToOne
     private Category categoryId;
@@ -89,12 +90,12 @@ public class Dish implements Serializable {
         this.id = id;
     }
 
-    public Dish(Integer id, String name, String description, String image, int timePrepate, String material) {
+    public Dish(Integer id, String name, String description, String image, int timePrepare, String material) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.image = image;
-        this.timePrepate = timePrepate;
+        this.timePrepare = timePrepare;
         this.material = material;
     }
 
@@ -106,29 +107,6 @@ public class Dish implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
 
     public Integer getPrice() {
         return price;
@@ -138,21 +116,6 @@ public class Dish implements Serializable {
         this.price = price;
     }
 
-    public int getTimePrepate() {
-        return timePrepate;
-    }
-
-    public void setTimePrepate(int timePrepate) {
-        this.timePrepate = timePrepate;
-    }
-
-    public String getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(String material) {
-        this.material = material;
-    }
 
     public Category getCategoryId() {
         return categoryId;
@@ -209,6 +172,46 @@ public class Dish implements Serializable {
     @Override
     public String toString() {
         return "com.ccc.pojo.Dish[ id=" + id + " ]";
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public int getTimePrepare() {
+        return timePrepare;
+    }
+
+    public void setTimePrepare(int timePrepare) {
+        this.timePrepare = timePrepare;
+    }
+
+    public String getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(String material) {
+        this.material = material;
     }
     
 }

@@ -4,6 +4,7 @@
  */
 package com.ccc.service;
 
+import com.ccc.dto.DishDto;
 import com.ccc.pojo.Dish;
 import java.util.List;
 import java.util.Map;
@@ -13,5 +14,5 @@ import java.util.Map;
  * @author Admin
  */
 public interface DishService {
-    List<Dish> getDishs(Map<String, String> params);
+    List<DishDto> getDishs(Map<String, String> params);
 }

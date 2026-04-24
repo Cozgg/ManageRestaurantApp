@@ -47,6 +47,16 @@ import java.util.Set;
 @JsonIgnoreProperties(value = {"orderDetailSet"})
 public class Orders implements Serializable {
 
+    @Size(max = 8)
+    @Column(name = "payment_method")
+    private String paymentMethod;
+    @Size(max = 9)
+    @Column(name = "status_pay")
+    private String statusPay;
+    @Size(max = 9)
+    @Column(name = "status_order")
+    private String statusOrder;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,18 +66,8 @@ public class Orders implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @Size(max = 8)
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method")
-    private PaymentMethod paymentMethod;
     @Column(name = "total_price")
     private Integer totalPrice;
-    @Size(max = 9)
-    @Column(name = "status_pay")
-    private String statusPay;
-    @Size(max = 9)
-    @Column(name = "status_order")
-    private String statusOrder;
     @JoinColumn(name = "reservation_id", referencedColumnName = "id")
     @OneToOne
     private Reservation reservationId;
@@ -81,7 +81,7 @@ public class Orders implements Serializable {
     
     public void setStrategy(PaymentStrategy p){
         this.payStrategy = p;
-        this.paymentMethod =  p.pay();
+        this.paymentMethod =  String.valueOf(p.pay());
     }
     public Orders() {
     }
@@ -111,7 +111,7 @@ public class Orders implements Serializable {
     }
 
     public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
+        this.paymentMethod = String.valueOf(paymentMethod);
     }
 
     public Integer getTotalPrice() {
@@ -186,5 +186,12 @@ public class Orders implements Serializable {
     public String toString() {
         return "com.ccc.pojo.Orders[ id=" + id + " ]";
     }
+
+    
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
     
 }

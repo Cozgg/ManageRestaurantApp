@@ -1,29 +1,46 @@
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import Apis, {endpoints} from "../configs/Apis";
-import {Button, Container, Nav, Navbar} from "react-bootstrap";
+import {
+  Button,
+  Container,
+  Form,
+  InputGroup,
+  Nav,
+  Navbar,
+} from "react-bootstrap";
+import {Link, useNavigate} from "react-router-dom";
+import {MyOrderContext} from "../utils/contexts/MyOrderContext";
 
 const Header = () => {
+  const {totalQuantity} = useContext(MyOrderContext);
   const [categories, setCategories] = useState([]);
+  // const [kw, setKw] = useState("");
+  const nav = useNavigate();
 
   const loadCategories = async () => {
     try {
       let res = await Apis.get(endpoints["categories"]);
-      console.log(res.data);
       setCategories(res.data);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   useEffect(() => {
     loadCategories();
   }, []);
+
+  // const search = (e) => {
+  //   e.preventDefault();
+  //   nav(`/?kw=${kw}`);
+  // };
   return (
     <Navbar bg="white" expand="lg" className="shadow-sm sticky-top py-3">
       <Container>
         {/* 1. Logo / Tên nhà hàng */}
         <Navbar.Brand
-          href="/"
+          as={Link}
+          to="/"
           className="fw-bold fs-3"
           style={{color: "#27ae60"}}
         >
@@ -39,20 +56,24 @@ const Header = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           {/* 2. Danh sách các loại món ăn (Nằm giữa) */}
           <Nav className="mx-auto fw-semibold">
-            <Nav.Link href="/" className="px-3 text-dark">
+            <Nav.Link as={Link} to="/" className="px-3 text-dark">
               Tất cả món
             </Nav.Link>
 
             {/* Lặp qua mảng categories để in ra các mục menu */}
-            {categories.map((c) => (
-              <Nav.Link
-                key={c.id}
-                href={`/?categoryId=${c.id}`}
-                className="px-3 text-secondary"
-              >
-                {c.name}
-              </Nav.Link>
-            ))}
+            {categories.map((c) => {
+              let url = `/?cateId=${c.id}`;
+              return (
+                <Nav.Link
+                  as={Link}
+                  className="px-3 text-secondary"
+                  key={c.id}
+                  to={url}
+                >
+                  {c.name}
+                </Nav.Link>
+              );
+            })}
           </Nav>
 
           {/* 3. Khu vực Nút bấm: Giỏ hàng & Đăng nhập (Nằm bên phải) */}
@@ -61,8 +82,9 @@ const Header = () => {
             <Button
               variant="outline-success"
               className="rounded-pill px-4 fw-bold"
+              onClick={() => nav("/order")}
             >
-              🛒 Giỏ hàng
+              🛒 Giỏ hàng ({totalQuantity})
             </Button>
             <Button
               variant="success"
