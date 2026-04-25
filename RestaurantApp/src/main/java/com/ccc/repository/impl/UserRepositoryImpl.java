@@ -64,4 +64,19 @@ public class UserRepositoryImpl implements UserRepository {
 
         return this.passwordEncoder.matches(password, u.getPassword());
     }
+
+    @Override
+    public void deleteUser(int id) {
+        Session s = this.factory.getObject().getCurrentSession();
+        User u = this.getUserById(id);
+        if (u != null) {
+            s.remove(u);
+        }
+    }
+
+    @Override
+    public void updateUser(User u) {
+        Session s = this.factory.getObject().getCurrentSession();
+        s.merge(u);
+    }
 }
