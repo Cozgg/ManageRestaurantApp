@@ -4,9 +4,6 @@
  */
 package com.ccc.dto;
 
-import com.ccc.payment.PaymentMethod;
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,14 +17,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderDto {
-    private int id;
-    private int userId;
-    private int reservationId;
-    private Date createdDate;
-    private String payment;
-    private int totalPrice;
-    private String statusPay;
-    private String statusOrder;
-
-}
+public class TableDto {
+    private Integer id;
+    private String tableNumber;
+    private Integer capacity;
+    private String location;
+    private Boolean active;
+}           
