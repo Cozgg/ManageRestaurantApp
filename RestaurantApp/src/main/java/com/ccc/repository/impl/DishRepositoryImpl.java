@@ -29,13 +29,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @PropertySource("classpath:configs.properties")
 @Transactional
-public class DishRepositoryImpl implements DishRepository{
+public class DishRepositoryImpl implements DishRepository {
+
     @Autowired
     private LocalSessionFactoryBean factory;
-    
+
     @Autowired
     private Environment env;
-
     
     @Override
     public List<Dish> getDishs(Map<String, String> params) {
@@ -52,12 +52,11 @@ public class DishRepositoryImpl implements DishRepository{
             if (kw != null && !kw.isEmpty()) {
                 predicates.add(b.like(root.get("name"), String.format("%%%s%%", kw)));
             }
-            
+
             String categoryId = params.get("cateId");
-            if (categoryId != null && !categoryId.isEmpty()){
+            if (categoryId != null && !categoryId.isEmpty()) {
                 predicates.add(b.equal(root.get("categoryId").as(Integer.class), categoryId));
             }
-            //tu lam tiep di thk cho
 
             q.where(predicates.toArray(Predicate[]::new));
         }
@@ -77,5 +76,40 @@ public class DishRepositoryImpl implements DishRepository{
 
         return query.getResultList();
     }
-    
+
+    @Override
+    public Dish getDishById(Integer id) {
+        Session session = this.factory.getObject().getCurrentSession();
+        return session.get(Dish.class, id);
+    }
+
+    @Override
+    public void saveDish(Dish dish) {
+        Session session = this.factory.getObject().getCurrentSession();
+        session.persist(dish);
+    }
+
+    @Override
+    public void updateDish(Dish dish) {
+        Session session = this.factory.getObject().getCurrentSession();
+        session.merge(dish);
+    }
+
+    @Override
+    public void deleteDish(Integer id) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Dish dish = session.get(Dish.class, id);
+        if (dish != null) {
+            session.remove(dish);
+        }
+    }
+
+    @Override
+    public void transferDishes(int fromUserId, int toUserId) {
+        Session session = this.factory.getObject().getCurrentSession();
+        Query q = session.createQuery("UPDATE Dish d SET d.userId.id = :toId WHERE d.userId.id = :fromId");
+        q.setParameter("toId", toUserId);
+        q.setParameter("fromId", fromUserId);
+        q.executeUpdate();
+    }
 }

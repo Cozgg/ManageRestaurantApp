@@ -5,14 +5,20 @@
 package com.ccc.service;
 
 import com.ccc.dto.DishDto;
-import com.ccc.pojo.Dish;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  * @author Admin
  */
 public interface DishService {
+
     List<DishDto> getDishs(Map<String, String> params);
+    DishDto getDishById(Integer id);
+    DishDto addDish(Map<String, String> params, MultipartFile image) throws IOException;
+    DishDto updateDish(Integer id, Map<String, String> params, MultipartFile image) throws IOException;
+    boolean deleteDish(Integer id);
 }
