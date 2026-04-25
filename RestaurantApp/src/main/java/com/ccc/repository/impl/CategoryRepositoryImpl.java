@@ -29,5 +29,25 @@ public class CategoryRepositoryImpl implements CategoryRepository{
         Query q = s.createNamedQuery("Category.findAll", Category.class);
         return q.getResultList();
     }
-    
+
+    @Override
+    public void addOrUpdate(Category c) {
+        Session s = this.factory.getObject().getCurrentSession();
+        s.merge(c);
+    }
+
+    @Override
+    public void delete(int id) {
+        Session s = this.factory.getObject().getCurrentSession();
+        Category c = this.getById(id);
+        if (c != null) {
+            s.remove(c);
+        }
+    }
+
+    @Override
+    public Category getById(int id) {
+        Session s = this.factory.getObject().getCurrentSession();
+        return s.get(Category.class, id);
+    }
 }

@@ -34,5 +34,46 @@ public class CategoryServiceImpl implements CategoryService{
             return dto;
         }).collect(Collectors.toList());
     }
-    
+
+    @Override
+    public CategoryDto addCategory(java.util.Map<String, String> params) {
+        Category c = new Category();
+        c.setName(params.get("name"));
+        this.cateRepo.addOrUpdate(c);
+        
+        CategoryDto dto = new CategoryDto();
+        dto.setId(c.getId());
+        dto.setName(c.getName());
+        return dto;
+    }
+
+    @Override
+    public CategoryDto updateCategory(int id, java.util.Map<String, String> params) {
+        Category c = this.cateRepo.getById(id);
+        if (c != null) {
+            if (params.containsKey("name")) {
+                c.setName(params.get("name"));
+            }
+            this.cateRepo.addOrUpdate(c);
+            
+            CategoryDto dto = CategoryDto.builder()
+                    .id(c.getId())
+                    .name(c.getName())
+                    .build();
+            return dto;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean deleteCategory(int id) {
+        Category c = this.cateRepo.getById(id);
+        if (c != null) {
+            if (c.getDishSet() == null || c.getDishSet().isEmpty()) {
+                this.cateRepo.delete(id);
+                return true;
+            }
+        }
+        return false; 
+    }
 }
