@@ -12,4 +12,6 @@ import java.util.List;
  */
 public interface StatRepository {
     List<Object[]> statsRevenueByTime(String time, int year);
+    List<Object[]> statsTopDishes(int top);
+    List<Object[]> statsReservationsByTime(String time, int year);
 }
