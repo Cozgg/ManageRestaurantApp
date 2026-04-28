@@ -14,4 +14,5 @@ import java.util.Map;
  */
 public interface DishRepository {
     List<Dish> getDishs(Map<String, String> params);
+    Dish getDishById(int id);
 }

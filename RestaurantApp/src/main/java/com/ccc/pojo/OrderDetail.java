@@ -31,6 +31,11 @@ import java.io.Serializable;
     @NamedQuery(name = "OrderDetail.findByUnitPrice", query = "SELECT o FROM OrderDetail o WHERE o.unitPrice = :unitPrice")})
 public class OrderDetail implements Serializable {
 
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "unit_price")
+    private int unitPrice;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +44,6 @@ public class OrderDetail implements Serializable {
     private Integer id;
     @Column(name = "quantity")
     private Integer quantity;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "unit_price")
-    private int unitPrice;
     @JoinColumn(name = "dish_id", referencedColumnName = "id")
     @ManyToOne
     private Dish dishId;
@@ -126,5 +127,7 @@ public class OrderDetail implements Serializable {
     public String toString() {
         return "com.ccc.pojo.OrderDetail[ id=" + id + " ]";
     }
+
+  
     
 }

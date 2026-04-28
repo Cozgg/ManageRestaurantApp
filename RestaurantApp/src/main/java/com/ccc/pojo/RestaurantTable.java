@@ -33,6 +33,12 @@ import java.util.Set;
     @NamedQuery(name = "RestaurantTable.findByTableNumber", query = "SELECT r FROM RestaurantTable r WHERE r.tableNumber = :tableNumber")})
 public class RestaurantTable implements Serializable {
 
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 10)
+    @Column(name = "table_number")
+    private String tableNumber;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,11 +47,6 @@ public class RestaurantTable implements Serializable {
     private Integer id;
     @Column(name = "capacity")
     private Integer capacity;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 10)
-    @Column(name = "table_number")
-    private String tableNumber;
     @JsonIgnore
     @OneToMany(mappedBy = "tableId")
     private Set<Reservation> reservationSet;
@@ -118,5 +119,6 @@ public class RestaurantTable implements Serializable {
     public String toString() {
         return "com.ccc.pojo.RestaurantTable[ id=" + id + " ]";
     }
+
     
 }

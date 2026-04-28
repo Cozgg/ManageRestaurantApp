@@ -53,6 +53,10 @@ public class DishRepositoryImpl implements DishRepository{
                 predicates.add(b.like(root.get("name"), String.format("%%%s%%", kw)));
             }
             
+            String categoryId = params.get("cateId");
+            if (categoryId != null && !categoryId.isEmpty()){
+                predicates.add(b.equal(root.get("categoryId").as(Integer.class), categoryId));
+            }
             //tu lam tiep di thk cho
 
             q.where(predicates.toArray(Predicate[]::new));
@@ -72,6 +76,12 @@ public class DishRepositoryImpl implements DishRepository{
         }
 
         return query.getResultList();
+    }
+
+    @Override
+    public Dish getDishById(int id) {
+        Session session = this.factory.getObject().getCurrentSession();
+        return session.get(Dish.class, id);
     }
     
 }

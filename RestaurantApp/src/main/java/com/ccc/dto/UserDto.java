@@ -4,12 +4,14 @@
  */
 package com.ccc.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  * @author Admin
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
     private String firstName;
     private String lastName;

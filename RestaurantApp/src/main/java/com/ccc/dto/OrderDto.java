@@ -14,19 +14,18 @@ import java.util.Date;
 public class OrderDto {
     private int id;
     private int userId;
-    private int reservationId;
+    private Integer reservationId;
     private Date createdDate;
     private String payment;
     private int totalPrice;
     private String statusPay;
-    private String statusOrder;
 
     public OrderDto() {
     }
     
     
 
-    public OrderDto(int id, int userId, int reservationId, Date createdDate, String payment, int totalPrice, String statusPay, String statusOrder) {
+    public OrderDto(int id, int userId, int reservationId, Date createdDate, String payment, int totalPrice, String statusPay) {
         this.id = id;
         this.userId = userId;
         this.reservationId = reservationId;
@@ -34,7 +33,6 @@ public class OrderDto {
         this.payment = payment;
         this.totalPrice = totalPrice;
         this.statusPay = statusPay;
-        this.statusOrder = statusOrder;
     }
 
     /**
@@ -68,14 +66,14 @@ public class OrderDto {
     /**
      * @return the reservationId
      */
-    public int getReservationId() {
+    public Integer getReservationId() {
         return reservationId;
     }
 
     /**
      * @param reservationId the reservationId to set
      */
-    public void setReservationId(int reservationId) {
+    public void setReservationId(Integer reservationId) {
         this.reservationId = reservationId;
     }
 
@@ -135,18 +133,5 @@ public class OrderDto {
         this.statusPay = statusPay;
     }
 
-    /**
-     * @return the statusOrder
-     */
-    public String getStatusOrder() {
-        return statusOrder;
-    }
-
-    /**
-     * @param statusOrder the statusOrder to set
-     */
-    public void setStatusOrder(String statusOrder) {
-        this.statusOrder = statusOrder;
-    }
     
 }

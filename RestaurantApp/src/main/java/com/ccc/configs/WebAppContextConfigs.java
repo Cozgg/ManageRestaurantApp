@@ -25,7 +25,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
         basePackages={
             "com.ccc.controllers",
             "com.ccc.repository",
-            "com.ccc.service"
+            "com.ccc.service",
+            "com.ccc.payment"
         }
 )
 @EnableWebMvc

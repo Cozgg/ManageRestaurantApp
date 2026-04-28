@@ -42,10 +42,19 @@ import java.util.Set;
     @NamedQuery(name = "Orders.findByCreatedAt", query = "SELECT o FROM Orders o WHERE o.createdAt = :createdAt"),
     @NamedQuery(name = "Orders.findByPaymentMethod", query = "SELECT o FROM Orders o WHERE o.paymentMethod = :paymentMethod"),
     @NamedQuery(name = "Orders.findByTotalPrice", query = "SELECT o FROM Orders o WHERE o.totalPrice = :totalPrice"),
-    @NamedQuery(name = "Orders.findByStatusPay", query = "SELECT o FROM Orders o WHERE o.statusPay = :statusPay"),
-    @NamedQuery(name = "Orders.findByStatusOrder", query = "SELECT o FROM Orders o WHERE o.statusOrder = :statusOrder")})
+    @NamedQuery(name = "Orders.findByStatusPay", query = "SELECT o FROM Orders o WHERE o.statusPay = :statusPay")})
 @JsonIgnoreProperties(value = {"orderDetailSet"})
 public class Orders implements Serializable {
+
+    @Size(max = 8)
+    @Column(name = "payment_method")
+    private String paymentMethod;
+    @Size(max = 9)
+    @Column(name = "status_pay")
+    private String statusPay;
+    @Size(max = 45)
+    @Column(name = "transaction_id")
+    private String transactionId;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -56,18 +65,8 @@ public class Orders implements Serializable {
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    @Size(max = 8)
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method")
-    private PaymentMethod paymentMethod;
     @Column(name = "total_price")
     private Integer totalPrice;
-    @Size(max = 9)
-    @Column(name = "status_pay")
-    private String statusPay;
-    @Size(max = 9)
-    @Column(name = "status_order")
-    private String statusOrder;
     @JoinColumn(name = "reservation_id", referencedColumnName = "id")
     @OneToOne
     private Reservation reservationId;
@@ -76,13 +75,7 @@ public class Orders implements Serializable {
     private User userId;
     @OneToMany(mappedBy = "orderId")
     private Set<OrderDetail> orderDetailSet;
-    @Transient
-    private PaymentStrategy payStrategy;
     
-    public void setStrategy(PaymentStrategy p){
-        this.payStrategy = p;
-        this.paymentMethod =  p.pay();
-    }
     public Orders() {
     }
 
@@ -111,7 +104,7 @@ public class Orders implements Serializable {
     }
 
     public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
+        this.paymentMethod = String.valueOf(paymentMethod);
     }
 
     public Integer getTotalPrice() {
@@ -128,14 +121,6 @@ public class Orders implements Serializable {
 
     public void setStatusPay(String statusPay) {
         this.statusPay = statusPay;
-    }
-
-    public String getStatusOrder() {
-        return statusOrder;
-    }
-
-    public void setStatusOrder(String statusOrder) {
-        this.statusOrder = statusOrder;
     }
 
     public Reservation getReservationId() {
@@ -186,5 +171,21 @@ public class Orders implements Serializable {
     public String toString() {
         return "com.ccc.pojo.Orders[ id=" + id + " ]";
     }
+
+    
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
     
 }
