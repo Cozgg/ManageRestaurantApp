@@ -44,7 +44,7 @@ public class MomoStrategy implements PaymentStrategy {
     public String pay(String orderId, long amount) {
         try {
             String orderInfo = "Thanh toan don hang " + orderId;
-            String requestId = String.valueOf(System.currentTimeMillis());
+            String requestId = String.valueOf(System.currentTimeMillis()) + "_" + java.util.UUID.randomUUID().toString();
             String extraData = "";
             String requestType = "captureWallet";
 

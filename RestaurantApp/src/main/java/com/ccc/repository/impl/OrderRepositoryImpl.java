@@ -100,7 +100,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     public void updateOrderStatus(int orderId, String status, Long transId) {
         Session s = this.factory.getObject().getCurrentSession();
         Orders o = this.getOrderById(orderId);
-        o.setStatusPay("COMPLETEd");
+        o.setStatusPay(status);
         o.setTransactionId(String.valueOf(transId));
         s.merge(o);
     }
@@ -109,7 +109,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     public void updateOrderStatus(int orderId, String status) {
         Session s = this.factory.getObject().getCurrentSession();
         Orders o = this.getOrderById(orderId);
-        o.setStatusPay("COMPLETEd");
+        o.setStatusPay(status);
         s.merge(o);
     }
     
