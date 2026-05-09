@@ -13,5 +13,16 @@ import java.util.Map;
  * @author Admin
  */
 public interface DishRepository {
+
     List<Dish> getDishs(Map<String, String> params);
+
+    Dish getDishById(Integer id);
+
+    void saveDish(Dish dish);
+
+    void updateDish(Dish dish);
+
+    void deleteDish(Integer id);
+
+    void transferDishes(int fromUserId, int toUserId);
 }
