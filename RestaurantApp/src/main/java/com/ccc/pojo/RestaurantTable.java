@@ -38,7 +38,6 @@ public class RestaurantTable implements Serializable {
     @Size(min = 1, max = 10)
     @Column(name = "table_number")
     private String tableNumber;
-    
     @Size(max = 100)
     @Column(name = "location")
     private String location;
@@ -154,6 +153,5 @@ public class RestaurantTable implements Serializable {
     public void setActive(Boolean active) {
         this.active = active;
     }
-
     
 }

@@ -23,11 +23,9 @@ import lombok.NoArgsConstructor;
 public class OrderDto {
     private int id;
     private int userId;
-    private int reservationId;
+    private Integer reservationId;
     private Date createdDate;
     private String payment;
     private int totalPrice;
     private String statusPay;
-    private String statusOrder;
-
 }

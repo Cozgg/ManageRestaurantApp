@@ -54,6 +54,7 @@ public class DishServiceImpl implements DishService {
         }
         return dto;
     }
+
     private String uploadImage(MultipartFile image) throws IOException {
         Map uploadResult = this.cloudinary.uploader().upload(
                 image.getBytes(),
@@ -160,6 +161,7 @@ public class DishServiceImpl implements DishService {
         this.dishRepo.updateDish(dish);
         return toDto(dish);
     }
+
     @Override
     public boolean deleteDish(Integer id) {
         Dish dish = this.dishRepo.getDishById(id);

@@ -4,15 +4,18 @@
  */
 package com.ccc.payment;
 
+import org.springframework.stereotype.Component;
+
 /**
  *
  * @author Admin
  */
+@Component("ZALO")
 public class ZaloStrategy implements PaymentStrategy{
 
     @Override
-    public PaymentMethod pay() {
-        return PaymentMethod.ZALO;
+    public String pay(String orderId, long amount) {
+        return "Đang phát triển";
     }
     
 }

@@ -7,6 +7,7 @@ const MyUserReducer = (current, action) => {
     default:
       return current;
   }
+  //trả về data user
 };
 
 export default MyUserReducer;

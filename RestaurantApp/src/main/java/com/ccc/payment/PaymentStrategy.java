@@ -9,5 +9,5 @@ package com.ccc.payment;
  * @author Admin
  */
 public interface PaymentStrategy {
-    PaymentMethod pay();
+    String pay(String orderId, long amount);
 }
