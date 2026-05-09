@@ -34,7 +34,7 @@ public class ApiTableController {
 
     @GetMapping("/tables")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<RestaurantTable>> list(@RequestParam Map<String, String> params) {
+    public ResponseEntity<List<com.ccc.dto.TableDto>> list(@RequestParam Map<String, String> params) {
         return new ResponseEntity<>(this.tableService.getTables(params), HttpStatus.OK);
     }
 

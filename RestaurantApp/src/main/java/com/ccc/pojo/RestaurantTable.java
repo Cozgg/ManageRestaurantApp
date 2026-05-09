@@ -20,12 +20,21 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Set;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  *
  * @author Admin
  */
 @Entity
 @Table(name = "restaurant_table")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @NamedQueries({
     @NamedQuery(name = "RestaurantTable.findAll", query = "SELECT r FROM RestaurantTable r"),
     @NamedQuery(name = "RestaurantTable.findById", query = "SELECT r FROM RestaurantTable r WHERE r.id = :id"),
@@ -57,49 +66,6 @@ public class RestaurantTable implements Serializable {
     @OneToMany(mappedBy = "tableId")
     private Set<Reservation> reservationSet;
 
-    public RestaurantTable() {
-    }
-
-    public RestaurantTable(Integer id) {
-        this.id = id;
-    }
-
-    public RestaurantTable(Integer id, String tableNumber) {
-        this.id = id;
-        this.tableNumber = tableNumber;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
-    }
-
-    public String getTableNumber() {
-        return tableNumber;
-    }
-
-    public void setTableNumber(String tableNumber) {
-        this.tableNumber = tableNumber;
-    }
-
-    public Set<Reservation> getReservationSet() {
-        return reservationSet;
-    }
-
-    public void setReservationSet(Set<Reservation> reservationSet) {
-        this.reservationSet = reservationSet;
-    }
 
     @Override
     public int hashCode() {
@@ -125,33 +91,4 @@ public class RestaurantTable implements Serializable {
     public String toString() {
         return "com.ccc.pojo.RestaurantTable[ id=" + id + " ]";
     }
-
-    /**
-     * @return the location
-     */
-    public String getLocation() {
-        return location;
-    }
-
-    /**
-     * @param location the location to set
-     */
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    /**
-     * @return the active
-     */
-    public Boolean getActive() {
-        return active;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-    
 }

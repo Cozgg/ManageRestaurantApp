@@ -89,7 +89,7 @@ public class DishServiceImpl implements DishService {
 
         Dish dish = Dish.builder()
                 .name(params.get("name"))
-                .price(Long.parseLong(params.get("price")))
+                .price(Integer.parseInt(params.get("price")))
                 .description(params.get("description"))
                 .active(true)
                 .timePrepare(Integer.parseInt(params.getOrDefault("timePrepare", "0")))

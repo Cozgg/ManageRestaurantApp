@@ -84,7 +84,6 @@ public class Orders implements Serializable {
 
     public void setStrategy(PaymentStrategy p) {
         this.payStrategy = p;
-        this.paymentMethod = String.valueOf(p.pay());
     }
 
     public Orders() {

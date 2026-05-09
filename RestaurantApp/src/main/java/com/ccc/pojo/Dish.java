@@ -71,6 +71,8 @@ public class Dish implements Serializable {
     @Size(min = 1, max = 65535)
     @Column(name = "material")
     private String material;
+    @Column(name = "active")
+    private Boolean active = true;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -91,71 +93,6 @@ public class Dish implements Serializable {
     @OneToMany(mappedBy = "dishId")
     private Set<OrderDetail> orderDetailSet;
 
-    public Dish() {
-    }
-
-    public Dish(Integer id) {
-        this.id = id;
-    }
-
-    public Dish(Integer id, String name, String description, String image, int timePrepare, String material) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.image = image;
-        this.timePrepare = timePrepare;
-        this.material = material;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
-
-    public Category getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Category categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public User getUserId() {
-        return userId;
-    }
-
-    public void setUserId(User userId) {
-        this.userId = userId;
-    }
-
-    public Set<Rating> getRatingSet() {
-        return ratingSet;
-    }
-
-    public void setRatingSet(Set<Rating> ratingSet) {
-        this.ratingSet = ratingSet;
-    }
-
-    public Set<OrderDetail> getOrderDetailSet() {
-        return orderDetailSet;
-    }
-
-    public void setOrderDetailSet(Set<OrderDetail> orderDetailSet) {
-        this.orderDetailSet = orderDetailSet;
-    }
 
     @Override
     public int hashCode() {
@@ -180,45 +117,5 @@ public class Dish implements Serializable {
     @Override
     public String toString() {
         return "com.ccc.pojo.Dish[ id=" + id + " ]";
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public int getTimePrepare() {
-        return timePrepare;
-    }
-
-    public void setTimePrepare(int timePrepare) {
-        this.timePrepare = timePrepare;
-    }
-
-    public String getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(String material) {
-        this.material = material;
     }
 }
