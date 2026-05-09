@@ -21,6 +21,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
@@ -28,6 +32,10 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "dish")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @NamedQueries({
     @NamedQuery(name = "Dish.findAll", query = "SELECT d FROM Dish d"),
     @NamedQuery(name = "Dish.findById", query = "SELECT d FROM Dish d WHERE d.id = :id"),
@@ -213,5 +221,4 @@ public class Dish implements Serializable {
     public void setMaterial(String material) {
         this.material = material;
     }
-    
 }
