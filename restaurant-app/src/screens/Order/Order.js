@@ -1,5 +1,6 @@
 import {useContext} from "react";
 import {MyOrderContext} from "../../utils/contexts/MyOrderContext";
+import {MyUserContext} from "../../utils/contexts/MyUserContext";
 import {
   Alert,
   Button,
@@ -19,12 +20,20 @@ import {
   WalletOutlined,
 } from "@ant-design/icons";
 import "./Order.css";
+import {Link, useNavigate} from "react-router-dom";
+import cookies from "react-cookies";
+import {authApis, endpoints} from "../../configs/Apis";
+import {message} from "antd";
+
 const Order = () => {
   const {cart, dispatch} = useContext(MyOrderContext);
+  const {user} = useContext(MyUserContext);
   const total = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
+
+  const nav = useNavigate();
 
   const handleUpdateToCart = (id, quantity) => {
     const qty = parseInt(quantity);
@@ -52,22 +61,43 @@ const Order = () => {
     }
   };
 
-  const handleCheckout = (paymentMethod) => {
-    // Tùy vào phương thức mà bạn sẽ gọi API tương ứng
+  const pay = async (paymentMethod) => {
+    try {
+      const token = cookies.load("token");
+      const orderData = {
+        paymentMethod: paymentMethod,
+        items: cart,
+      };
+      // console.log(orderData);
+      // return null;
+      let res = await authApis(token).post(endpoints["add-order"], orderData);
+      return res.data;
+    } catch (error) {
+      console.error("Lỗi thanh toán:", error);
+      message.error("Có lỗi xảy ra khi tạo đơn hàng.");
+      return null;
+    }
+  };
+
+  const handleCheckout = async (paymentMethod) => {
+    const result = await pay(paymentMethod);
+    if (!result) return;
     switch (paymentMethod) {
       case "CASH":
-        alert(
-          "Thanh toán Tiền mặt: Đặt hàng thành công! Vui lòng chuẩn bị tiền mặt khi nhận hàng.",
-        );
-        // Gửi API tạo đơn hàng (Status: PENDING)
+        dispatch({
+          type: "CLEAR_CART",
+        });
+        await nav(`/thank-you?orderId=${result}`);
         break;
       case "MOMO":
-        alert("Chuyển hướng đến cổng thanh toán MoMo...");
-        // Gọi API lấy link thanh toán MoMo và window.location.href = link
+        if (result.startsWith("http")) {
+          window.location.href = result;
+        } else {
+          message.error("Lỗi lấy link thanh toán MoMo");
+        }
         break;
       case "ZALOPAY":
-        alert("Chuyển hướng đến cổng thanh toán ZaloPay...");
-        // Gọi API lấy link thanh toán ZaloPay
+        message.success("Chức năng zalo pay sẽ sớm được ra mắt");
         break;
       default:
         break;
@@ -199,46 +229,59 @@ const Order = () => {
                 </span>
               </div>
 
-              <Dropdown className="d-grid">
-                <Dropdown.Toggle
-                  size="medium"
-                  className="rounded-pill fw-bold text-white btn-checkout shadow border-0"
-                  id="dropdown-payment"
-                >
-                  ĐẶT HÀNG NGAY
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu
-                  className="w-100 shadow-lg border-0 rounded-4 mt-2 p-2"
-                  style={{zIndex: 9999}}
-                >
-                  <Dropdown.Item
-                    onClick={() => handleCheckout("CASH")}
-                    className="py-3 rounded-3 fw-semibold text-dark mb-1 d-flex align-items-center"
+              {!user ? (
+                <>
+                  <Button
+                    as={Link}
+                    to="/login?next=/order"
+                    className="w-100 rounded-pill fw-bold text-white btn-checkout shadow border-0"
                   >
-                    <WalletOutlined /> Tiền mặt
-                  </Dropdown.Item>
-
-                  <Dropdown.Item
-                    onClick={() => handleCheckout("MOMO")}
-                    className="py-3 rounded-3 fw-semibold mb-1 d-flex align-items-center"
-                    style={{
-                      color: "#a50064",
-                    }} /* Màu tím hồng đặc trưng của MoMo */
+                    ĐĂNG NHẬP ĐỂ ĐẶT HÀNG
+                  </Button>
+                </>
+              ) : (
+                <Dropdown className="d-grid">
+                  <Dropdown.Toggle
+                    size="medium"
+                    className="rounded-pill fw-bold text-white btn-checkout shadow border-0"
+                    id="dropdown-payment"
                   >
-                    <CreditCardOutlined /> Ví điện tử MoMo
-                  </Dropdown.Item>
+                    ĐẶT HÀNG NGAY
+                  </Dropdown.Toggle>
 
-                  <Dropdown.Item
-                    onClick={() => handleCheckout("ZALOPAY")}
-                    className="py-3 rounded-3 fw-semibold text-primary d-flex align-items-center"
+                  <Dropdown.Menu
+                    className="w-100 shadow-lg border-0 rounded-4 mt-2 p-2"
+                    style={{zIndex: 9999}}
                   >
-                    <QrcodeOutlined /> Ví ZaloPay
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
+                    <Dropdown.Item
+                      onClick={() => handleCheckout("CASH")}
+                      className="py-3 rounded-3 fw-semibold text-dark mb-1 d-flex align-items-center"
+                    >
+                      <WalletOutlined /> Tiền mặt
+                    </Dropdown.Item>
+
+                    <Dropdown.Item
+                      onClick={() => handleCheckout("MOMO")}
+                      className="py-3 rounded-3 fw-semibold mb-1 d-flex align-items-center"
+                      style={{
+                        color: "#a50064",
+                      }} /* Màu tím hồng đặc trưng của MoMo */
+                    >
+                      <CreditCardOutlined /> Ví điện tử MoMo
+                    </Dropdown.Item>
+
+                    <Dropdown.Item
+                      onClick={() => handleCheckout("ZALOPAY")}
+                      className="py-3 rounded-3 fw-semibold text-primary d-flex align-items-center"
+                    >
+                      <QrcodeOutlined /> Ví ZaloPay
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              )}
+
               <div className="text-center mt-3 text-muted small">
-                <i className="fas fa-shield-alt"></i> Thanh toán an toàn & bảo
+                <i className="fas fa-shield-alt"></i> Thanh toán an toàn &amp; bảo
                 mật
               </div>
             </Card>

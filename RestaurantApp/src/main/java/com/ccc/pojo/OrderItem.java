@@ -10,34 +10,22 @@ package com.ccc.pojo;
  */
 public class OrderItem {
     private int id;
-    private Long price;
+    private int price;
     private int quantity;
 
-    /**
-     * @return the id
-     */
-    public int getId() {
-        return id;
-    }
 
-    /**
-     * @param id the id to set
-     */
-    public void setId(int id) {
-        this.id = id;
-    }
 
     /**
      * @return the price
      */
-    public Long getPrice() {
+    public int getPrice() {
         return price;
     }
 
     /**
      * @param price the price to set
      */
-    public void setPrice(Long price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 
@@ -53,6 +41,17 @@ public class OrderItem {
      */
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    /**
+     * @return the dishId
+     */
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int Id) {
+        this.id = Id;
     }
     
 }

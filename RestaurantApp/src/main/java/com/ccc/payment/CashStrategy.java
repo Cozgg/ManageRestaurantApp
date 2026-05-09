@@ -4,15 +4,18 @@
  */
 package com.ccc.payment;
 
+import org.springframework.stereotype.Component;
+
 /**
  *
  * @author Admin
  */
+@Component("CASH")
 public class CashStrategy implements PaymentStrategy{
 
     @Override
-    public PaymentMethod pay() {
-        return PaymentMethod.CASH;
+    public String pay(String orderId, long amount) {
+        return orderId;
     }
     
 }

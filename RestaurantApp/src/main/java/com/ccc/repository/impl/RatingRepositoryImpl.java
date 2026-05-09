@@ -4,8 +4,8 @@
  */
 package com.ccc.repository.impl;
 
-import com.ccc.pojo.Category;
-import com.ccc.repository.CategoryRepository;
+import com.ccc.pojo.Rating;
+import com.ccc.repository.RatingRepository;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -20,34 +20,23 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
-public class CategoryRepositoryImpl implements CategoryRepository{
+public class RatingRepositoryImpl implements RatingRepository {
+
     @Autowired
     private LocalSessionFactoryBean factory;
+
     @Override
-    public List<Category> getCates() {
+    public Rating addRating(Rating r) {
         Session s = this.factory.getObject().getCurrentSession();
-        Query q = s.createNamedQuery("Category.findAll", Category.class);
+        s.persist(r);
+        return r;
+    }
+
+    @Override
+    public List<Rating> getRatingsByDishId(int dishId) {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query q = s.createQuery("SELECT r FROM Rating r WHERE r.dishId.id = :dishId ORDER BY r.createdAt DESC", Rating.class);
+        q.setParameter("dishId", dishId);
         return q.getResultList();
-    }
-
-    @Override
-    public void addOrUpdate(Category c) {
-        Session s = this.factory.getObject().getCurrentSession();
-        s.merge(c);
-    }
-
-    @Override
-    public void delete(int id) {
-        Session s = this.factory.getObject().getCurrentSession();
-        Category c = this.getById(id);
-        if (c != null) {
-            s.remove(c);
-        }
-    }
-
-    @Override
-    public Category getById(int id) {
-        Session s = this.factory.getObject().getCurrentSession();
-        return s.get(Category.class, id);
     }
 }

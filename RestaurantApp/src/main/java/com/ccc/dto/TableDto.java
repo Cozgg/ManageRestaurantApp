@@ -17,7 +17,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDto {
-    private int id;
-    private String name;
-}
+public class TableDto {
+    private Integer id;
+    private String tableNumber;
+    private Integer capacity;
+    private String location;
+    private Boolean active;
+}           
