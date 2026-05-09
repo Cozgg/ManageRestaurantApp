@@ -38,6 +38,13 @@ public class RestaurantTable implements Serializable {
     @Size(min = 1, max = 10)
     @Column(name = "table_number")
     private String tableNumber;
+    
+    @Size(max = 100)
+    @Column(name = "location")
+    private String location;
+    
+    @Column(name = "active")
+    private Boolean active = true;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -118,6 +125,34 @@ public class RestaurantTable implements Serializable {
     @Override
     public String toString() {
         return "com.ccc.pojo.RestaurantTable[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the location
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * @param location the location to set
+     */
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    /**
+     * @return the active
+     */
+    public Boolean getActive() {
+        return active;
+    }
+
+    /**
+     * @param active the active to set
+     */
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     
