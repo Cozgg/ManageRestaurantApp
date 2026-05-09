@@ -10,8 +10,11 @@ import java.util.List;
 
 /**
  *
- * @author Admin
+ * @author Admin    
  */
 public interface CategoryService {
     List<CategoryDto> getCates();
+    CategoryDto addCategory(java.util.Map<String, String> params);
+    CategoryDto updateCategory(int id, java.util.Map<String, String> params);
+    boolean deleteCategory(int id);
 }
