@@ -24,4 +24,14 @@ public class StatServiceImpl implements StatService {
     public List<Object[]> statsRevenueByTime(String time, int year) {
         return this.statRepo.statsRevenueByTime(time, year);
     }
+
+    @Override
+    public List<Object[]> statsTopDishes(int top) {
+        return this.statRepo.statsTopDishes(top);
+    }
+
+    @Override
+    public List<Object[]> statsReservationsByTime(String time, int year) {
+        return this.statRepo.statsReservationsByTime(time, year);
+    }
 }

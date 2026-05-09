@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  *
@@ -30,6 +31,20 @@ public class ApiStatController {
             @RequestParam(value="year", defaultValue = "2026") int year){
         List<Object[]> data = this.statService.statsRevenueByTime(time, year);
         return ResponseEntity.ok(data);
+    }
+
+    @GetMapping("/statistics/dishes")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CHEF')")
+    public ResponseEntity<List<Object[]>> statsTopDishes(@RequestParam(value = "top", defaultValue = "5") int top) {
+        return ResponseEntity.ok(this.statService.statsTopDishes(top));
+    }
+
+    @GetMapping("/statistics/reservations")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Object[]>> statsReservationsByTime(
+            @RequestParam(value = "time", defaultValue = "MONTH") String time,
+            @RequestParam(value = "year", defaultValue = "2026") int year) {
+        return ResponseEntity.ok(this.statService.statsReservationsByTime(time, year));
     }
     
 }
