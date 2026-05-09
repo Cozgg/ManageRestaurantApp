@@ -1,0 +1,56 @@
+/* --- ThankYou.css --- */
+
+/* Hiệu ứng gradient mượt mà cho icon Thành công */
+.success-icon-container {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e6fcf5; /* Màu nền Success nhạt */
+    margin: 0 auto 30px;
+}
+
+.success-icon-container i {
+    font-size: 4rem;
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Biểu tượng Thất bại */
+.error-icon-container {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #fdf2f2; /* Màu nền Danger nhạt */
+    margin: 0 auto 30px;
+}
+
+.error-icon-container i {
+    font-size: 4rem;
+    color: #e74c3c;
+}
+
+/* Bo góc và bóng đổ cho các khối chi tiết */
+.details-box {
+    background-color: #f8f9fa;
+    border-radius: 1rem;
+    padding: 20px;
+}
+
+/* Làm nổi bật nút Thanh toán */
+.btn-checkout-history {
+    background: linear-gradient(135deg, #198754, #146c43) !important;
+    border: none !important;
+    transition: transform 0.2s;
+}
+
+.btn-checkout-history:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(25, 135, 84, 0.4);
+}

@@ -42,8 +42,7 @@ import java.util.Set;
     @NamedQuery(name = "Orders.findByCreatedAt", query = "SELECT o FROM Orders o WHERE o.createdAt = :createdAt"),
     @NamedQuery(name = "Orders.findByPaymentMethod", query = "SELECT o FROM Orders o WHERE o.paymentMethod = :paymentMethod"),
     @NamedQuery(name = "Orders.findByTotalPrice", query = "SELECT o FROM Orders o WHERE o.totalPrice = :totalPrice"),
-    @NamedQuery(name = "Orders.findByStatusPay", query = "SELECT o FROM Orders o WHERE o.statusPay = :statusPay"),
-    @NamedQuery(name = "Orders.findByStatusOrder", query = "SELECT o FROM Orders o WHERE o.statusOrder = :statusOrder")})
+    @NamedQuery(name = "Orders.findByStatusPay", query = "SELECT o FROM Orders o WHERE o.statusPay = :statusPay")})
 @JsonIgnoreProperties(value = {"orderDetailSet"})
 public class Orders implements Serializable {
 
@@ -56,6 +55,9 @@ public class Orders implements Serializable {
     @Size(max = 9)
     @Column(name = "status_order")
     private String statusOrder;
+    @Size(max = 45)
+    @Column(name = "transaction_id")
+    private String transactionId;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -76,13 +78,15 @@ public class Orders implements Serializable {
     private User userId;
     @OneToMany(mappedBy = "orderId")
     private Set<OrderDetail> orderDetailSet;
+
     @Transient
     private PaymentStrategy payStrategy;
-    
-    public void setStrategy(PaymentStrategy p){
+
+    public void setStrategy(PaymentStrategy p) {
         this.payStrategy = p;
-        this.paymentMethod =  String.valueOf(p.pay());
+        this.paymentMethod = String.valueOf(p.pay());
     }
+
     public Orders() {
     }
 
@@ -128,14 +132,6 @@ public class Orders implements Serializable {
 
     public void setStatusPay(String statusPay) {
         this.statusPay = statusPay;
-    }
-
-    public String getStatusOrder() {
-        return statusOrder;
-    }
-
-    public void setStatusOrder(String statusOrder) {
-        this.statusOrder = statusOrder;
     }
 
     public Reservation getReservationId() {
@@ -193,5 +189,20 @@ public class Orders implements Serializable {
         this.paymentMethod = paymentMethod;
     }
 
+    public String getStatusOrder() {
+        return statusOrder;
+    }
+
+    public void setStatusOrder(String statusOrder) {
+        this.statusOrder = statusOrder;
+    }
+
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
     
 }

@@ -77,7 +77,6 @@ public class User implements Serializable {
     @Column(name = "user_role")
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
-    
     @Column(name = "active")
     private Boolean active = false;
 
@@ -234,7 +233,6 @@ public class User implements Serializable {
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
     }
-
     /**
      * @return the active
      */
