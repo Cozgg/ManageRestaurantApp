@@ -118,4 +118,46 @@ public class Dish implements Serializable {
     public String toString() {
         return "com.ccc.pojo.Dish[ id=" + id + " ]";
     }
+
+
+    public int getTimePrepare() {
+        return timePrepare;
+    }
+
+    public void setTimePrepare(int timePrepare) {
+        this.timePrepare = timePrepare;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+
+    public String getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(String material) {
+        this.material = material;
+    }
 }

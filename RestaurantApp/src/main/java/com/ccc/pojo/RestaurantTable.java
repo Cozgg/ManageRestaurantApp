@@ -91,4 +91,20 @@ public class RestaurantTable implements Serializable {
     public String toString() {
         return "com.ccc.pojo.RestaurantTable[ id=" + id + " ]";
     }
+
+    public String getTableNumber() {
+        return tableNumber;
+    }
+
+    public void setTableNumber(String tableNumber) {
+        this.tableNumber = tableNumber;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
 }

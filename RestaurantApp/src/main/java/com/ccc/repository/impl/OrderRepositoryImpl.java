@@ -43,7 +43,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Autowired
     private UserRepository userRepo;
-    
+
     @Autowired
     private DishRepository dishRepo;
 
@@ -51,8 +51,8 @@ public class OrderRepositoryImpl implements OrderRepository {
     public Orders addOrder(Orders order, ItemDto items) {
         Session s = this.factory.getObject().getCurrentSession();
         s.persist(order);
-        
-        for(var item : items.getItems()){
+
+        for (var item : items.getItems()) {
             OrderDetail d = new OrderDetail();
             d.setDishId(this.dishRepo.getDishById(item.getId()));
             d.setQuantity(item.getQuantity());
@@ -66,20 +66,22 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public List<Orders> getOrders() {
         Session s = this.factory.getObject().getCurrentSession();
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
         User u = userRepo.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<Orders> cq = b.createQuery(Orders.class);
         Root root = cq.from(Orders.class);
-        if (u.getUserRole() == UserRole.ROLE_ADMIN) {
-            cq.select(root);
-        } else if (u.getUserRole() == UserRole.ROLE_CHEF) {
-            Join<Orders, OrderDetail> orderJoin = root.join("orderDetailSet", JoinType.INNER);
-            Join<OrderDetail, Dish> dishJoin = orderJoin.join("dishId", JoinType.INNER);
-            
-            cq.select(root).distinct(true).where(b.equal(dishJoin.get("userId").get("id"), u.getId()));
+        switch (u.getUserRole()) {
+            case ROLE_ADMIN ->
+                cq.select(root);
+            case ROLE_CHEF -> {
+                Join<Orders, OrderDetail> orderJoin = root.join("orderDetailSet", JoinType.INNER);
+                Join<OrderDetail, Dish> dishJoin = orderJoin.join("dishId", JoinType.INNER);
+
+                cq.select(root).distinct(true).where(b.equal(dishJoin.get("userId").get("id"), u.getId()));
+            }
+            default ->
+                cq.where(b.equal(root.get("userId").get("id"), u.getId()));
         }
-        
         Query q = s.createQuery(cq);
         return q.getResultList();
     }
@@ -112,6 +114,19 @@ public class OrderRepositoryImpl implements OrderRepository {
         o.setStatusPay(status);
         s.merge(o);
     }
-    
+
+    @Override
+    public List<OrderDetail> getOrderDetailsByOrderId(int orderId) {
+        Session s = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<OrderDetail> cq = b.createQuery(OrderDetail.class);
+        Root<OrderDetail> root = cq.from(OrderDetail.class);
+        //eager load luôn data dish, order tránh n+1 query
+        root.fetch("dishId", JoinType.INNER);
+        root.fetch("orderId", JoinType.INNER);
+        cq.select(root).where(b.equal(root.get("orderId").get("id"), orderId));
+
+        return s.createQuery(cq).getResultList();
+    }
 
 }

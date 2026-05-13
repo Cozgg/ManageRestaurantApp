@@ -5,10 +5,10 @@
 package com.ccc.service;
 
 import com.ccc.dto.ItemDto;
+import com.ccc.dto.MomoIpnResponse;
+import com.ccc.dto.OrderDetailDto;
 import com.ccc.dto.OrderDto;
-import com.ccc.pojo.Orders;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -16,9 +16,9 @@ import java.util.Map;
  */
 public interface OrderService {
     List<OrderDto> getOrders();
-    OrderDto getOrderById(int orderId);
+    OrderDetailDto getOrderById(int orderId);
     String addOrder(ItemDto items);
-    boolean verifyMomoSignature(Map<String, Object> payload);
+    boolean verifyMomoSignature(MomoIpnResponse payload);
     void updateOrderStatus(int orderId, String status, Long transId);
     void updateOrderStatus(int orderId, String status);
 }

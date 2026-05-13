@@ -4,10 +4,9 @@
  */
 package com.ccc.dto;
 
-import com.ccc.payment.PaymentMethod;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,12 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrderDto {
-    private Integer id;
-    private Integer userId;
-    private Integer reservationId;
-    private Date createdDate;
-    private String payment;
-    private Integer totalPrice;
-    private String statusPay;
+public class OrderDetailDto {
+    private OrderDto order;
+    private List<OrderItemDto> items;
 }

@@ -22,7 +22,7 @@ const Header = () => {
   const loadCategories = async () => {
     try {
       let res = await Apis.get(endpoints["categories"]);
-      setCategories(res.data);
+      setCategories(res.data || []);
     } catch (error) {
       console.error(error);
     }
@@ -65,7 +65,6 @@ const Header = () => {
               Tất cả món
             </Nav.Link>
 
-            {/* Lặp qua mảng categories để in ra các mục menu */}
             {categories.map((c) => (
               <Nav.Link
                 key={c.id}
