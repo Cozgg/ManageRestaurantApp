@@ -14,6 +14,7 @@ import {MyUserContext} from "./utils/contexts/MyUserContext";
 import MyUserReducer from "./utils/reducers/MyUserReducer";
 import {useReducer} from "react";
 import Profile from "./screens/User/Profile";
+import OrderDetail from "./screens/Order/OrderDetail";
 
 const App = () => {
   const [user, dispatch] = useReducer(MyUserReducer, null);
@@ -30,6 +31,7 @@ const App = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/order-detail/:orderId" element={<OrderDetail />} />
             </Routes>
           </Container>
           <Footer />

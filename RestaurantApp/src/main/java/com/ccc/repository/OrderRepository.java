@@ -5,6 +5,7 @@
 package com.ccc.repository;
 
 import com.ccc.dto.ItemDto;
+import com.ccc.pojo.OrderDetail;
 import com.ccc.pojo.OrderItem;
 import com.ccc.pojo.Orders;
 import java.util.List;
@@ -17,6 +18,7 @@ public interface OrderRepository {
     Orders addOrder(Orders order, ItemDto items);
     List<Orders> getOrders();
     Orders getOrderById(int orderId);
+    List<OrderDetail> getOrderDetailsByOrderId(int orderId);
     void updateOrder(Orders order);
     void updateOrderStatus(int orderId, String status, Long transId);
     void updateOrderStatus(int orderId, String status);

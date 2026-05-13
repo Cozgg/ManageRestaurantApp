@@ -5,6 +5,7 @@
 package com.ccc.controllers;
 
 import com.ccc.dto.ItemDto;
+import com.ccc.dto.OrderDetailDto;
 import com.ccc.dto.OrderDto;
 import com.ccc.pojo.Orders;
 import com.ccc.service.OrderService;
@@ -36,7 +37,7 @@ public class ApiOrderController {
     }
     
     @GetMapping("/secure/orders/{orderId}")
-    public ResponseEntity<OrderDto> getOrderDetail(@PathVariable(value = "orderId") int orderId){
+    public ResponseEntity<OrderDetailDto> getOrderDetail(@PathVariable(value = "orderId") int orderId){
         return new ResponseEntity<>(this.orderService.getOrderById(orderId), HttpStatus.OK);
     }
     
