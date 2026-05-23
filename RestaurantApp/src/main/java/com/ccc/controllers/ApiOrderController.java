@@ -13,7 +13,9 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,6 +47,14 @@ public class ApiOrderController {
     public ResponseEntity<String> addOrder(@RequestBody ItemDto request){
         String url = this.orderService.addOrder(request);
         return new ResponseEntity<>(url, HttpStatus.CREATED);
+    }
+    
+    @CrossOrigin
+    @PatchMapping("/secure/orders/{orderId}")
+    public ResponseEntity<OrderDetailDto> confirmCashOrder(@PathVariable(value = "orderId") int orderId){
+        this.orderService.updateOrderStatus(orderId, "COMPLETED");
+        OrderDetailDto dto = this.orderService.getOrderById(orderId);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
     
 }
