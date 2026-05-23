@@ -9,6 +9,7 @@ export const endpoints = {
   "add-order": "/secure/orders",
   "order-detail": (orderId) => `/secure/orders/${orderId}`,
   "get-orders": "/secure/orders",
+  "confirm-order": (orderId) => `/secure/orders/${orderId}`,
 };
 
 export default axios.create({

@@ -5,6 +5,7 @@ import {useNavigate} from "react-router-dom";
 import {Button, Card, Col, Container, Image, Row, Table} from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 import {authApis, endpoints} from "../../configs/Apis";
+import {message} from "antd";
 const Profile = () => {
   const {user, dispatch} = useContext(MyUserContext);
   const [loading, setLoading] = useState(false);
@@ -17,6 +18,26 @@ const Profile = () => {
       const token = cookies.load("token");
       let res = await authApis(token).get(endpoints["get-orders"]);
       setOrders(res.data || []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmOrder = async (orderId) => {
+    try {
+      setLoading(true);
+      const token = cookies.load("token");
+      let res = await authApis(token).patch(
+        endpoints["confirm-order"](orderId),
+      );
+      if (res.status === 200) {
+        message.success("Xác nhận thanh toán thành công");
+        loadOrders();
+      } else {
+        message.error("Lỗi xác nhận thanh toán");
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -193,14 +214,30 @@ const Profile = () => {
                               {order.totalPrice.toLocaleString("vi-VN")} ₫
                             </td>
                             <td className="text-center align-middle">
-                              <Button
-                                variant="outline-primary"
-                                size="sm"
-                                className="rounded-pill fw-semibold px-3 shadow-sm"
-                                onClick={() => nav(`/order-detail/${order.id}`)}
-                              >
-                                <i className="fas fa-eye me-1"></i> Chi tiết
-                              </Button>
+                              {user.userRole === "ROLE_ADMIN" &&
+                              order.statusPay === "PENDING" ? (
+                                <>
+                                  <Button
+                                    variant="outline-primary"
+                                    size="sm"
+                                    className="rounded-pill fw-semibold px-3 shadow-sm"
+                                    onClick={() => confirmOrder(order.id)}
+                                  >
+                                    Xác nhận thanh toán
+                                  </Button>
+                                </>
+                              ) : (
+                                <Button
+                                  variant="outline-primary"
+                                  size="sm"
+                                  className="rounded-pill fw-semibold px-3 shadow-sm"
+                                  onClick={() =>
+                                    nav(`/order-detail/${order.id}`)
+                                  }
+                                >
+                                  <i className="fas fa-eye me-1"></i> Chi tiết
+                                </Button>
+                              )}
                             </td>
                           </tr>
                         ))

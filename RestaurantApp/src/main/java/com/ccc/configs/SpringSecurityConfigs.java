@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -39,6 +40,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
             "com.ccc.payment"
         }
 )
+@Order(2)
 public class SpringSecurityConfigs {
 
     @Autowired
@@ -56,17 +58,16 @@ public class SpringSecurityConfigs {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(Customizer.withDefaults())
-                .csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/", "/admin", "api/users").hasRole("ADMIN")
-                .requestMatchers("/api/**").permitAll()
-                .anyRequest().authenticated()
+       http.securityMatcher("/admin/**", "/", "/login").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
+                .requestMatchers("/", "/admin").hasRole("ADMIN")
+                .anyRequest().permitAll()
         ).formLogin(form -> form.loginPage("/admin/login") // Đường dẫn tới trang đăng nhập
                 .loginProcessingUrl("/login") // Đường dẫn xử lý POST
                 .defaultSuccessUrl("/", true) // Chuyển hướng khi thành công
                 .failureUrl("/admin/login?error=true") // Chuyển hướng khi thất bại
                 .permitAll()
         ).logout((logout) -> logout.logoutSuccessUrl("/admin/login").permitAll());
+        
         return http.build();
     }
 
@@ -79,23 +80,6 @@ public class SpringSecurityConfigs {
                         "api_secret", "zfwveRcXlclSOKM7mqSU2j0421c",
                         "secure", true));
         return cloudinary;
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        config.setExposedHeaders(List.of("Authorization"));
-        config.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-
-        return source;
     }
 
 }
