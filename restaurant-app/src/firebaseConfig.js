@@ -1,16 +1,16 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
 
-// Firebase configuration
+// Firebase configuration from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyBLevbRWuhTUI115nsQt7dVmzKW7nB1b7Q",
-  authDomain: "restaurant-c36fe.firebaseapp.com",
-  databaseURL: "https://restaurant-c36fe-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "restaurant-c36fe",
-  storageBucket: "restaurant-c36fe.firebasestorage.app",
-  messagingSenderId: "172358272586",
-  appId: "1:172358272586:web:bfb1c58a5d41704161c8b3",
-  measurementId: "G-1ZCH1GJG1W"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase

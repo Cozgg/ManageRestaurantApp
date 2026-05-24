@@ -8,7 +8,7 @@ import MySpinner from '../../components/MySpinner';
 const Chat = () => {
     // 1. LẤY USER TỪ CONTEXT
     const [user] = useContext(MyUserContext);
-    
+
     const [conversations, setConversations] = useState([]);
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -44,9 +44,9 @@ const Chat = () => {
 
     const loadConversations = (userId) => {
         const conversationsRef = ref(database, 'conversations');
-        
+
         conversationsListenerRef.current = conversationsRef;
-        
+
         onValue(conversationsRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -55,8 +55,8 @@ const Chat = () => {
                         id: key,
                         ...value
                     }))
-                    .filter(conv => 
-                        conv.participants && 
+                    .filter(conv =>
+                        conv.participants &&
                         (conv.participants.includes(userId) || conv.participants.includes(userId.toString()))
                     );
                 setConversations(convs);
@@ -68,7 +68,7 @@ const Chat = () => {
 
     const loadUnreadCount = (userId) => {
         const unreadRef = ref(database, `unread/${userId}`);
-        
+
         onValue(unreadRef, (snapshot) => {
             const data = snapshot.val();
             setUnreadCount(data || 0);
@@ -82,7 +82,7 @@ const Chat = () => {
 
         const messagesRef = ref(database, `messages/${conversationId}`);
         messagesListenerRef.current = messagesRef;
-        
+
         onValue(messagesRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -93,7 +93,7 @@ const Chat = () => {
                     }))
                     .sort((a, b) => a.timestamp - b.timestamp);
                 setMessages(msgs);
-                
+
                 if (user) {
                     markAsRead(conversationId, user.id);
                 }
@@ -112,11 +112,11 @@ const Chat = () => {
         if (!newMessage.trim() || !selectedConversation || !user) return;
 
         const conversationId = selectedConversation.id;
-        
+
         try {
             const messagesRef = ref(database, `messages/${conversationId}`);
             const newMessageRef = push(messagesRef);
-            
+
             await set(newMessageRef, {
                 senderId: user.id.toString(),
                 senderName: user.firstName + ' ' + user.lastName,
@@ -166,10 +166,10 @@ const Chat = () => {
     return (
         <Container className="my-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="text-primary fw-bold">💬 Tin nhắn của tôi</h2>
+                <h2 className="text-primary fw-bold">Tin nhắn của tôi</h2>
                 {unreadCount > 0 && <Badge bg="danger" pill fs={5}>{unreadCount} tin nhắn mới</Badge>}
             </div>
-            
+
             <Row>
                 <Col md={4} className="mb-3">
                     <Card className="shadow-sm h-100">
@@ -179,9 +179,9 @@ const Chat = () => {
                                 <ListGroup.Item className="text-muted text-center py-4">Chưa có trò chuyện nào</ListGroup.Item>
                             ) : (
                                 conversations.map((conv) => (
-                                    <ListGroup.Item 
+                                    <ListGroup.Item
                                         key={conv.id}
-                                        action 
+                                        action
                                         active={selectedConversation?.id === conv.id}
                                         onClick={() => {
                                             setSelectedConversation(conv);
@@ -207,14 +207,14 @@ const Chat = () => {
                                 <Card.Header className="bg-primary text-white fw-bold">
                                     Đang chat với: {getOtherUserName(selectedConversation)}
                                 </Card.Header>
-                                
+
                                 <Card.Body style={{ height: '50vh', overflowY: 'auto', backgroundColor: '#f8f9fa' }}>
                                     {messages.length === 0 ? (
                                         <div className="text-center text-muted mt-5">Hãy gửi lời chào!</div>
                                     ) : (
                                         messages.map((msg) => (
                                             <div key={msg.id} className={`d-flex mb-3 ${msg.senderId === user.id.toString() ? 'justify-content-end' : 'justify-content-start'}`}>
-                                                <div 
+                                                <div
                                                     className={`p-3 rounded-4 shadow-sm ${msg.senderId === user.id.toString() ? 'bg-primary text-white' : 'bg-white text-dark'}`}
                                                     style={{ maxWidth: '75%' }}
                                                 >
@@ -231,9 +231,9 @@ const Chat = () => {
 
                                 <Card.Footer className="bg-white">
                                     <Form className="d-flex gap-2" onSubmit={(e) => { e.preventDefault(); sendMessage(); }}>
-                                        <Form.Control 
-                                            type="text" 
-                                            placeholder="Nhập tin nhắn..." 
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Nhập tin nhắn..."
                                             value={newMessage}
                                             onChange={(e) => setNewMessage(e.target.value)}
                                         />
@@ -245,7 +245,7 @@ const Chat = () => {
                             </>
                         ) : (
                             <div className="d-flex align-items-center justify-content-center h-100 text-muted">
-                                <h5>👈 Chọn một cuộc trò chuyện để bắt đầu</h5>
+                                <h5>Chọn một cuộc trò chuyện để bắt đầu</h5>
                             </div>
                         )}
                     </Card>
