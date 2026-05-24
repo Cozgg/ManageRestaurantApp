@@ -3,7 +3,6 @@ import Apis, { authApis, endpoints } from "../../configs/Apis";
 import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 import { MyUserContext } from "../../utils/contexts/MyUserContext";
-import { message } from "antd";
 import cookies from "react-cookies";
 
 const Reservation = () => {
@@ -60,12 +59,12 @@ const Reservation = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
-      message.error("Vui lòng đăng nhập để đặt bàn!");
+      alert("Vui lòng đăng nhập để đặt bàn!");
       return;
     }
 
     if (!formData.tableId || !formData.startTime || !formData.endTime) {
-      message.error("Vui lòng chọn bàn và thời gian!");
+      alert("Vui lòng chọn bàn và thời gian!");
       return;
     }
 
@@ -80,7 +79,7 @@ const Reservation = () => {
         userId: user.id,
       };
       let res = await authApis(token).post(endpoints["reservations"], reservationData);
-      message.success("Đặt bàn thành công!");
+      alert("Đặt bàn thành công!");
       setFormData({
         tableId: "",
         startTime: "",
@@ -89,7 +88,8 @@ const Reservation = () => {
       });
       loadReservations();
     } catch (error) {
-      message.error("Đặt bàn thất bại!");
+      const errorMsg = error.response?.data || "Đặt bàn thất bại!";
+      alert(errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -100,10 +100,10 @@ const Reservation = () => {
     try {
       const token = cookies.load("token");
       await authApis(token).delete(endpoints["reservation-detail"](id));
-      message.success("Hủy đặt bàn thành công!");
+      alert("Hủy đặt bàn thành công!");
       loadReservations();
     } catch (error) {
-      message.error("Hủy đặt bàn thất bại!");
+      alert("Hủy đặt bàn thất bại!");
     }
   };
 

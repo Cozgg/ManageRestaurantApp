@@ -5,6 +5,7 @@
 package com.ccc.controllers;
 
 import com.ccc.dto.ReservationDto;
+import com.ccc.dto.TableDto;
 import com.ccc.service.ReservationService;
 import java.util.List;
 import java.util.Map;
@@ -33,13 +34,13 @@ public class ApiReservationController {
     @Autowired
     private ReservationService reservationService;
 
-    @GetMapping("/reservations")
+    @GetMapping("/secure/reservations")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ReservationDto>> list(@RequestParam Map<String, String> params) {
         return new ResponseEntity<>(this.reservationService.getReservations(params), HttpStatus.OK);
     }
 
-    @GetMapping("/reservations/{id}")
+    @GetMapping("/secure/reservations/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ReservationDto> getReservation(@PathVariable int id) {
         ReservationDto r = this.reservationService.getReservationById(id);
@@ -49,19 +50,19 @@ public class ApiReservationController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/reservations/user/{userId}")
+    @GetMapping("/secure/reservations/user/{userId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ReservationDto>> getReservationsByUser(@PathVariable int userId) {
         return new ResponseEntity<>(this.reservationService.getReservationsByUserId(userId), HttpStatus.OK);
     }
 
-    @GetMapping("/reservations/table/{tableId}")
+    @GetMapping("/secure/reservations/table/{tableId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ReservationDto>> getReservationsByTable(@PathVariable int tableId) {
         return new ResponseEntity<>(this.reservationService.getReservationsByTableId(tableId), HttpStatus.OK);
     }
 
-    @PostMapping("/reservations")
+    @PostMapping("/secure/reservations")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ReservationDto> add(@RequestBody Map<String, String> params) {
         ReservationDto r = this.reservationService.addReservation(params);
@@ -71,7 +72,7 @@ public class ApiReservationController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("/reservations/{id}")
+    @PutMapping("/secure/reservations/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ReservationDto> update(@PathVariable int id, @RequestBody Map<String, String> params) {
         ReservationDto r = this.reservationService.updateReservation(id, params);
@@ -81,12 +82,32 @@ public class ApiReservationController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/reservations/{id}")
+    @DeleteMapping("/secure/reservations/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         if (this.reservationService.deleteReservation(id)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/available-tables")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<TableDto>> getAvailableTables(@RequestParam String startTime, @RequestParam String endTime) {
+        return new ResponseEntity<>(this.reservationService.getAvailableTables(startTime, endTime), HttpStatus.OK);
+    }
+
+    @PostMapping("/walk-in")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ReservationDto> createWalkIn(@RequestBody Map<String, String> params) {
+        try {
+            ReservationDto r = this.reservationService.createWalkInReservation(params);
+            if (r != null) {
+                return new ResponseEntity<>(r, HttpStatus.CREATED);
+            }
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }

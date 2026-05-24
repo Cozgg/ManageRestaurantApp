@@ -5,6 +5,7 @@
 package com.ccc.service;
 
 import com.ccc.dto.ReservationDto;
+import com.ccc.dto.TableDto;
 import java.util.List;
 import java.util.Map;
 
@@ -20,4 +21,6 @@ public interface ReservationService {
     ReservationDto getReservationById(int id);
     List<ReservationDto> getReservationsByUserId(int userId);
     List<ReservationDto> getReservationsByTableId(int tableId);
+    List<TableDto> getAvailableTables(String startTime, String endTime);
+    ReservationDto createWalkInReservation(Map<String, String> params);
 }
