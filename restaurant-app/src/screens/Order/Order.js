@@ -1,6 +1,6 @@
-import {useContext} from "react";
-import {MyOrderContext} from "../../utils/contexts/MyOrderContext";
-import {MyUserContext} from "../../utils/contexts/MyUserContext";
+import { useContext, useState } from "react";
+import { MyOrderContext } from "../../utils/contexts/MyOrderContext";
+import { MyUserContext } from "../../utils/contexts/MyUserContext";
 import {
   Alert,
   Button,
@@ -20,14 +20,16 @@ import {
   WalletOutlined,
 } from "@ant-design/icons";
 import "./Order.css";
-import {Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import cookies from "react-cookies";
-import {authApis, endpoints} from "../../configs/Apis";
-import {message} from "antd";
+import { authApis, endpoints } from "../../configs/Apis";
+import { message } from "antd";
+import MySpinner from "../../components/MySpinner";
 
 const Order = () => {
-  const {cart, dispatch} = useContext(MyOrderContext);
-  const {user} = useContext(MyUserContext);
+  const { cart, dispatch } = useContext(MyOrderContext);
+  const { user } = useContext(MyUserContext);
+  const [loading, setLoading] = useState(false);
   const total = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
@@ -62,20 +64,21 @@ const Order = () => {
   };
 
   const pay = async (paymentMethod) => {
+    setLoading(true);
     try {
       const token = cookies.load("token");
       const orderData = {
         paymentMethod: paymentMethod,
         items: cart,
       };
-      // console.log(orderData);
-      // return null;
       let res = await authApis(token).post(endpoints["add-order"], orderData);
       return res.data;
     } catch (error) {
       console.error("Lỗi thanh toán:", error);
       message.error("Có lỗi xảy ra khi tạo đơn hàng.");
       return null;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,7 +109,7 @@ const Order = () => {
 
   return (
     <Container className="my-5">
-      <h2 className="mb-4 fw-bold" style={{color: "#2c3e50"}}>
+      <h2 className="mb-4 fw-bold" style={{ color: "#2c3e50" }}>
         Giỏ hàng của bạn{" "}
         <span className="text-muted fs-5">({cart ? cart.length : 0} món)</span>
       </h2>
@@ -128,7 +131,7 @@ const Order = () => {
                         src={item.image}
                         alt={item.name}
                         className="rounded-3 shadow-sm w-100"
-                        style={{height: "90px", objectFit: "cover"}}
+                        style={{ height: "90px", objectFit: "cover" }}
                       />
                     </Col>
 
@@ -245,13 +248,14 @@ const Order = () => {
                     size="medium"
                     className="rounded-pill fw-bold text-white btn-checkout shadow border-0"
                     id="dropdown-payment"
+                    disabled={loading}
                   >
-                    ĐẶT HÀNG NGAY
+                    {loading ? <MySpinner /> : "ĐẶT HÀNG NGAY"}
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu
                     className="w-100 shadow-lg border-0 rounded-4 mt-2 p-2"
-                    style={{zIndex: 9999}}
+                    style={{ zIndex: 9999 }}
                   >
                     <Dropdown.Item
                       onClick={() => handleCheckout("CASH")}
@@ -290,7 +294,7 @@ const Order = () => {
       ) : (
         /* TRẠNG THÁI GIỎ HÀNG TRỐNG */
         <div className="text-center py-5 bg-white shadow-sm rounded-4 border">
-          <div className="mb-4" style={{fontSize: "5rem"}}>
+          <div className="mb-4" style={{ fontSize: "5rem" }}>
             🛒
           </div>
           <h4 className="text-muted mb-3 fw-bold">

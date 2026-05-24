@@ -1,6 +1,7 @@
-import {useContext, useEffect, useState} from "react";
-import Apis, {endpoints} from "../configs/Apis";
+import { useContext, useEffect, useState } from "react";
+import Apis, { endpoints } from "../configs/Apis";
 import {
+  Badge,
   Button,
   Container,
   Form,
@@ -8,23 +9,30 @@ import {
   Nav,
   Navbar,
 } from "react-bootstrap";
-import {Link, useNavigate} from "react-router-dom";
-import {MyOrderContext} from "../utils/contexts/MyOrderContext";
-import {MyUserContext} from "../utils/contexts/MyUserContext";
+import { Link, useNavigate } from "react-router-dom";
+import { MyOrderContext } from "../utils/contexts/MyOrderContext";
+import { MyUserContext } from "../utils/contexts/MyUserContext";
+import { useCompare } from "../utils/contexts/CompareContext";
+import MySpinner from "../components/MySpinner";
 
 const Header = () => {
-  const {totalQuantity} = useContext(MyOrderContext);
+  const { totalQuantity } = useContext(MyOrderContext);
   const [categories, setCategories] = useState([]);
-  const {user} = useContext(MyUserContext);
+  const [loading, setLoading] = useState(false);
+  const { user } = useContext(MyUserContext);
+  const { state: compareState } = useCompare();
   // const [kw, setKw] = useState("");
   const nav = useNavigate();
 
   const loadCategories = async () => {
+    setLoading(true);
     try {
       let res = await Apis.get(endpoints["categories"]);
       setCategories(res.data);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,9 +56,9 @@ const Header = () => {
           as={Link}
           to="/"
           className="fw-bold fs-3 d-flex align-items-center gap-2"
-          style={{color: "#27ae60"}}
+          style={{ color: "#27ae60" }}
         >
-          🍽️ <span>eRestaurant</span>
+          <span>eRestaurant</span>
         </Navbar.Brand>
 
         <Navbar.Toggle
@@ -80,11 +88,33 @@ const Header = () => {
 
           <div className="d-flex align-items-center mt-3 mt-lg-0 gap-3 flex-wrap">
             <Button
+              variant="outline-warning"
+              onClick={() => nav("/reservation")}
+              className="rounded-pill px-3 fw-bold shadow-sm"
+            >
+              Đặt bàn
+            </Button>
+            <Button
+              variant="outline-primary"
+              onClick={() => nav("/compare")}
+              className="rounded-pill px-3 fw-bold shadow-sm position-relative"
+            >
+              So sánh
+              {compareState.compareList.length > 0 && (
+                <Badge
+                  bg="danger"
+                  className="position-absolute top-0 start-100 translate-middle rounded-pill"
+                >
+                  {compareState.compareList.length}
+                </Badge>
+              )}
+            </Button>
+            <Button
               variant="outline-success"
               onClick={() => nav("/order")}
               className="rounded-pill px-4 fw-bold shadow-sm"
             >
-              🛒 Giỏ hàng ({totalQuantity})
+              Giỏ hàng ({totalQuantity})
             </Button>
             {user ? (
               <Button

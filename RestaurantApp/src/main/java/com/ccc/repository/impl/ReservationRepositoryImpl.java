@@ -1,0 +1,112 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.ccc.repository.impl;
+
+import com.ccc.pojo.Reservation;
+import com.ccc.repository.ReservationRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ *
+ * @author Admin
+ */
+@Repository
+@Transactional
+public class ReservationRepositoryImpl implements ReservationRepository {
+
+    @Autowired
+    private LocalSessionFactoryBean factory;
+
+    @Override
+    public List<Reservation> getReservations(Map<String, String> params) {
+        Session s = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<Reservation> q = b.createQuery(Reservation.class);
+        Root<Reservation> root = q.from(Reservation.class);
+        q.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+        if (params != null) {
+            String userId = params.get("userId");
+            if (userId != null && !userId.isEmpty()) {
+                predicates.add(b.equal(root.get("userId").get("id"), Integer.parseInt(userId)));
+            }
+
+            String tableId = params.get("tableId");
+            if (tableId != null && !tableId.isEmpty()) {
+                predicates.add(b.equal(root.get("tableId").get("id"), Integer.parseInt(tableId)));
+            }
+
+            String status = params.get("status");
+            if (status != null && !status.isEmpty()) {
+                predicates.add(b.equal(root.get("status"), status));
+            }
+        }
+        q.where(predicates.toArray(Predicate[]::new));
+        q.orderBy(b.desc(root.get("createdAt")));
+
+        Query query = s.createQuery(q);
+        return query.getResultList();
+    }
+
+    @Override
+    public void addOrUpdate(Reservation r) {
+        Session s = this.factory.getObject().getCurrentSession();
+        s.merge(r);
+    }
+
+    @Override
+    public void delete(int id) {
+        Session s = this.factory.getObject().getCurrentSession();
+        Reservation r = this.getById(id);
+        if (r != null) {
+            s.remove(r);
+        }
+    }
+
+    @Override
+    public Reservation getById(int id) {
+        Session s = this.factory.getObject().getCurrentSession();
+        return s.get(Reservation.class, id);
+    }
+
+    @Override
+    public List<Reservation> getReservationsByUserId(int userId) {
+        Session s = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<Reservation> q = b.createQuery(Reservation.class);
+        Root<Reservation> root = q.from(Reservation.class);
+        q.select(root);
+        q.where(b.equal(root.get("userId").get("id"), userId));
+        q.orderBy(b.desc(root.get("createdAt")));
+        Query query = s.createQuery(q);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Reservation> getReservationsByTableId(int tableId) {
+        Session s = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<Reservation> q = b.createQuery(Reservation.class);
+        Root<Reservation> root = q.from(Reservation.class);
+        q.select(root);
+        q.where(b.equal(root.get("tableId").get("id"), tableId));
+        q.orderBy(b.desc(root.get("createdAt")));
+        Query query = s.createQuery(q);
+        return query.getResultList();
+    }
+}

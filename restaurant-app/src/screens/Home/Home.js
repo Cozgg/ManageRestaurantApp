@@ -1,5 +1,5 @@
-import {useContext, useEffect, useState} from "react";
-import Apis, {endpoints} from "../../configs/Apis";
+import { useContext, useEffect, useState } from "react";
+import Apis, { endpoints } from "../../configs/Apis";
 import {
   Alert,
   Badge,
@@ -12,11 +12,13 @@ import {
   Row,
 } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
-import {useSearchParams} from "react-router-dom";
-import {MyOrderContext} from "../../utils/contexts/MyOrderContext";
+import { useSearchParams } from "react-router-dom";
+import { MyOrderContext } from "../../utils/contexts/MyOrderContext";
+import { useCompare } from "../../utils/contexts/CompareContext";
 
 const Home = () => {
-  const {dispatch} = useContext(MyOrderContext);
+  const { dispatch } = useContext(MyOrderContext);
+  const { state: compareState, dispatch: compareDispatch } = useCompare();
   const [dishes, setDishes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -64,6 +66,17 @@ const Home = () => {
     });
   };
 
+  const handleAddToCompare = (dish) => {
+    compareDispatch({
+      type: "ADD_TO_COMPARE",
+      payload: dish,
+    });
+  };
+
+  const isInCompare = (dishId) => {
+    return compareState.compareList.some((d) => d.id === dishId);
+  };
+
   useEffect(() => {
     let timer = setTimeout(() => {
       loadDishes();
@@ -103,7 +116,7 @@ const Home = () => {
             className="text-center rounded-4 shadow-sm py-4 border-0"
           >
             <h5 className="mb-0 text-muted">
-              🍽️ Rất tiếc, không tìm thấy món ăn nào phù hợp!
+              Rất tiếc, không tìm thấy món ăn nào phù hợp!
             </h5>
           </Alert>
         )}
@@ -117,7 +130,7 @@ const Home = () => {
                     variant="top"
                     src={d.image}
                     alt={d.name}
-                    style={{height: "200px", objectFit: "cover"}}
+                    style={{ height: "200px", objectFit: "cover" }}
                   />
 
                   <Badge
@@ -125,7 +138,7 @@ const Home = () => {
                     text="dark"
                     className="position-absolute top-0 end-0 m-2 px-2 py-1 shadow-sm"
                   >
-                    ⏱ {d.timePrepare} phút
+                    {d.timePrepare} phút
                   </Badge>
                 </div>
 
@@ -163,18 +176,28 @@ const Home = () => {
                       </span>
                       <span
                         className="text-muted small"
-                        style={{fontSize: "0.8rem"}}
+                        style={{ fontSize: "0.8rem" }}
                       >
-                        👨‍🍳 {d.user.lastName} {d.user.firstName}
+                        {d.user.lastName} {d.user.firstName}
                       </span>
                     </div>
-                    <Button
-                      variant="success"
-                      className="w-100 rounded-pill fw-bold shadow-sm"
-                      onClick={() => handleAddToCart(d)}
-                    >
-                      🛒 Thêm vào giỏ
-                    </Button>
+                    <div className="d-flex gap-2">
+                      <Button
+                        variant="success"
+                        className="flex-grow-1 rounded-pill fw-bold shadow-sm"
+                        onClick={() => handleAddToCart(d)}
+                      >
+                        Thêm
+                      </Button>
+                      <Button
+                        variant={isInCompare(d.id) ? "secondary" : "outline-primary"}
+                        className="rounded-pill fw-bold shadow-sm"
+                        onClick={() => handleAddToCompare(d)}
+                        disabled={isInCompare(d.id)}
+                      >
+                        {isInCompare(d.id) ? "Đã so sánh" : "So sánh"}
+                      </Button>
+                    </div>
                   </div>
                 </Card.Body>
               </Card>
@@ -191,7 +214,7 @@ const Home = () => {
                 className="rounded-pill px-5 py-2 fw-bold shadow-sm"
                 onClick={loadMore}
               >
-                👇 Xem thêm món ngon
+                Xem thêm món ngon
               </Button>
             )}
           </div>

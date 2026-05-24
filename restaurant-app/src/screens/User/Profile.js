@@ -1,11 +1,11 @@
-import {useContext, useEffect, useState} from "react";
-import {MyUserContext} from "../../utils/contexts/MyUserContext";
+import { useContext, useEffect, useState } from "react";
+import { MyUserContext } from "../../utils/contexts/MyUserContext";
 import cookies from "react-cookies";
-import {useNavigate} from "react-router-dom";
-import {Button, Card, Col, Container, Image, Row} from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { Button, Card, Col, Container, Image, Row } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 const Profile = () => {
-  const {user, dispatch} = useContext(MyUserContext);
+  const { user, dispatch } = useContext(MyUserContext);
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
 
@@ -20,16 +20,17 @@ const Profile = () => {
 
   if (!user) {
     return (
-      <Container className="mt-5 text-center">Đang tải dữ liệu...</Container>
+      <Container className="mt-5 text-center">
+        <MySpinner />
+      </Container>
     );
   }
 
   return (
     <Container className="my-5 d-flex justify-content-center">
-      {!user && <MySpinner></MySpinner>}
       <Card
         className="shadow-lg border-0 rounded-4"
-        style={{maxWidth: "600px", width: "100%"}}
+        style={{ maxWidth: "600px", width: "100%" }}
       >
         <Card.Body className="p-4 text-center">
           <h2 className="fw-bold mb-4 text-success">Thông tin cá nhân</h2>
@@ -38,7 +39,7 @@ const Profile = () => {
             src={user.avatar || "https://via.placeholder.com/150"}
             roundedCircle
             className="mb-3 border border-3 border-success p-1"
-            style={{width: "150px", height: "150px", objectFit: "cover"}}
+            style={{ width: "150px", height: "150px", objectFit: "cover" }}
           />
 
           <h3 className="fw-bold mb-1">
