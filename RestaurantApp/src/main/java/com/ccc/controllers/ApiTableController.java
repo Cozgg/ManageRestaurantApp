@@ -33,25 +33,21 @@ public class ApiTableController {
     private TableService tableService;
 
     @GetMapping("/tables")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<com.ccc.dto.TableDto>> list(@RequestParam Map<String, String> params) {
         return new ResponseEntity<>(this.tableService.getTables(params), HttpStatus.OK);
     }
 
     @PostMapping("/tables")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<com.ccc.dto.TableDto> add(@RequestParam Map<String, String> params) {
         return new ResponseEntity<>(this.tableService.addTable(params), HttpStatus.CREATED);
     }
 
     @PatchMapping("/tables/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<com.ccc.dto.TableDto> update(@PathVariable int id, @RequestParam Map<String, String> params) {
         return new ResponseEntity<>(this.tableService.updateTable(id, params), HttpStatus.OK);
     }
 
     @DeleteMapping("/tables/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

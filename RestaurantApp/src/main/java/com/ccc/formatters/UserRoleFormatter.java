@@ -4,7 +4,7 @@
  */
 package com.ccc.formatters;
 
-import com.ccc.pojo.UserRole;
+import com.ccc.enums.UserRole;
 import java.text.ParseException;
 import java.util.Locale;
 import org.springframework.format.Formatter;

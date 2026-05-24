@@ -5,6 +5,7 @@
 package com.ccc.configs;
 
 import com.ccc.filters.JwtFilter;
+import com.ccc.filters.RateLimitFilter;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,7 +36,8 @@ public class ApiSecurityConfigs {
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/secure/**").authenticated()
                 .anyRequest().permitAll()
-                ).addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class);
+                ).addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new RateLimitFilter(), JwtFilter.class);
 
         return http.build();
     }

@@ -5,13 +5,13 @@
 package com.ccc.repository.impl;
 
 import com.ccc.dto.ItemDto;
-import com.ccc.payment.PaymentMethod;
+import com.ccc.enums.PaymentMethod;
 import com.ccc.pojo.Dish;
 import com.ccc.pojo.OrderDetail;
 import com.ccc.pojo.OrderItem;
 import com.ccc.pojo.Orders;
 import com.ccc.pojo.User;
-import com.ccc.pojo.UserRole;
+import com.ccc.enums.UserRole;
 import com.ccc.repository.DishRepository;
 import com.ccc.repository.OrderRepository;
 import com.ccc.repository.UserRepository;

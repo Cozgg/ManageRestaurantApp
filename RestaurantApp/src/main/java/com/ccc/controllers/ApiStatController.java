@@ -34,13 +34,11 @@ public class ApiStatController {
     }
 
     @GetMapping("/statistics/dishes")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('CHEF')")
     public ResponseEntity<List<Object[]>> statsTopDishes(@RequestParam(value = "top", defaultValue = "5") int top) {
         return ResponseEntity.ok(this.statService.statsTopDishes(top));
     }
 
     @GetMapping("/statistics/reservations")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Object[]>> statsReservationsByTime(
             @RequestParam(value = "time", defaultValue = "MONTH") String time,
             @RequestParam(value = "year", defaultValue = "2026") int year) {
