@@ -72,13 +72,12 @@ public class User implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "avatar")
     private String avatar;
-    // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
     @Size(max = 10)
     @Column(name = "user_role")
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
     @Column(name = "active")
-    private Boolean active = false;
+    private Boolean active;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -193,6 +192,19 @@ public class User implements Serializable {
     public String toString() {
         return "com.ccc.pojo.User[ id=" + id + " ]";
     }
+    
+    public UserRole getUserRole() {
+        return userRole;
+    }
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
+    public Boolean getActive() {
+        return active;
+    }
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 
     public String getUsername() {
         return username;
@@ -201,14 +213,21 @@ public class User implements Serializable {
     public void setUsername(String username) {
         this.username = username;
     }
-
+    /**
+     * @return the active
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * @param active the active to set
+     */
     public void setPassword(String password) {
         this.password = password;
     }
+
+    
 
     public String getPhone() {
         return phone;
@@ -226,25 +245,4 @@ public class User implements Serializable {
         this.avatar = avatar;
     }
 
-    public UserRole getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(UserRole userRole) {
-        this.userRole = userRole;
-    }
-    /**
-     * @return the active
-     */
-    public Boolean getActive() {
-        return active;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-    
 }

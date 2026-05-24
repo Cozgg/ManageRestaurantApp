@@ -173,7 +173,6 @@ public class Reservation implements Serializable {
         return "com.ccc.pojo.Reservation[ id=" + id + " ]";
     }
 
-
     public String getStatus() {
         return status;
     }

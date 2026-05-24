@@ -5,9 +5,13 @@
 package com.ccc.service.impl;
 
 import com.ccc.dto.ItemDto;
+import com.ccc.dto.MomoIpnResponse;
+import com.ccc.dto.OrderDetailDto;
 import com.ccc.dto.OrderDto;
+import com.ccc.dto.OrderItemDto;
 import com.ccc.payment.PaymentMethod;
 import com.ccc.payment.PaymentStrategy;
+import com.ccc.pojo.OrderDetail;
 import com.ccc.pojo.Orders;
 import com.ccc.repository.OrderRepository;
 import com.ccc.repository.UserRepository;
@@ -19,10 +23,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  *
@@ -51,35 +55,35 @@ public class OrderServiceImpl implements OrderService {
         List<Orders> orders = this.orderRepo.getOrders();
 
         return orders.stream().map(o -> {
-            OrderDto odto = new OrderDto();
-            odto.setId(o.getId());
-            odto.setUserId(o.getUserId().getId());
-            odto.setReservationId(o.getReservationId().getId());
-            odto.setTotalPrice(o.getTotalPrice());
-            odto.setCreatedDate(o.getCreatedAt());
-            if (o.getPaymentMethod() != null) {
-                odto.setPayment(o.getPaymentMethod());
-            }
-            if (o.getStatusPay() != null) {
-                odto.setStatusPay(o.getStatusPay());
-            }
+            OrderDto odto = OrderDto.builder().id(o.getId()).userId(o.getUserId().getId()).totalPrice(o.getTotalPrice())
+                    .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
+                    .reservationId(o.getReservationId() != null
+                            ? o.getReservationId().getId()
+                            : null).build();
 
             return odto;
         }).collect(Collectors.toList());
     }
 
     @Override
-    public OrderDto getOrderById(int orderId) {
-        Orders o = this.orderRepo.getOrderById(orderId);
-        OrderDto dto = new OrderDto();
-        dto.setId(o.getId());
-        dto.setUserId(o.getUserId().getId());
-        dto.setCreatedDate(o.getCreatedAt());
-        dto.setPayment(o.getPaymentMethod());
-        dto.setStatusPay(o.getStatusPay());
-        dto.setTotalPrice(o.getTotalPrice());
-        dto.setReservationId(o.getReservationId() != null ? o.getReservationId().getId() : null);
-        return dto;
+    public OrderDetailDto getOrderById(int orderId) {
+        List<OrderDetail> details = this.orderRepo.getOrderDetailsByOrderId(orderId);
+        if(details != null && !details.isEmpty()){
+            Orders o = details.get(0).getOrderId();
+            OrderDto odto = OrderDto.builder().id(o.getId()).userId(o.getUserId().getId()).totalPrice(o.getTotalPrice())
+                    .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
+                    .reservationId(o.getReservationId() != null ? o.getReservationId().getId() : null).build();
+            
+            List<OrderItemDto> items = details.stream().map(od ->{
+                OrderItemDto itemDto = OrderItemDto.builder().dishId(od.getDishId().getId()).dishImage(od.getDishId().getImage())
+                        .dishName(od.getDishId().getName()).quantity(od.getQuantity()).unitPrice(od.getUnitPrice()).build();
+                return itemDto;
+            }).collect(Collectors.toList());
+            OrderDetailDto dto = OrderDetailDto.builder().order(odto).items(items).build();
+            return dto;
+        }
+        
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy chi tiết đơn hàng cho ID: " + orderId);
     }
 
     @Override
@@ -110,23 +114,23 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public boolean verifyMomoSignature(Map<String, Object> payload) {
+    public boolean verifyMomoSignature(MomoIpnResponse payload) {
         try {
-            String signatureFromMoMo = payload.get("signature").toString();
+            String signatureFromMoMo = payload.getSignature();
 
             // Xử lý null an toàn cho các trường có thể không tồn tại
-            String amount = payload.get("amount").toString();
-            String extraData = payload.getOrDefault("extraData", "").toString();
-            String message = payload.getOrDefault("message", "").toString();
-            String orderId = payload.get("orderId").toString();
-            String orderInfo = payload.getOrDefault("orderInfo", "").toString();
-            String orderType = payload.get("orderType").toString();
-            String partnerCode = payload.get("partnerCode").toString();
-            String payType = payload.get("payType").toString();
-            String requestId = payload.get("requestId").toString();
-            String responseTime = payload.get("responseTime").toString();
-            String resultCode = payload.get("resultCode").toString();
-            String transId = payload.get("transId").toString();
+            String amount = payload.getAmount().toString();
+            String extraData = payload.getExtraData();
+            String message = payload.getMessage();
+            String orderId = payload.getOrderId();
+            String orderInfo = payload.getOrderInfo();
+            String orderType = payload.getOrderType();
+            String partnerCode = payload.getPartnerCode();
+            String payType = payload.getPayType();
+            String requestId = payload.getRequestId();
+            String responseTime = payload.getResponseTime().toString();
+            String resultCode = payload.getResultCode().toString();
+            String transId = payload.getTransId().toString();
             String rawHash = "accessKey=" + accessKey
                     + "&amount=" + amount
                     + "&extraData=" + extraData

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  *
@@ -32,6 +33,13 @@ public class ApiPaymentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void receiveMomoIpn(@RequestBody MomoIpnResponse response) {
         System.out.println(">>> ĐÃ NHẬN IPN TỪ MOMO: " + response.toString());
+        boolean isValid = orderService.verifyMomoSignature(response);
+        if (!isValid) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid MoMo signature"
+            );
+        }
 
         try {
             if (response.getOrderId() == null) {
@@ -57,7 +65,7 @@ public class ApiPaymentController {
         } catch (Exception e) {
             // 3. IN CHI TIẾT LỖI: Để biết chính xác dòng nào làm sập code
             System.err.println("⚠️ Lỗi xử lý IPN:");
-            e.printStackTrace(); 
+            e.printStackTrace();
         }
     }
 }
