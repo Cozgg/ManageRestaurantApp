@@ -5,6 +5,7 @@
 package com.ccc.repository;
 
 import com.ccc.pojo.Reservation;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -19,4 +20,5 @@ public interface ReservationRepository {
     Reservation getById(int id);
     List<Reservation> getReservationsByUserId(int userId);
     List<Reservation> getReservationsByTableId(int tableId);
+    boolean hasTimeConflict(int tableId, Date startTime, Date endTime, Integer excludeReservationId);
 }

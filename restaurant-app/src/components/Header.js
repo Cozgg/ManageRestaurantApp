@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import Apis, { endpoints } from "../configs/Apis";
 import {
   Badge,
@@ -14,6 +14,8 @@ import { MyOrderContext } from "../utils/contexts/MyOrderContext";
 import { MyUserContext } from "../utils/contexts/MyUserContext";
 import { MyCompareContext } from "../utils/contexts/MyCompareContext";
 import MySpinner from "../components/MySpinner";
+import { database } from "../firebaseConfig";
+import { ref, onValue, off } from "firebase/database";
 
 const Header = () => {
   const { totalQuantity } = useContext(MyOrderContext);
@@ -21,6 +23,8 @@ const Header = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useContext(MyUserContext);
   const [compareList, compareDispatch] = useContext(MyCompareContext);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const unreadListenerRef = useRef(null);
   // const [kw, setKw] = useState("");
   const nav = useNavigate();
 
@@ -36,9 +40,39 @@ const Header = () => {
     }
   };
 
+  const loadUnreadCount = (userId) => {
+    if (!userId) return;
+
+    // Cleanup previous listener
+    if (unreadListenerRef.current) {
+      off(unreadListenerRef.current);
+    }
+
+    const unreadRef = ref(database, `unread/${userId}`);
+    unreadListenerRef.current = unreadRef;
+
+    onValue(unreadRef, (snapshot) => {
+      const data = snapshot.val();
+      setUnreadCount(data || 0);
+    });
+  };
+
   useEffect(() => {
     loadCategories();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      loadUnreadCount(user.id);
+    }
+
+    return () => {
+      // Cleanup listener on unmount
+      if (unreadListenerRef.current) {
+        off(unreadListenerRef.current);
+      }
+    };
+  }, [user]);
 
   // const search = (e) => {
   //   e.preventDefault();
@@ -93,6 +127,23 @@ const Header = () => {
             >
               Đặt bàn
             </Button>
+            {user && (
+              <Button
+                variant="outline-info"
+                onClick={() => nav("/chat")}
+                className="rounded-pill px-3 fw-bold shadow-sm position-relative"
+              >
+                Tin nhắn
+                {unreadCount > 0 && (
+                  <Badge
+                    bg="danger"
+                    className="position-absolute top-0 start-100 translate-middle rounded-pill"
+                  >
+                    {unreadCount}
+                  </Badge>
+                )}
+              </Button>
+            )}
             <Button
               variant="outline-primary"
               onClick={() => nav("/compare")}

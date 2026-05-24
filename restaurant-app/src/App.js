@@ -19,6 +19,7 @@ import Profile from "./screens/User/Profile";
 import Compare from "./screens/Compare/Compare";
 import Reservation from "./screens/Reservation/Reservation";
 import OrderDetail from "./screens/Order/OrderDetail";
+import Chat from "./screens/Chat/Chat";
 
 const App = () => {
   const [user, dispatch] = useReducer(MyUserReducer, null);
@@ -39,6 +40,7 @@ const App = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/compare" element={<Compare />} />
                 <Route path="/reservation" element={<Reservation />} />
+                <Route path="/chat" element={<Chat />} />
               </Routes>
             </Container>
             <Footer />

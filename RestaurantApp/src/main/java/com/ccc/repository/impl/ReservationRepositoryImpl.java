@@ -11,6 +11,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
@@ -108,5 +109,46 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         q.orderBy(b.desc(root.get("createdAt")));
         Query query = s.createQuery(q);
         return query.getResultList();
+    }
+
+    @Override
+    public boolean hasTimeConflict(int tableId, Date startTime, Date endTime, Integer excludeReservationId) {
+        Session s = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<Reservation> q = b.createQuery(Reservation.class);
+        Root<Reservation> root = q.from(Reservation.class);
+        
+        List<Predicate> predicates = new ArrayList<>();
+        
+        predicates.add(b.equal(root.get("tableId").get("id"), tableId));
+        
+        predicates.add(b.notEqual(root.get("status"), "CANCELLED"));
+        predicates.add(b.notEqual(root.get("status"), "COMPLETED"));
+        
+        predicates.add(b.or(
+            b.and(
+                b.lessThanOrEqualTo(root.get("startTime"), startTime),
+                b.greaterThan(root.get("endTime"), startTime)
+            ),
+            b.and(
+                b.lessThan(root.get("startTime"), endTime),
+                b.greaterThanOrEqualTo(root.get("endTime"), endTime)
+            ),
+            b.and(
+                b.greaterThanOrEqualTo(root.get("startTime"), startTime),
+                b.lessThanOrEqualTo(root.get("endTime"), endTime)
+            )
+        ));
+        
+        if (excludeReservationId != null) {
+            predicates.add(b.notEqual(root.get("id"), excludeReservationId));
+        }
+        
+        q.where(predicates.toArray(Predicate[]::new));
+        
+        Query query = s.createQuery(q);
+        List<Reservation> conflictingReservations = query.getResultList();
+        
+        return !conflictingReservations.isEmpty();
     }
 }

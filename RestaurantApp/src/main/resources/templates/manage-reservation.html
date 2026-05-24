@@ -1,0 +1,246 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Quản lý Đặt Bàn</title>
+    <th:block th:replace="~{base :: css}"></th:block>
+</head>
+<body>
+    <div th:replace="~{base :: header}"></div>
+
+    <section class="container mt-4 mb-5">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-black text-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0" style="color: #e67e22; font-family: 'Playfair Display', serif;">
+                    Quản lý Đặt Bàn
+                </h5>
+                <div class="d-flex gap-2">
+                    <select id="statusFilter" class="form-select form-select-sm" style="width: 150px;" onchange="filterReservations()">
+                        <option value="">Tất cả</option>
+                        <option value="PENDING">Chờ xác nhận</option>
+                        <option value="CONFIRMED">Đã xác nhận</option>
+                        <option value="CANCELLED">Đã hủy</option>
+                        <option value="COMPLETED">Hoàn thành</option>
+                        <option value="OCCUPIED">Đang có khách</option>
+                    </select>
+                    <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#walkInModal">
+                        + Walk-in
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-center" style="width: 5%">ID</th>
+                                <th style="width: 15%">Khách hàng</th>
+                                <th style="width: 10%">Bàn</th>
+                                <th style="width: 10%">Số người</th>
+                                <th style="width: 15%">Thời gian bắt đầu</th>
+                                <th style="width: 15%">Thời gian kết thúc</th>
+                                <th class="text-center" style="width: 10%">Trạng thái</th>
+                                <th class="text-center" style="width: 20%">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r: ${reservations}">
+                                <td class="text-center fw-bold" th:text="'#' + ${r.id}"></td>
+                                <td>
+                                    <div class="fw-bold" th:text="${r.userFirstName + ' ' + r.userLastName}"></div>
+                                    <small class="text-muted" th:text="'@' + ${r.username}"></small>
+                                </td>
+                                <td>
+                                    <div class="fw-bold" th:text="'Bàn ' + ${r.tableNumber}"></div>
+                                    <small class="text-muted" th:text="${r.tableLocation}"></small>
+                                </td>
+                                <td th:text="${r.numberPeople}"></td>
+                                <td th:text="${#temporals.format(r.startTime, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${#temporals.format(r.endTime, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td class="text-center">
+                                    <span th:if="${r.status == 'PENDING'}" class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                    <span th:if="${r.status == 'CONFIRMED'}" class="badge bg-success">Đã xác nhận</span>
+                                    <span th:if="${r.status == 'CANCELLED'}" class="badge bg-danger">Đã hủy</span>
+                                    <span th:if="${r.status == 'COMPLETED'}" class="badge bg-info">Hoàn thành</span>
+                                    <span th:if="${r.status == 'OCCUPIED'}" class="badge bg-primary">Đang có khách</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button th:if="${r.status == 'PENDING'}"
+                                                class="btn btn-sm btn-success rounded-pill px-3"
+                                                th:onclick="'confirmReservation(' + ${r.id} + ')'">
+                                            Xác nhận
+                                        </button>
+                                        <button th:if="${r.status == 'PENDING' or r.status == 'CONFIRMED'}"
+                                                class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                                th:onclick="'cancelReservation(' + ${r.id} + ')'">
+                                            Hủy
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr th:if="${#lists.isEmpty(reservations)}">
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    Không có đặt bàn nào.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div th:replace="~{base :: footer}"></div>
+    
+    <!-- Walk-in Modal -->
+    <div class="modal fade" id="walkInModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Khách Walk-in</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="walkInForm">
+                        <div class="mb-3">
+                            <label class="form-label">Tên khách</label>
+                            <input type="text" class="form-control" id="customerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Bàn</label>
+                            <select class="form-select" id="tableId" required>
+                                <option value="">Chọn bàn</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Số người</label>
+                            <input type="number" class="form-control" id="numberPeople" min="1" value="1" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="createWalkIn()">Khóa bàn</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script th:src="@{/js/script.js}"></script>
+    <script>
+        let availableTables = [];
+        
+        // Load available tables when modal opens
+        document.getElementById('walkInModal').addEventListener('show.bs.modal', function() {
+            const now = new Date();
+            const endTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+            
+            const startTimeStr = now.toISOString().slice(0, 16);
+            const endTimeStr = endTime.toISOString().slice(0, 16);
+            
+            fetch(`/api/available-tables?startTime=${startTimeStr}&endTime=${endTimeStr}`)
+                .then(response => response.json())
+                .then(data => {
+                    availableTables = data;
+                    const tableSelect = document.getElementById('tableId');
+                    tableSelect.innerHTML = '<option value="">Chọn bàn</option>';
+                    data.forEach(table => {
+                        tableSelect.innerHTML += `<option value="${table.id}">Bàn ${table.tableNumber} - ${table.location} (${table.capacity} người)</option>`;
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        });
+        
+        function createWalkIn() {
+            const customerName = document.getElementById('customerName').value;
+            const tableId = document.getElementById('tableId').value;
+            const numberPeople = document.getElementById('numberPeople').value;
+            
+            if (!customerName || !tableId) {
+                alert('Vui lòng nhập tên khách và chọn bàn!');
+                return;
+            }
+            
+            const data = {
+                customerName: customerName,
+                tableId: tableId,
+                numberPeople: numberPeople
+            };
+            
+            fetch('/api/walk-in', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Đã khóa bàn thành công!');
+                    location.reload();
+                } else {
+                    alert('Lỗi khi khóa bàn!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi kết nối server!');
+            });
+        }
+        
+        function confirmReservation(reservationId) {
+            if (confirm('Bạn có chắc muốn xác nhận đặt bàn này?')) {
+                fetch(`/api/reservations/${reservationId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: 'CONFIRMED' })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Đã xác nhận đặt bàn thành công!');
+                        location.reload();
+                    } else {
+                        alert('Lỗi khi xác nhận đặt bàn!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi kết nối server!');
+                });
+            }
+        }
+
+        function cancelReservation(reservationId) {
+            if (confirm('Bạn có chắc muốn hủy đặt bàn này?')) {
+                fetch(`/api/reservations/${reservationId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Đã hủy đặt bàn thành công!');
+                        location.reload();
+                    } else {
+                        alert('Lỗi khi hủy đặt bàn!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi kết nối server!');
+                });
+            }
+        }
+
+        function filterReservations() {
+            const status = document.getElementById('statusFilter').value;
+            if (status) {
+                window.location.href = `/admin/reservations?status=${status}`;
+            } else {
+                window.location.href = '/admin/reservations';
+            }
+        }
+    </script>
+</body>
+</html>

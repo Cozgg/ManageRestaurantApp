@@ -64,7 +64,7 @@
                                         <button th:if="${u.userRole.name() == 'ROLE_CHEF' and !u.active}"
                                                 class="btn btn-sm btn-success rounded-pill px-3"
                                                 th:onclick="'approveUser(' + ${u.id} + ')'">
-                                            ✅ Duyệt
+                                            Duyệt
                                         </button>
                                         <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
                                                 th:onclick="'deleteUser(' + ${u.id} + ')'">

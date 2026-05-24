@@ -4,6 +4,12 @@
  */
 package com.ccc.pojo;
 
+import com.ccc.states.ReservationState;
+import com.ccc.states.impl.CancelledState;
+import com.ccc.states.impl.CompletedState;
+import com.ccc.states.impl.ConfirmedState;
+import com.ccc.states.impl.OccupiedState;
+import com.ccc.states.impl.PendingState;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,6 +24,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
@@ -46,6 +53,12 @@ public class Reservation implements Serializable {
     @Size(max = 9)
     @Column(name = "status")
     private String status;
+    @Size(max = 100)
+    @Column(name = "customer_name")
+    private String customerName;
+
+    @Transient
+    private ReservationState state;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -72,15 +85,18 @@ public class Reservation implements Serializable {
     private Orders orders;
 
     public Reservation() {
+        this.state = new PendingState(); // Default state
     }
 
     public Reservation(Integer id) {
         this.id = id;
+        this.state = new PendingState();
     }
 
     public Reservation(Integer id, int numberPeople) {
         this.id = id;
         this.numberPeople = numberPeople;
+        this.state = new PendingState();
     }
 
     public Integer getId() {
@@ -179,6 +195,56 @@ public class Reservation implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+    
+    public ReservationState getState() {
+        if (state == null) {
+            state = getStateFromString(this.status);
+        }
+        return state;
+    }
+
+    public void setState(ReservationState state) {
+        this.state = state;
+    }
+
+    public void confirm() {
+        getState().confirm(this);
+    }
+
+    public void cancel() {
+        getState().cancel(this);
+    }
+
+    public void complete() {
+        getState().complete(this);
+    }
+    private ReservationState getStateFromString(String status) {
+        if (status == null) {
+            return new PendingState();
+        }
+        switch (status) {
+            case "PENDING":
+                return new PendingState();
+            case "CONFIRMED":
+                return new ConfirmedState();
+            case "CANCELLED":
+                return new CancelledState();
+            case "COMPLETED":
+                return new CompletedState();
+            case "OCCUPIED":
+                return new OccupiedState();
+            default:
+                return new PendingState();
+        }
     }
     
 }
