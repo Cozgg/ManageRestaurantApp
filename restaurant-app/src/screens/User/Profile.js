@@ -1,23 +1,24 @@
-import {useContext, useEffect, useState} from "react";
-import {MyUserContext} from "../../utils/contexts/MyUserContext";
+import { useContext, useEffect, useState } from "react";
+import { MyUserContext } from "../../utils/contexts/MyUserContext";
 import cookies from "react-cookies";
-import {useNavigate} from "react-router-dom";
-import {Button, Card, Col, Container, Image, Row, Table} from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { Button, Card, Col, Container, Image, Row, Table } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
-import {authApis, endpoints} from "../../configs/Apis";
-import {message} from "antd";
+import Apis, { authApis, endpoints } from "../../configs/Apis";
+
 const Profile = () => {
-  const {user, dispatch} = useContext(MyUserContext);
+  const { user, dispatch } = useContext(MyUserContext);
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState([]);
   const nav = useNavigate();
 
   const loadOrders = async () => {
+    if (!user) return;
+    setLoading(true);
     try {
-      setLoading(true);
       const token = cookies.load("token");
-      let res = await authApis(token).get(endpoints["get-orders"]);
-      setOrders(res.data || []);
+      let res = await authApis(token).get(endpoints["order-detail"](""));
+      setOrders(res.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -26,28 +27,16 @@ const Profile = () => {
   };
 
   const confirmOrder = async (orderId) => {
+    if (!window.confirm("Bạn có chắc muốn xác nhận thanh toán đơn này?")) return;
     try {
-      setLoading(true);
       const token = cookies.load("token");
-      let res = await authApis(token).patch(
-        endpoints["confirm-order"](orderId),
-      );
-      if (res.status === 200) {
-        message.success("Xác nhận thanh toán thành công");
-        loadOrders();
-      } else {
-        message.error("Lỗi xác nhận thanh toán");
-      }
+      await authApis(token).patch(`${endpoints["order-detail"]("")}${orderId}/confirm`);
+      loadOrders();
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
   const logout = () => {
     dispatch({
       type: "logout",
@@ -57,16 +46,22 @@ const Profile = () => {
     nav("/");
   };
 
+  useEffect(() => {
+    if (user) {
+      loadOrders();
+    }
+  }, [user]);
+
   if (!user) {
     return (
-      <Container className="mt-5 text-center">Đang tải dữ liệu...</Container>
+      <Container className="mt-5 text-center">
+        <MySpinner />
+      </Container>
     );
   }
 
   return (
     <Container className="my-5">
-      {!user && <MySpinner />}
-
       <Row className="g-4">
         <Col lg={4} md={5}>
           <Card className="shadow-sm border-0 rounded-4 h-100">
@@ -78,7 +73,7 @@ const Profile = () => {
                   src={user.avatar || "https://via.placeholder.com/150"}
                   roundedCircle
                   className="border border-3 border-success p-1 shadow-sm"
-                  style={{width: "130px", height: "130px", objectFit: "cover"}}
+                  style={{ width: "130px", height: "130px", objectFit: "cover" }}
                 />
               </div>
 
@@ -125,11 +120,11 @@ const Profile = () => {
           <Card className="shadow-sm border-0 rounded-4 h-100">
             <Card.Body className="p-4">
               {user.userRole === "ROLE_CHEF" ? (
-                <h4 className="fw-bold mb-4" style={{color: "#2c3e50"}}>
+                <h4 className="fw-bold mb-4" style={{ color: "#2c3e50" }}>
                   Lịch sử đặt món
                 </h4>
               ) : (
-                <h4 className="fw-bold mb-4" style={{color: "#2c3e50"}}>
+                <h4 className="fw-bold mb-4" style={{ color: "#2c3e50" }}>
                   Lịch sử giao dịch
                 </h4>
               )}
@@ -152,13 +147,7 @@ const Profile = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {loading === true ? (
-                        <tr>
-                          <td colSpan="6" className="text-center py-5">
-                            <MySpinner />
-                          </td>
-                        </tr>
-                      ) : orders.length === 0 ? (
+                      {orders.length === 0 ? (
                         <tr>
                           {user.userRole === "ROLE_CHEF" ? (
                             <td
@@ -198,13 +187,12 @@ const Profile = () => {
 
                             <td>
                               <span
-                                className={`badge ${
-                                  order.statusPay === "COMPLETED"
+                                className={`badge ${order.statusPay === "COMPLETED"
                                     ? "bg-success"
                                     : order.statusPay === "PENDING"
                                       ? "bg-warning text-dark"
                                       : "bg-danger"
-                                }`}
+                                  }`}
                               >
                                 {order.statusPay}
                               </span>
@@ -215,7 +203,7 @@ const Profile = () => {
                             </td>
                             <td className="text-center align-middle">
                               {user.userRole === "ROLE_ADMIN" &&
-                              order.statusPay === "PENDING" ? (
+                                order.statusPay === "PENDING" ? (
                                 <>
                                   <Button
                                     variant="outline-primary"
@@ -235,7 +223,7 @@ const Profile = () => {
                                     nav(`/order-detail/${order.id}`)
                                   }
                                 >
-                                  <i className="fas fa-eye me-1"></i> Chi tiết
+                                  Chi tiết
                                 </Button>
                               )}
                             </td>

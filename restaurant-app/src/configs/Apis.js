@@ -8,6 +8,11 @@ export const endpoints = {
   profile: "/secure/profile",
   "add-order": "/secure/orders",
   "order-detail": (orderId) => `/secure/orders/${orderId}`,
+  tables: "/tables",
+  reservations: "/reservations",
+  "reservations-user": (userId) => `/reservations/user/${userId}`,
+  "reservations-table": (tableId) => `/reservations/table/${tableId}`,
+  "reservation-detail": (id) => `/reservations/${id}`,
   "get-orders": "/secure/orders",
   "confirm-order": (orderId) => `/secure/orders/${orderId}`,
 };
