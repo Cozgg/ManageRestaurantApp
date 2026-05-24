@@ -4,7 +4,7 @@
  */
 package com.ccc.pojo;
 
-import com.ccc.payment.PaymentMethod;
+import com.ccc.enums.PaymentMethod;
 import com.ccc.payment.PaymentStrategy;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Basic;

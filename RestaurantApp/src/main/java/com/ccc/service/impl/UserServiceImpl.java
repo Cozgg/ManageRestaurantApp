@@ -6,7 +6,7 @@ package com.ccc.service.impl;
 
 import com.ccc.dto.UserDto;
 import com.ccc.pojo.User;
-import com.ccc.pojo.UserRole;
+import com.ccc.enums.UserRole;
 import com.ccc.repository.UserRepository;
 import com.ccc.service.UserService;
 import com.ccc.utils.UserFactory;

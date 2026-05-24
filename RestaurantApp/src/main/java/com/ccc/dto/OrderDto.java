@@ -4,7 +4,7 @@
  */
 package com.ccc.dto;
 
-import com.ccc.payment.PaymentMethod;
+import com.ccc.enums.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Date;
 

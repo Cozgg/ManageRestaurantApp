@@ -78,21 +78,19 @@ public class ApiUserController {
     }
 
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         this.userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping(path = "/users/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> update(@PathVariable int id, 
                                     @RequestParam Map<String, String> params,
                                     @RequestParam(value = "avatar", required = false) MultipartFile avatar,
                                     Principal principal) {
         User currentUser = this.userService.getUserByUsername(principal.getName());
         
-        if (currentUser.getId() != id && currentUser.getUserRole() != com.ccc.pojo.UserRole.ROLE_ADMIN) {
+        if (currentUser.getId() != id && currentUser.getUserRole() != com.ccc.enums.UserRole.ROLE_ADMIN) {
             return new ResponseEntity<>("Bạn không có quyền sửa thông tin này", HttpStatus.FORBIDDEN);
         }
         
@@ -101,7 +99,6 @@ public class ApiUserController {
     }
 
     @PostMapping("/users/{id}/approve")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> approve(@PathVariable int id) {
         this.userService.approveUser(id);
         return new ResponseEntity<>(HttpStatus.OK);

@@ -35,13 +35,11 @@ public class ApiReservationController {
     private ReservationService reservationService;
 
     @GetMapping("/secure/reservations")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ReservationDto>> list(@RequestParam Map<String, String> params) {
         return new ResponseEntity<>(this.reservationService.getReservations(params), HttpStatus.OK);
     }
 
     @GetMapping("/secure/reservations/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ReservationDto> getReservation(@PathVariable int id) {
         ReservationDto r = this.reservationService.getReservationById(id);
         if (r != null) {
@@ -51,19 +49,16 @@ public class ApiReservationController {
     }
 
     @GetMapping("/secure/reservations/user/{userId}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ReservationDto>> getReservationsByUser(@PathVariable int userId) {
         return new ResponseEntity<>(this.reservationService.getReservationsByUserId(userId), HttpStatus.OK);
     }
 
     @GetMapping("/secure/reservations/table/{tableId}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ReservationDto>> getReservationsByTable(@PathVariable int tableId) {
         return new ResponseEntity<>(this.reservationService.getReservationsByTableId(tableId), HttpStatus.OK);
     }
 
     @PostMapping("/secure/reservations")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ReservationDto> add(@RequestBody Map<String, String> params) {
         ReservationDto r = this.reservationService.addReservation(params);
         if (r != null) {
@@ -73,7 +68,6 @@ public class ApiReservationController {
     }
 
     @PutMapping("/secure/reservations/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ReservationDto> update(@PathVariable int id, @RequestBody Map<String, String> params) {
         ReservationDto r = this.reservationService.updateReservation(id, params);
         if (r != null) {
@@ -83,7 +77,6 @@ public class ApiReservationController {
     }
 
     @DeleteMapping("/secure/reservations/{id}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         if (this.reservationService.deleteReservation(id)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -92,13 +85,11 @@ public class ApiReservationController {
     }
 
     @GetMapping("/available-tables")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TableDto>> getAvailableTables(@RequestParam String startTime, @RequestParam String endTime) {
         return new ResponseEntity<>(this.reservationService.getAvailableTables(startTime, endTime), HttpStatus.OK);
     }
 
     @PostMapping("/walk-in")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ReservationDto> createWalkIn(@RequestBody Map<String, String> params) {
         try {
             ReservationDto r = this.reservationService.createWalkInReservation(params);

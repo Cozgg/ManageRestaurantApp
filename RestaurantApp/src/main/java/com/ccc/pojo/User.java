@@ -4,6 +4,7 @@
  */
 package com.ccc.pojo;
 
+import com.ccc.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Basic;
@@ -72,6 +73,9 @@ public class User implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "avatar")
     private String avatar;
+    @Size(min = 1, max = 255)
+    @Column(name = "email")
+    private String email;
     @Size(max = 10)
     @Column(name = "user_role")
     @Enumerated(EnumType.STRING)
@@ -243,6 +247,20 @@ public class User implements Serializable {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(String email) {
+        this.email = email;
     }
 
 }
