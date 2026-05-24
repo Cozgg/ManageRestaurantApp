@@ -6,7 +6,8 @@ import { Container } from "react-bootstrap";
 import Home from "./screens/Home/Home";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { MyOrderProvider } from "./utils/contexts/MyOrderContext";
-import { CompareProvider } from "./utils/contexts/CompareContext";
+import { MyCompareContext } from "./utils/contexts/MyCompareContext";
+import MyCompareReducer from "./utils/reducers/MyCompareReducer";
 import Order from "./screens/Order/Order";
 import ThankYou from "./screens/Order/ThankYou";
 import Login from "./screens/User/Login";
@@ -20,10 +21,11 @@ import Reservation from "./screens/Reservation/Reservation";
 
 const App = () => {
   const [user, dispatch] = useReducer(MyUserReducer, null);
+  const [compareList, compareDispatch] = useReducer(MyCompareReducer, []);
   return (
     <BrowserRouter>
       <MyUserContext.Provider value={{ user, dispatch }}>
-        <CompareProvider>
+        <MyCompareContext.Provider value={[compareList, compareDispatch]}>
           <MyOrderProvider>
             <Header />
             <Container>
@@ -40,7 +42,7 @@ const App = () => {
             </Container>
             <Footer />
           </MyOrderProvider>
-        </CompareProvider>
+        </MyCompareContext.Provider>
       </MyUserContext.Provider>
     </BrowserRouter>
   );

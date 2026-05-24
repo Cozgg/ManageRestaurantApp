@@ -14,11 +14,11 @@ import {
 import MySpinner from "../../components/MySpinner";
 import { useSearchParams } from "react-router-dom";
 import { MyOrderContext } from "../../utils/contexts/MyOrderContext";
-import { useCompare } from "../../utils/contexts/CompareContext";
+import { MyCompareContext } from "../../utils/contexts/MyCompareContext";
 
 const Home = () => {
   const { dispatch } = useContext(MyOrderContext);
-  const { state: compareState, dispatch: compareDispatch } = useCompare();
+  const [compareList, compareDispatch] = useContext(MyCompareContext);
   const [dishes, setDishes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -74,7 +74,7 @@ const Home = () => {
   };
 
   const isInCompare = (dishId) => {
-    return compareState.compareList.some((d) => d.id === dishId);
+    return compareList.some((d) => d.id === dishId);
   };
 
   useEffect(() => {

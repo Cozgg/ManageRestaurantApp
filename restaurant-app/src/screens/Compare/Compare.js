@@ -1,9 +1,10 @@
-import { useCompare } from "../../utils/contexts/CompareContext";
+import { useContext } from "react";
+import { MyCompareContext } from "../../utils/contexts/MyCompareContext";
 import { Button, Card, Col, Container, Image, Row, Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const Compare = () => {
-  const { state: compareState, dispatch: compareDispatch } = useCompare();
+  const [compareList, compareDispatch] = useContext(MyCompareContext);
 
   const handleRemove = (dishId) => {
     compareDispatch({
@@ -18,7 +19,7 @@ const Compare = () => {
     });
   };
 
-  if (compareState.compareList.length === 0) {
+  if (compareList.length === 0) {
     return (
       <Container className="my-5 text-center">
         <div className="py-5">
@@ -39,7 +40,7 @@ const Compare = () => {
   return (
     <Container className="my-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold">So sánh món ăn ({compareState.compareList.length}/3)</h2>
+        <h2 className="fw-bold">So sánh món ăn ({compareList.length}/3)</h2>
         <Button variant="outline-danger" onClick={handleClear}>
           Xóa tất cả
         </Button>
@@ -51,7 +52,7 @@ const Compare = () => {
             <thead className="table-light">
               <tr>
                 <th style={{ width: "20%" }}>Tiêu chí</th>
-                {compareState.compareList.map((dish) => (
+                {compareList.map((dish) => (
                   <th key={dish.id} className="text-center" style={{ width: "26.6%" }}>
                     <Button
                       variant="link"
@@ -75,7 +76,7 @@ const Compare = () => {
             <tbody>
               <tr>
                 <td className="fw-bold">Giá</td>
-                {compareState.compareList.map((dish) => (
+                {compareList.map((dish) => (
                   <td key={dish.id} className="text-center">
                     <span className="fw-bold text-danger fs-5">
                       {dish.price.toLocaleString()} ₫
@@ -85,7 +86,7 @@ const Compare = () => {
               </tr>
               <tr>
                 <td className="fw-bold">Thời gian chuẩn bị</td>
-                {compareState.compareList.map((dish) => (
+                {compareList.map((dish) => (
                   <td key={dish.id} className="text-center">
                     {dish.timePrepare} phút
                   </td>
@@ -93,7 +94,7 @@ const Compare = () => {
               </tr>
               <tr>
                 <td className="fw-bold">Đầu bếp</td>
-                {compareState.compareList.map((dish) => (
+                {compareList.map((dish) => (
                   <td key={dish.id} className="text-center">
                     {dish.user?.lastName} {dish.user?.firstName}
                   </td>
@@ -101,7 +102,7 @@ const Compare = () => {
               </tr>
               <tr>
                 <td className="fw-bold">Mô tả</td>
-                {compareState.compareList.map((dish) => (
+                {compareList.map((dish) => (
                   <td key={dish.id} className="text-center small">
                     {dish.description}
                   </td>
@@ -109,7 +110,7 @@ const Compare = () => {
               </tr>
               <tr>
                 <td className="fw-bold">Nguyên liệu</td>
-                {compareState.compareList.map((dish) => (
+                {compareList.map((dish) => (
                   <td key={dish.id} className="text-center small">
                     {dish.material}
                   </td>
@@ -117,7 +118,7 @@ const Compare = () => {
               </tr>
               <tr>
                 <td className="fw-bold">Đánh giá</td>
-                {compareState.compareList.map((dish) => (
+                {compareList.map((dish) => (
                   <td key={dish.id} className="text-center">
                     <span className="text-warning">*****</span>
                     <div className="small text-muted">(Chưa có đánh giá)</div>

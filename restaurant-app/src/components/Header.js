@@ -12,7 +12,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { MyOrderContext } from "../utils/contexts/MyOrderContext";
 import { MyUserContext } from "../utils/contexts/MyUserContext";
-import { useCompare } from "../utils/contexts/CompareContext";
+import { MyCompareContext } from "../utils/contexts/MyCompareContext";
 import MySpinner from "../components/MySpinner";
 
 const Header = () => {
@@ -20,7 +20,7 @@ const Header = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const { user } = useContext(MyUserContext);
-  const { state: compareState } = useCompare();
+  const [compareList, compareDispatch] = useContext(MyCompareContext);
   // const [kw, setKw] = useState("");
   const nav = useNavigate();
 
@@ -100,12 +100,12 @@ const Header = () => {
               className="rounded-pill px-3 fw-bold shadow-sm position-relative"
             >
               So sánh
-              {compareState.compareList.length > 0 && (
+              {compareList.length > 0 && (
                 <Badge
                   bg="danger"
                   className="position-absolute top-0 start-100 translate-middle rounded-pill"
                 >
-                  {compareState.compareList.length}
+                  {compareList.length}
                 </Badge>
               )}
             </Button>
