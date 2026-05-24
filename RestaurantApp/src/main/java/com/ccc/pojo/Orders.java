@@ -52,9 +52,6 @@ public class Orders implements Serializable {
     @Size(max = 9)
     @Column(name = "status_pay")
     private String statusPay;
-    @Size(max = 9)
-    @Column(name = "status_order")
-    private String statusOrder;
     @Size(max = 45)
     @Column(name = "transaction_id")
     private String transactionId;
@@ -182,18 +179,8 @@ public class Orders implements Serializable {
         return "com.ccc.pojo.Orders[ id=" + id + " ]";
     }
 
-    
-
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
-    }
-
-    public String getStatusOrder() {
-        return statusOrder;
-    }
-
-    public void setStatusOrder(String statusOrder) {
-        this.statusOrder = statusOrder;
     }
 
     public String getTransactionId() {
@@ -203,5 +190,4 @@ public class Orders implements Serializable {
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
     }
-    
 }

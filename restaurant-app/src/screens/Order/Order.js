@@ -72,6 +72,7 @@ const Order = () => {
         items: cart,
       };
       let res = await authApis(token).post(endpoints["add-order"], orderData);
+      console.log(res.data);
       return res.data;
     } catch (error) {
       console.error("Lỗi thanh toán:", error);
@@ -269,7 +270,7 @@ const Order = () => {
                       className="py-3 rounded-3 fw-semibold mb-1 d-flex align-items-center"
                       style={{
                         color: "#a50064",
-                      }} /* Màu tím hồng đặc trưng của MoMo */
+                      }}
                     >
                       <CreditCardOutlined /> Ví điện tử MoMo
                     </Dropdown.Item>
@@ -285,14 +286,13 @@ const Order = () => {
               )}
 
               <div className="text-center mt-3 text-muted small">
-                <i className="fas fa-shield-alt"></i> Thanh toán an toàn &amp; bảo
-                mật
+                <i className="fas fa-shield-alt"></i> Thanh toán an toàn &amp;
+                bảo mật
               </div>
             </Card>
           </Col>
         </Row>
       ) : (
-        /* TRẠNG THÁI GIỎ HÀNG TRỐNG */
         <div className="text-center py-5 bg-white shadow-sm rounded-4 border">
           <div className="mb-4" style={{ fontSize: "5rem" }}>
             🛒
@@ -306,7 +306,8 @@ const Order = () => {
           <Button
             variant="success"
             size="lg"
-            href="/"
+            as={Link}
+            to="/"
             className="rounded-pill px-5 fw-bold shadow-sm"
           >
             Quay lại Thực đơn

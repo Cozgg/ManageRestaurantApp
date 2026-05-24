@@ -128,6 +128,5 @@ public class OrderDetail implements Serializable {
         return "com.ccc.pojo.OrderDetail[ id=" + id + " ]";
     }
 
-  
     
 }

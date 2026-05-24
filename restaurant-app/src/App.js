@@ -18,6 +18,7 @@ import { useReducer } from "react";
 import Profile from "./screens/User/Profile";
 import Compare from "./screens/Compare/Compare";
 import Reservation from "./screens/Reservation/Reservation";
+import OrderDetail from "./screens/Order/OrderDetail";
 
 const App = () => {
   const [user, dispatch] = useReducer(MyUserReducer, null);
