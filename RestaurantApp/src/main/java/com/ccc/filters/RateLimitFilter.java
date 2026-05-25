@@ -4,10 +4,8 @@
  */
 package com.ccc.filters;
 
-import com.ccc.utils.JwtUtils;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Refill;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +28,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    //Login, Thanh toán - 5 req/phút
+    //Login, Thanh toán - 10 req/phút
     private Bucket createCriticalBucket() {
         return Bucket.builder().addLimit(Bandwidth.builder().capacity(10).refillGreedy(5, Duration.ofMinutes(1)).build())
                 .addLimit(Bandwidth.builder().capacity(5).refillGreedy(5, Duration.ofSeconds(20)).build()).build();
@@ -55,7 +53,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
         String method = request.getMethod().toUpperCase();
         String clientId = resolveClientId(request);
 
-        if (pathMatcher.match("/api/payment/**", uri) || pathMatcher.match("/api/login", uri) || (pathMatcher.match("/api/secure/orders", uri) && method.equals("POST"))) {
+        if (pathMatcher.match("/**/api/payment/**", uri)
+                || pathMatcher.match("/**/api/login", uri) || pathMatcher.match("/**/api/login/", uri)
+                || (pathMatcher.match("/**/api/secure/orders", uri) && method.equals("POST"))) {
+
             bucketKey = "CRITICAL_" + clientId;
             bucket = buckets.computeIfAbsent(bucketKey, k -> createCriticalBucket());
         } else if (method.equals("GET")) {
@@ -65,7 +66,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             bucketKey = "WRITE_" + clientId;
             bucket = buckets.computeIfAbsent(bucketKey, k -> createWriteBucket());
         }
-        
+
         if (bucket.tryConsume(1)) {
             filterChain.doFilter(request, response);
         } else {
