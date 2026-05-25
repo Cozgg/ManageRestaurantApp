@@ -50,7 +50,7 @@ const ChefDashboard = () => {
                 <Col>
                     <Card className="shadow-sm">
                         <Card.Header className="bg-primary text-white">
-                            <h4 className="mb-0">👨‍🍳 Dashboard Đầu bếp</h4>
+                            <h4 className="mb-0">Dashboard Đầu bếp</h4>
                         </Card.Header>
                         <Card.Body>
                             <Tabs
