@@ -5,7 +5,8 @@
 package com.ccc.controllers;
 
 import com.ccc.dto.CategoryDto;
-import com.ccc.pojo.Category;
+import com.ccc.enums.UserRole;
+import com.ccc.pojo.User;
 import com.ccc.service.CategoryService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.access.prepost.PreAuthorize;
+import java.security.Principal;
 import java.util.Map;
 
 /**
@@ -33,26 +34,38 @@ public class ApiCategoryController {
     @Autowired
     private CategoryService cateService;
     
+    @Autowired
+    private com.ccc.service.UserService userService;
+    
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryDto>> list() {
         return new ResponseEntity<>(this.cateService.getCates(), HttpStatus.OK);
     }
 
     @PostMapping("/categories")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoryDto> add(@RequestParam Map<String, String> params) {
+    public ResponseEntity<?> add(@RequestParam Map<String, String> params, Principal principal) {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
+            return new ResponseEntity<>("Bạn không có quyền thêm danh mục", HttpStatus.FORBIDDEN);
+        }
         return new ResponseEntity<>(this.cateService.addCategory(params), HttpStatus.CREATED);
     }
 
     @PatchMapping("/categories/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CategoryDto> update(@PathVariable int id, @RequestParam Map<String, String> params) {
+    public ResponseEntity<?> update(@PathVariable int id, @RequestParam Map<String, String> params, Principal principal) {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
+            return new ResponseEntity<>("Bạn không có quyền sửa danh mục", HttpStatus.FORBIDDEN);
+        }
         return new ResponseEntity<>(this.cateService.updateCategory(id, params), HttpStatus.OK);
     }
 
     @DeleteMapping("/categories/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> delete(@PathVariable int id) {
+    public ResponseEntity<String> delete(@PathVariable int id, Principal principal) {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
+            return new ResponseEntity<String>("Bạn không có quyền xóa danh mục", HttpStatus.FORBIDDEN);
+        }
         boolean deleted = this.cateService.deleteCategory(id);
         if (deleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
