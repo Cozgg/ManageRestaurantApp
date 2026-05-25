@@ -64,9 +64,8 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<Orders> getOrders() {
+    public List<Orders> getOrders(User u) {
         Session s = this.factory.getObject().getCurrentSession();
-        User u = userRepo.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<Orders> cq = b.createQuery(Orders.class);
         Root root = cq.from(Orders.class);

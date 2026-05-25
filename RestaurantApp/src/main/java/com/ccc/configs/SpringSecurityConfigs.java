@@ -42,24 +42,25 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 )
 @Order(2)
 public class SpringSecurityConfigs {
-
+    
     @Autowired
     private UserDetailsService userDetailsService;
-
+    
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    
     @Bean
     public HandlerMappingIntrospector mvcHandlerMappingIntrospector() {
         return new HandlerMappingIntrospector();
     }
-
+    
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-       http.securityMatcher("/admin/**", "/", "/login").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
+        http.securityMatcher("/admin/**", "/", "/login").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/", "/admin").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
         ).formLogin(form -> form.loginPage("/admin/login") // Đường dẫn tới trang đăng nhập
                 .loginProcessingUrl("/login") // Đường dẫn xử lý POST
@@ -70,7 +71,7 @@ public class SpringSecurityConfigs {
         
         return http.build();
     }
-
+    
     @Bean
     public Cloudinary cloudinary() {
         Cloudinary cloudinary
@@ -81,5 +82,5 @@ public class SpringSecurityConfigs {
                         "secure", true));
         return cloudinary;
     }
-
+    
 }

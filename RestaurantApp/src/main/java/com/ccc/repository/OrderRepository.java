@@ -8,6 +8,7 @@ import com.ccc.dto.ItemDto;
 import com.ccc.pojo.OrderDetail;
 import com.ccc.pojo.OrderItem;
 import com.ccc.pojo.Orders;
+import com.ccc.pojo.User;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public interface OrderRepository {
     Orders addOrder(Orders order, ItemDto items);
-    List<Orders> getOrders();
+    List<Orders> getOrders(User u);
     Orders getOrderById(int orderId);
     List<OrderDetail> getOrderDetailsByOrderId(int orderId);
     void updateOrder(Orders order);

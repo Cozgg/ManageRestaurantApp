@@ -87,49 +87,5 @@
     </section>
     <div th:replace="~{base :: footer}"></div>
     <script th:src="@{/js/script.js}"></script>
-    <script>
-        function approveUser(userId) {
-            if (confirm('Bạn có chắc muốn duyệt tài khoản Đầu bếp này?')) {
-                fetch(`/api/users/${userId}/approve`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Đã duyệt tài khoản thành công!');
-                        location.reload();
-                    } else {
-                        alert('Lỗi khi duyệt tài khoản!');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi kết nối server!');
-                });
-            }
-        }
-
-        function deleteUser(userId) {
-            if (confirm('Bạn có chắc muốn xóa người dùng này?')) {
-                fetch(`/api/users/${userId}`, {
-                    method: 'DELETE'
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Đã xóa người dùng thành công!');
-                        location.reload();
-                    } else {
-                        alert('Lỗi khi xóa người dùng!');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi kết nối server!');
-                });
-            }
-        }
-    </script>
 </body>
 </html>

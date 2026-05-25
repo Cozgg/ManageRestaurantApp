@@ -77,11 +77,6 @@ public class ApiUserController {
         return new ResponseEntity<>(this.userService.getUserByUsername(principal.getName()), HttpStatus.OK);
     }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
-        this.userService.deleteUser(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
 
     @PatchMapping(path = "/users/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@PathVariable int id, 
