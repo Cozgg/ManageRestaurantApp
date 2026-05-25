@@ -28,7 +28,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    //Login, Thanh toán - 10 req/phút
+    //Login, Thanh toán - 10 req/phút - 5req/20s
     private Bucket createCriticalBucket() {
         return Bucket.builder().addLimit(Bandwidth.builder().capacity(10).refillGreedy(5, Duration.ofMinutes(1)).build())
                 .addLimit(Bandwidth.builder().capacity(5).refillGreedy(5, Duration.ofSeconds(20)).build()).build();
