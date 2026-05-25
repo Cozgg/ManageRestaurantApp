@@ -8,6 +8,7 @@ import com.ccc.dto.ItemDto;
 import com.ccc.dto.MomoIpnResponse;
 import com.ccc.dto.OrderDetailDto;
 import com.ccc.dto.OrderDto;
+import com.ccc.pojo.User;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ import java.util.List;
  * @author Admin
  */
 public interface OrderService {
-    List<OrderDto> getOrders();
+    List<OrderDto> getOrders(User u);
     OrderDetailDto getOrderById(int orderId);
     String addOrder(ItemDto items);
     boolean verifyMomoSignature(MomoIpnResponse payload);

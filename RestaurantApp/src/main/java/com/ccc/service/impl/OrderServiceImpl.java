@@ -13,6 +13,7 @@ import com.ccc.enums.PaymentMethod;
 import com.ccc.payment.PaymentStrategy;
 import com.ccc.pojo.OrderDetail;
 import com.ccc.pojo.Orders;
+import com.ccc.pojo.User;
 import com.ccc.repository.OrderRepository;
 import com.ccc.repository.UserRepository;
 import com.ccc.service.OrderService;
@@ -51,15 +52,15 @@ public class OrderServiceImpl implements OrderService {
     private String secretKey;
 
     @Override
-    public List<OrderDto> getOrders() {
-        List<Orders> orders = this.orderRepo.getOrders();
+    public List<OrderDto> getOrders(User u) {
+        List<Orders> orders = this.orderRepo.getOrders(u);
 
         return orders.stream().map(o -> {
             OrderDto odto = OrderDto.builder().id(o.getId()).userId(o.getUserId().getId()).totalPrice(o.getTotalPrice())
                     .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
                     .reservationId(o.getReservationId() != null
                             ? o.getReservationId().getId()
-                            : null).build();
+                            : null).transactionId(o.getTransactionId() != null ? o.getTransactionId() : null).build();
 
             return odto;
         }).collect(Collectors.toList());

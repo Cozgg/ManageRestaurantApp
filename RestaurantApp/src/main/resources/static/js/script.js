@@ -42,12 +42,89 @@ function loadChart(time, year) {
 
 }
 document.addEventListener("DOMContentLoaded", function () {
-    loadChart('MONTH', 2026);
+    const chart = document.getElementById('myChart');
+
+    if (chart) {
+        loadChart('MONTH', 2026);
+    }
 });
 
-document.getElementById('statForm').addEventListener('submit', function (event) {
-    event.preventDefault();
-    const selectedTime = document.getElementById('timeFilter').value;
-    const selectedYear = document.getElementById('yearFilter').value;
-    loadChart(selectedTime, selectedYear);
-});
+const statForm = document.getElementById('statForm');
+
+if (statForm) {
+    statForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const selectedTime = document.getElementById('timeFilter').value;
+        const selectedYear = document.getElementById('yearFilter').value;
+
+        loadChart(selectedTime, selectedYear);
+    });
+}
+
+function approveUser(userId) {
+    if (confirm('Bạn có chắc muốn duyệt tài khoản Đầu bếp này?')) {
+        fetch(`http://localhost:8080/RestaurantApp/api/users/${userId}/approve`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Đã duyệt tài khoản thành công!');
+                location.reload();
+            } else {
+                alert('Lỗi khi duyệt tài khoản!');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi kết nối server!');
+        });
+    }
+}
+
+function deleteUser(userId) {
+    if (confirm('Bạn có chắc muốn xóa người dùng này?')) {
+        fetch(`http://localhost:8080/RestaurantApp/admin/users/${userId}`, {
+            method: 'DELETE',
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Đã xóa người dùng thành công!');
+                location.reload();
+            } else {
+                alert('Lỗi khi xóa người dùng!');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi kết nối server!');
+        });
+    }
+}
+
+function confirmOrder(orderId) {
+    if (confirm('Bạn có chắc muốn xóa người dùng này?')) {
+        fetch(`http://localhost:8080/RestaurantApp/admin/orders/${orderId}/confirm`, {
+            method: 'POST',
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Đã xác nhận thành công!');
+                location.reload();
+            } else {
+                alert('Lỗi khi xác nhận!');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi kết nối server!');
+        });
+    }
+}
+

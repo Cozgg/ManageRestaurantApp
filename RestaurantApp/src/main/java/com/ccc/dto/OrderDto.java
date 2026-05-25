@@ -30,4 +30,5 @@ public class OrderDto {
     private String payment;
     private Integer totalPrice;
     private String statusPay;
+    private String transactionId;
 }
