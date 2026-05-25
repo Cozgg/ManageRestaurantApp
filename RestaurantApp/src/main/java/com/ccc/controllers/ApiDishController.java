@@ -5,6 +5,9 @@
 package com.ccc.controllers;
 
 import com.ccc.dto.DishDto;
+import com.ccc.enums.UserRole;
+import com.ccc.pojo.Rating;
+import com.ccc.pojo.User;
 import com.ccc.service.DishService;
 import java.io.IOException;
 import java.util.List;
@@ -12,7 +15,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import java.security.Principal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -46,8 +49,10 @@ public class ApiDishController {
     }
 
     @GetMapping("/dishes/{id}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<DishDto> getDish(@PathVariable Integer id) {
+    public ResponseEntity<DishDto> getDish(@PathVariable Integer id, Principal principal) {
+        if (principal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         DishDto dish = this.dishService.getDishById(id);
         if (dish == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -56,20 +61,28 @@ public class ApiDishController {
     }
 
     @PostMapping("/dishes")
-    @PreAuthorize("hasRole('CHEF')")
-    public ResponseEntity<DishDto> addDish(
+    public ResponseEntity<?> addDish(
             @RequestParam Map<String, String> params,
-            @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            Principal principal) throws IOException {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != UserRole.ROLE_CHEF && currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
+            return new ResponseEntity<>("Bạn không có quyền thêm món ăn", HttpStatus.FORBIDDEN);
+        }
         DishDto created = this.dishService.addDish(params, image);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PatchMapping("/dishes/{id}")
-    @PreAuthorize("hasRole('CHEF')")
-    public ResponseEntity<DishDto> updateDish(
+    public ResponseEntity<?> updateDish(
             @PathVariable Integer id,
             @RequestParam Map<String, String> params,
-            @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            Principal principal) throws IOException {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != UserRole.ROLE_CHEF && currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
+            return new ResponseEntity<>("Bạn không có quyền sửa món ăn", HttpStatus.FORBIDDEN);
+        }
         DishDto updated = this.dishService.updateDish(id, params, image);
         if (updated == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -78,8 +91,11 @@ public class ApiDishController {
     }
 
     @DeleteMapping("/dishes/{id}")
-    @PreAuthorize("hasRole('CHEF') or hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteDish(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteDish(@PathVariable Integer id, Principal principal) {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != UserRole.ROLE_CHEF && currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
         boolean deleted = this.dishService.deleteDish(id);
         if (!deleted) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -88,18 +104,20 @@ public class ApiDishController {
     }
 
     @PostMapping("/dishes/{id}/rating")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<com.ccc.pojo.Rating> addRating(@PathVariable Integer id, 
+    public ResponseEntity<?> addRating(@PathVariable Integer id, 
                                                          @RequestParam Map<String, String> params, 
-                                                         java.security.Principal principal) {
-        com.ccc.pojo.User user = this.userService.getUserByUsername(principal.getName());
+                                                         Principal principal) {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != UserRole.ROLE_USER) {
+            return new ResponseEntity<>("Bạn không có quyền đánh giá", HttpStatus.FORBIDDEN);
+        }
         params.put("dishId", id.toString());
-        com.ccc.pojo.Rating r = this.ratingService.addRating(params, user);
+        Rating r = this.ratingService.addRating(params, currentUser);
         return new ResponseEntity<>(r, HttpStatus.CREATED);
     }
 
     @GetMapping("/dishes/{id}/rating")
-    public ResponseEntity<List<com.ccc.pojo.Rating>> getRatings(@PathVariable Integer id) {
+    public ResponseEntity<List<Rating>> getRatings(@PathVariable Integer id) {
         return new ResponseEntity<>(this.ratingService.getRatingsByDishId(id), HttpStatus.OK);
     }
 }
