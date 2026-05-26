@@ -22,7 +22,8 @@ public class DispatcherServletInit extends AbstractAnnotationConfigDispatcherSer
             ThymeleafConfigs.class,
             HibernateConfigs.class,
             SpringSecurityConfigs.class,
-            ApiSecurityConfigs.class
+            ApiSecurityConfigs.class,
+            RabbitMQConfig.class
         };
     }
 
@@ -46,10 +47,5 @@ public class DispatcherServletInit extends AbstractAnnotationConfigDispatcherSer
         int fileSizeThreshold = 0;
 
         registration.setMultipartConfig(new MultipartConfigElement(location, maxFileSize, maxRequestSize, fileSizeThreshold));
-    }
-    
-    @Override
-    protected Filter[] getServletFilters() {
-        return new Filter[] { new JwtFilter()}; // Filter sẽ áp dụng cho mọi request
     }
 }

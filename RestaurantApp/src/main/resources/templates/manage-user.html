@@ -11,7 +11,7 @@
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-header bg-black text-white d-flex justify-content-between align-items-center py-3">
                 <h5 class="mb-0" style="color: #e67e22; font-family: 'Playfair Display', serif;">
-                    👥 Danh Sách Người Dùng
+                    Danh Sách Người Dùng
                 </h5>
                 <a class="btn btn-warning fw-bold text-dark rounded-pill px-4 btn-sm"
                    th:href="@{/admin/users/create}">
@@ -29,6 +29,7 @@
                                 <th style="width: 20%">Họ và tên</th>
                                 <th style="width: 15%">Số điện thoại</th>
                                 <th class="text-center" style="width: 15%">Vai trò</th>
+                                <th class="text-center" style="width: 15%">Trạng thái</th>
                                 <th class="text-center" style="width: 25%">Thao tác</th>
                             </tr>
                         </thead>
@@ -50,15 +51,31 @@
                                 </td>
 
                                 <td class="text-center">
+                                    <span th:if="${u.userRole.name() == 'ROLE_CHEF' and !u.active}" 
+                                          class="badge bg-secondary">Chờ duyệt</span>
+                                    <span th:if="${u.userRole.name() == 'ROLE_CHEF' and u.active}" 
+                                          class="badge bg-success">Đã duyệt</span>
+                                    <span th:if="${u.userRole.name() != 'ROLE_CHEF'}" 
+                                          class="badge bg-success">Hoạt động</span>
+                                </td>
+
+                                <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2" th:if="${u.userRole != 'ROLE_ADMIN'}">
-                                        <a class="btn btn-sm btn-outline-success rounded-pill px-3">Nâng cấp</a>
-                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3">Xóa</button>
+                                        <button th:if="${u.userRole.name() == 'ROLE_CHEF' and !u.active}"
+                                                class="btn btn-sm btn-success rounded-pill px-3"
+                                                th:onclick="'approveUser(' + ${u.id} + ')'">
+                                            Duyệt
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                                th:onclick="'deleteUser(' + ${u.id} + ')'">
+                                            Xóa
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
 
                             <tr th:if="${#lists.isEmpty(users)}">
-                                <td colspan="6" class="text-center text-muted py-4">
+                                <td colspan="7" class="text-center text-muted py-4">
                                     Chưa có người dùng nào trong hệ thống.
                                 </td>
                             </tr>

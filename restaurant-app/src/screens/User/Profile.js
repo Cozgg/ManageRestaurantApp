@@ -4,8 +4,8 @@ import cookies from "react-cookies";
 import {useNavigate} from "react-router-dom";
 import {Button, Card, Col, Container, Image, Row, Table} from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
-import {authApis, endpoints} from "../../configs/Apis";
-import {message} from "antd";
+import Apis, {authApis, endpoints} from "../../configs/Apis";
+
 const Profile = () => {
   const {user, dispatch} = useContext(MyUserContext);
   const [loading, setLoading] = useState(false);
@@ -13,11 +13,12 @@ const Profile = () => {
   const nav = useNavigate();
 
   const loadOrders = async () => {
+    if (!user) return;
+    setLoading(true);
     try {
-      setLoading(true);
       const token = cookies.load("token");
       let res = await authApis(token).get(endpoints["get-orders"]);
-      setOrders(res.data || []);
+      setOrders(res.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -25,29 +26,6 @@ const Profile = () => {
     }
   };
 
-  const confirmOrder = async (orderId) => {
-    try {
-      setLoading(true);
-      const token = cookies.load("token");
-      let res = await authApis(token).patch(
-        endpoints["confirm-order"](orderId),
-      );
-      if (res.status === 200) {
-        message.success("Xác nhận thanh toán thành công");
-        loadOrders();
-      } else {
-        message.error("Lỗi xác nhận thanh toán");
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadOrders();
-  }, []);
   const logout = () => {
     dispatch({
       type: "logout",
@@ -57,16 +35,22 @@ const Profile = () => {
     nav("/");
   };
 
+  useEffect(() => {
+    if (user) {
+      loadOrders();
+    }
+  }, [user]);
+
   if (!user) {
     return (
-      <Container className="mt-5 text-center">Đang tải dữ liệu...</Container>
+      <Container className="mt-5 text-center">
+        <MySpinner />
+      </Container>
     );
   }
 
   return (
     <Container className="my-5">
-      {!user && <MySpinner />}
-
       <Row className="g-4">
         <Col lg={4} md={5}>
           <Card className="shadow-sm border-0 rounded-4 h-100">
@@ -152,13 +136,7 @@ const Profile = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {loading === true ? (
-                        <tr>
-                          <td colSpan="6" className="text-center py-5">
-                            <MySpinner />
-                          </td>
-                        </tr>
-                      ) : orders.length === 0 ? (
+                      {orders.length === 0 ? (
                         <tr>
                           {user.userRole === "ROLE_CHEF" ? (
                             <td
@@ -214,30 +192,14 @@ const Profile = () => {
                               {order.totalPrice.toLocaleString("vi-VN")} ₫
                             </td>
                             <td className="text-center align-middle">
-                              {user.userRole === "ROLE_ADMIN" &&
-                              order.statusPay === "PENDING" ? (
-                                <>
-                                  <Button
-                                    variant="outline-primary"
-                                    size="sm"
-                                    className="rounded-pill fw-semibold px-3 shadow-sm"
-                                    onClick={() => confirmOrder(order.id)}
-                                  >
-                                    Xác nhận thanh toán
-                                  </Button>
-                                </>
-                              ) : (
-                                <Button
-                                  variant="outline-primary"
-                                  size="sm"
-                                  className="rounded-pill fw-semibold px-3 shadow-sm"
-                                  onClick={() =>
-                                    nav(`/order-detail/${order.id}`)
-                                  }
-                                >
-                                  <i className="fas fa-eye me-1"></i> Chi tiết
-                                </Button>
-                              )}
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                className="rounded-pill fw-semibold px-3 shadow-sm"
+                                onClick={() => nav(`/order-detail/${order.id}`)}
+                              >
+                                Chi tiết
+                              </Button>
                             </td>
                           </tr>
                         ))

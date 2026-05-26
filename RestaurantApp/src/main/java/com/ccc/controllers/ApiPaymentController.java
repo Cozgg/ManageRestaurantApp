@@ -5,7 +5,9 @@
 package com.ccc.controllers;
 
 import com.ccc.dto.MomoIpnResponse;
+import com.ccc.dto.PaymentEventDto;
 import com.ccc.service.OrderService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,10 @@ public class ApiPaymentController {
 
     @Autowired
     private OrderService orderService;
+    
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    
 
     @PostMapping("/momo-ipn")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -51,19 +57,22 @@ public class ApiPaymentController {
             String realOrderIdStr = rawOrderId.split("_")[0];
             int orderId = Integer.parseInt(realOrderIdStr);
 
-            // 2. XỬ LÝ AN TOÀN transId: Nếu null thì gán tạm là 0L
             Long transId = response.getTransId() != null ? response.getTransId() : 0L;
 
             if (response.getResultCode() == 0) {
                 orderService.updateOrderStatus(orderId, "COMPLETED", transId);
-                System.out.println("✅ Đã cập nhật đơn " + orderId + " thành COMPLETED");
+                System.out.println("Đã cập nhật đơn " + orderId + " thành COMPLETED");
+                
+                PaymentEventDto event = PaymentEventDto.builder().orderId(String.valueOf(orderId)).
+                        transactionId(String.valueOf(transId)).amount(response.getAmount()).build();
+                rabbitTemplate.convertAndSend("ex.payment_success", "", event);
+                System.out.println("Đã bắn sự kiện thanh toán lên RabbitMQ cho đơn: " + orderId);
             } else {
                 orderService.updateOrderStatus(orderId, "CANCELED", transId);
-                System.out.println("❌ Đã cập nhật đơn " + orderId + " thành CANCELED. Lý do: " + response.getMessage());
+                System.out.println("Đã cập nhật đơn " + orderId + " thành CANCELED. Lý do: " + response.getMessage());
             }
 
         } catch (Exception e) {
-            // 3. IN CHI TIẾT LỖI: Để biết chính xác dòng nào làm sập code
             System.err.println("⚠️ Lỗi xử lý IPN:");
             e.printStackTrace();
         }

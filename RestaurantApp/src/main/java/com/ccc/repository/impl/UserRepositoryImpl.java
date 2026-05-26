@@ -56,6 +56,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User getUserById(int userId) {
         Session s = this.factory.getObject().getCurrentSession();
         Query q = s.createNamedQuery("User.findById", User.class);
+        q.setParameter("id", userId);
         return (User) q.getSingleResult();
     }
     

@@ -8,8 +8,12 @@ export const endpoints = {
   profile: "/secure/profile",
   "add-order": "/secure/orders",
   "order-detail": (orderId) => `/secure/orders/${orderId}`,
+  tables: "/tables",
+  reservations: "/secure/reservations",
+  "reservations-user": (userId) => `/secure/reservations/user/${userId}`,
+  "reservations-table": (tableId) => `/secure/reservations/table/${tableId}`,
+  "reservation-detail": (id) => `/secure/reservations/${id}`,
   "get-orders": "/secure/orders",
-  "confirm-order": (orderId) => `/secure/orders/${orderId}`,
 };
 
 export default axios.create({

@@ -1,6 +1,7 @@
-import {useContext, useEffect, useState} from "react";
-import Apis, {endpoints} from "../configs/Apis";
+import { useContext, useEffect, useState, useRef } from "react";
+import Apis, { endpoints } from "../configs/Apis";
 import {
+  Badge,
   Button,
   Container,
   Form,
@@ -8,29 +9,70 @@ import {
   Nav,
   Navbar,
 } from "react-bootstrap";
-import {Link, useNavigate} from "react-router-dom";
-import {MyOrderContext} from "../utils/contexts/MyOrderContext";
-import {MyUserContext} from "../utils/contexts/MyUserContext";
+import { Link, useNavigate } from "react-router-dom";
+import { MyOrderContext } from "../utils/contexts/MyOrderContext";
+import { MyUserContext } from "../utils/contexts/MyUserContext";
+import { MyCompareContext } from "../utils/contexts/MyCompareContext";
+import MySpinner from "../components/MySpinner";
+import { database } from "../firebaseConfig";
+import { ref, onValue, off } from "firebase/database";
 
 const Header = () => {
-  const {totalQuantity} = useContext(MyOrderContext);
+  const { totalQuantity } = useContext(MyOrderContext);
   const [categories, setCategories] = useState([]);
-  const {user} = useContext(MyUserContext);
+  const [loading, setLoading] = useState(false);
+  const { user } = useContext(MyUserContext);
+  const [compareList, compareDispatch] = useContext(MyCompareContext);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const unreadListenerRef = useRef(null);
   // const [kw, setKw] = useState("");
   const nav = useNavigate();
 
   const loadCategories = async () => {
+    setLoading(true);
     try {
       let res = await Apis.get(endpoints["categories"]);
       setCategories(res.data || []);
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const loadUnreadCount = (userId) => {
+    if (!userId) return;
+
+    // Cleanup previous listener
+    if (unreadListenerRef.current) {
+      off(unreadListenerRef.current);
+    }
+
+    const unreadRef = ref(database, `unread/${userId}`);
+    unreadListenerRef.current = unreadRef;
+
+    onValue(unreadRef, (snapshot) => {
+      const data = snapshot.val();
+      setUnreadCount(data || 0);
+    });
   };
 
   useEffect(() => {
     loadCategories();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      loadUnreadCount(user.id);
+    }
+
+    return () => {
+      // Cleanup listener on unmount
+      if (unreadListenerRef.current) {
+        off(unreadListenerRef.current);
+      }
+    };
+  }, [user]);
 
   // const search = (e) => {
   //   e.preventDefault();
@@ -48,9 +90,9 @@ const Header = () => {
           as={Link}
           to="/"
           className="fw-bold fs-3 d-flex align-items-center gap-2"
-          style={{color: "#27ae60"}}
+          style={{ color: "#27ae60" }}
         >
-          🍽️ <span>eRestaurant</span>
+          <span>eRestaurant</span>
         </Navbar.Brand>
 
         <Navbar.Toggle
@@ -79,11 +121,50 @@ const Header = () => {
 
           <div className="d-flex align-items-center mt-3 mt-lg-0 gap-3 flex-wrap">
             <Button
+              variant="outline-warning"
+              onClick={() => nav("/reservation")}
+              className="rounded-pill px-3 fw-bold shadow-sm"
+            >
+              Đặt bàn
+            </Button>
+            {user && (
+              <Button
+                variant="outline-info"
+                onClick={() => nav("/chat")}
+                className="rounded-pill px-3 fw-bold shadow-sm position-relative"
+              >
+                Tin nhắn
+                {unreadCount > 0 && (
+                  <Badge
+                    bg="danger"
+                    className="position-absolute top-0 start-100 translate-middle rounded-pill"
+                  >
+                    {unreadCount}
+                  </Badge>
+                )}
+              </Button>
+            )}
+            <Button
+              variant="outline-primary"
+              onClick={() => nav("/compare")}
+              className="rounded-pill px-3 fw-bold shadow-sm position-relative"
+            >
+              So sánh
+              {compareList.length > 0 && (
+                <Badge
+                  bg="danger"
+                  className="position-absolute top-0 start-100 translate-middle rounded-pill"
+                >
+                  {compareList.length}
+                </Badge>
+              )}
+            </Button>
+            <Button
               variant="outline-success"
               onClick={() => nav("/order")}
               className="rounded-pill px-4 fw-bold shadow-sm"
             >
-              🛒 Giỏ hàng ({totalQuantity})
+              Giỏ hàng ({totalQuantity})
             </Button>
             {user ? (
               <Button

@@ -5,13 +5,13 @@
 package com.ccc.repository.impl;
 
 import com.ccc.dto.ItemDto;
-import com.ccc.payment.PaymentMethod;
+import com.ccc.enums.PaymentMethod;
 import com.ccc.pojo.Dish;
 import com.ccc.pojo.OrderDetail;
 import com.ccc.pojo.OrderItem;
 import com.ccc.pojo.Orders;
 import com.ccc.pojo.User;
-import com.ccc.pojo.UserRole;
+import com.ccc.enums.UserRole;
 import com.ccc.repository.DishRepository;
 import com.ccc.repository.OrderRepository;
 import com.ccc.repository.UserRepository;
@@ -64,9 +64,8 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<Orders> getOrders() {
+    public List<Orders> getOrders(User u) {
         Session s = this.factory.getObject().getCurrentSession();
-        User u = userRepo.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<Orders> cq = b.createQuery(Orders.class);
         Root root = cq.from(Orders.class);

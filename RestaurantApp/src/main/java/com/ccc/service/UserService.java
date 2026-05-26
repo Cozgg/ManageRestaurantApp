@@ -6,7 +6,7 @@ package com.ccc.service;
 
 import com.ccc.dto.UserDto;
 import com.ccc.pojo.User;
-import com.ccc.pojo.UserRole;
+import com.ccc.enums.UserRole;
 import java.util.List;
 import java.util.Map;
 import org.springframework.security.core.userdetails.UserDetailsService;

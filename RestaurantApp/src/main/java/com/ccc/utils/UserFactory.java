@@ -5,7 +5,7 @@
 package com.ccc.utils;
 
 import com.ccc.pojo.User;
-import com.ccc.pojo.UserRole;
+import com.ccc.enums.UserRole;
 import java.util.Map;
 
 /**
