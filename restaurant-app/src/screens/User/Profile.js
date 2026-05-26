@@ -17,26 +17,12 @@ const Profile = () => {
     setLoading(true);
     try {
       const token = cookies.load("token");
-      let res = await authApis(token).get(endpoints["order-detail"](""));
+      let res = await authApis(token).get(endpoints["get-orders"]);
       setOrders(res.data);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const confirmOrder = async (orderId) => {
-    if (!window.confirm("Bạn có chắc muốn xác nhận thanh toán đơn này?"))
-      return;
-    try {
-      const token = cookies.load("token");
-      await authApis(token).patch(
-        `${endpoints["order-detail"]("")}${orderId}/confirm`,
-      );
-      loadOrders();
-    } catch (error) {
-      console.error(error);
     }
   };
 

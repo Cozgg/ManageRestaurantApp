@@ -101,7 +101,8 @@ const OrderDetail = () => {
                     />
                     <div className="flex-grow-1 pt-1 pl-2">
                       <h6 className="fw-bold mb-1 text-dark">
-                        {item.dishName}
+                        {item.dishName} (Phụ trách:{" "}
+                        {item.chef.firstName + " " + item.chef.lastName})
                       </h6>
                       <span className="text-muted small fw-medium">
                         {item.quantity} x{" "}
