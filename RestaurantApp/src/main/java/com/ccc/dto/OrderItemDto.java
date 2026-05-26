@@ -25,4 +25,5 @@ public class OrderItemDto {
     private String dishImage;
     private int quantity;
     private int unitPrice;
+    private UserDto chef;
 }

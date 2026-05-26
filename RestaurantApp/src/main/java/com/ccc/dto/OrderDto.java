@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderDto {
     private Integer id;
-    private Integer userId;
+    private UserDto user;
     private Integer reservationId;
     private Date createdDate;
     private String payment;

@@ -9,6 +9,7 @@ import com.ccc.dto.MomoIpnResponse;
 import com.ccc.dto.OrderDetailDto;
 import com.ccc.dto.OrderDto;
 import com.ccc.dto.OrderItemDto;
+import com.ccc.dto.UserDto;
 import com.ccc.payment.PaymentMethod;
 import com.ccc.payment.PaymentStrategy;
 import com.ccc.pojo.OrderDetail;
@@ -55,7 +56,8 @@ public class OrderServiceImpl implements OrderService {
         List<Orders> orders = this.orderRepo.getOrders();
 
         return orders.stream().map(o -> {
-            OrderDto odto = OrderDto.builder().id(o.getId()).userId(o.getUserId().getId()).totalPrice(o.getTotalPrice())
+            UserDto u = UserDto.builder().firstName(o.getUserId().getFirstName()).lastName(o.getUserId().getLastName()).build();
+            OrderDto odto = OrderDto.builder().id(o.getId()).user(u).totalPrice(o.getTotalPrice())
                     .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
                     .reservationId(o.getReservationId() != null
                             ? o.getReservationId().getId()
@@ -70,13 +72,16 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDetail> details = this.orderRepo.getOrderDetailsByOrderId(orderId);
         if(details != null && !details.isEmpty()){
             Orders o = details.get(0).getOrderId();
-            OrderDto odto = OrderDto.builder().id(o.getId()).userId(o.getUserId().getId()).totalPrice(o.getTotalPrice())
+            UserDto u = UserDto.builder().firstName(o.getUserId().getFirstName()).lastName(o.getUserId().getLastName()).build();
+
+            OrderDto odto = OrderDto.builder().id(o.getId()).user(u).totalPrice(o.getTotalPrice())
                     .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
                     .reservationId(o.getReservationId() != null ? o.getReservationId().getId() : null).build();
             
             List<OrderItemDto> items = details.stream().map(od ->{
                 OrderItemDto itemDto = OrderItemDto.builder().dishId(od.getDishId().getId()).dishImage(od.getDishId().getImage())
-                        .dishName(od.getDishId().getName()).quantity(od.getQuantity()).unitPrice(od.getUnitPrice()).build();
+                        .dishName(od.getDishId().getName()).quantity(od.getQuantity()).unitPrice(od.getUnitPrice()).chef(UserDto.builder()
+                                .firstName(od.getDishId().getUserId().getFirstName()).lastName(od.getDishId().getUserId().getLastName()).build()).build();
                 return itemDto;
             }).collect(Collectors.toList());
             OrderDetailDto dto = OrderDetailDto.builder().order(odto).items(items).build();
