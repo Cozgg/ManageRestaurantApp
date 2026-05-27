@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const endpoints = {
   categories: "/categories",
-  dishes: "/dishes",
+  dishes: "/secure/dishes",
   login: "/login",
   register: "/register",
   profile: "/secure/profile",

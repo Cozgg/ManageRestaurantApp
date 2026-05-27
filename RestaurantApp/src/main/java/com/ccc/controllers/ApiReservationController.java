@@ -6,13 +6,15 @@ package com.ccc.controllers;
 
 import com.ccc.dto.ReservationDto;
 import com.ccc.dto.TableDto;
+import com.ccc.enums.UserRole;
+import com.ccc.pojo.User;
 import com.ccc.service.ReservationService;
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +35,9 @@ public class ApiReservationController {
 
     @Autowired
     private ReservationService reservationService;
+    
+    @Autowired
+    private com.ccc.service.UserService userService;
 
     @GetMapping("/secure/reservations")
     public ResponseEntity<List<ReservationDto>> list(@RequestParam Map<String, String> params) {
@@ -67,8 +72,12 @@ public class ApiReservationController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("/secure/reservations/{id}")
-    public ResponseEntity<ReservationDto> update(@PathVariable int id, @RequestBody Map<String, String> params) {
+    @PutMapping("/api/reservations/{id}")
+    public ResponseEntity<?> update(@PathVariable int id, @RequestBody Map<String, String> params, Principal principal) {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
+            return new ResponseEntity<>("Bạn không có quyền sửa đặt bàn", HttpStatus.FORBIDDEN);
+        }
         ReservationDto r = this.reservationService.updateReservation(id, params);
         if (r != null) {
             return new ResponseEntity<>(r, HttpStatus.OK);
@@ -76,8 +85,12 @@ public class ApiReservationController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/secure/reservations/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
+    @DeleteMapping("/api/reservations/{id}")
+    public ResponseEntity<?> delete(@PathVariable int id, Principal principal) {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
+            return new ResponseEntity<>("Bạn không có quyền xóa đặt bàn", HttpStatus.FORBIDDEN);
+        }
         if (this.reservationService.deleteReservation(id)) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -89,8 +102,12 @@ public class ApiReservationController {
         return new ResponseEntity<>(this.reservationService.getAvailableTables(startTime, endTime), HttpStatus.OK);
     }
 
-    @PostMapping("/walk-in")
-    public ResponseEntity<ReservationDto> createWalkIn(@RequestBody Map<String, String> params) {
+    @PostMapping("/api/walk-in")
+    public ResponseEntity<?> createWalkIn(@RequestBody Map<String, String> params, Principal principal) {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
+            return new ResponseEntity<>("Bạn không có quyền tạo walk-in", HttpStatus.FORBIDDEN);
+        }
         try {
             ReservationDto r = this.reservationService.createWalkInReservation(params);
             if (r != null) {

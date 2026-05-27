@@ -66,16 +66,20 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
-                                        <button th:if="${r.status == 'PENDING'}"
-                                                class="btn btn-sm btn-success rounded-pill px-3"
-                                                th:onclick="'confirmReservation(' + ${r.id} + ')'">
-                                            Xác nhận
-                                        </button>
-                                        <button th:if="${r.status == 'PENDING' or r.status == 'CONFIRMED'}"
-                                                class="btn btn-sm btn-outline-danger rounded-pill px-3"
-                                                th:onclick="'cancelReservation(' + ${r.id} + ')'">
-                                            Hủy
-                                        </button>
+                                        <form th:if="${r.status == 'PENDING'}"
+                                              th:action="@{/admin/reservations/{reservationId}/confirm(reservationId=${r.id})}"
+                                              method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                                                Xác nhận
+                                            </button>
+                                        </form>
+                                        <form th:if="${r.status == 'PENDING' or r.status == 'CONFIRMED'}"
+                                              th:action="@{/admin/reservations/{reservationId}/cancel(reservationId=${r.id})}"
+                                              method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                                Hủy
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>
@@ -102,26 +106,26 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="walkInForm">
+                    <form th:action="@{/admin/walk-in}" method="post">
                         <div class="mb-3">
                             <label class="form-label">Tên khách</label>
-                            <input type="text" class="form-control" id="customerName" required>
+                            <input type="text" class="form-control" id="customerName" name="customerName" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Bàn</label>
-                            <select class="form-select" id="tableId" required>
+                            <select class="form-select" id="tableId" name="tableId" required>
                                 <option value="">Chọn bàn</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Số người</label>
-                            <input type="number" class="form-control" id="numberPeople" min="1" value="1" required>
+                            <input type="number" class="form-control" id="numberPeople" name="numberPeople" min="1" value="1" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Khóa bàn</button>
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="createWalkIn()">Khóa bàn</button>
                 </div>
             </div>
         </div>
@@ -151,87 +155,6 @@
                 })
                 .catch(error => console.error('Error:', error));
         });
-        
-        function createWalkIn() {
-            const customerName = document.getElementById('customerName').value;
-            const tableId = document.getElementById('tableId').value;
-            const numberPeople = document.getElementById('numberPeople').value;
-            
-            if (!customerName || !tableId) {
-                alert('Vui lòng nhập tên khách và chọn bàn!');
-                return;
-            }
-            
-            const data = {
-                customerName: customerName,
-                tableId: tableId,
-                numberPeople: numberPeople
-            };
-            
-            fetch('/api/walk-in', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('Đã khóa bàn thành công!');
-                    location.reload();
-                } else {
-                    alert('Lỗi khi khóa bàn!');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi kết nối server!');
-            });
-        }
-        
-        function confirmReservation(reservationId) {
-            if (confirm('Bạn có chắc muốn xác nhận đặt bàn này?')) {
-                fetch(`/api/reservations/${reservationId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ status: 'CONFIRMED' })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Đã xác nhận đặt bàn thành công!');
-                        location.reload();
-                    } else {
-                        alert('Lỗi khi xác nhận đặt bàn!');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi kết nối server!');
-                });
-            }
-        }
-
-        function cancelReservation(reservationId) {
-            if (confirm('Bạn có chắc muốn hủy đặt bàn này?')) {
-                fetch(`/api/reservations/${reservationId}`, {
-                    method: 'DELETE'
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Đã hủy đặt bàn thành công!');
-                        location.reload();
-                    } else {
-                        alert('Lỗi khi hủy đặt bàn!');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi kết nối server!');
-                });
-            }
-        }
 
         function filterReservations() {
             const status = document.getElementById('statusFilter').value;
