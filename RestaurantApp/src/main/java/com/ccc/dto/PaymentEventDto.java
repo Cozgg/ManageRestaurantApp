@@ -4,10 +4,8 @@
  */
 package com.ccc.dto;
 
-import com.ccc.enums.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.Date;
-
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,13 +20,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrderDto {
-    private Integer id;
-    private UserDto user;
-    private Integer reservationId;
-    private Date createdDate;
-    private String payment;
-    private Integer totalPrice;
-    private String statusPay;
+public class PaymentEventDto implements Serializable {
+    private String orderId;
     private String transactionId;
+    private double amount;
 }

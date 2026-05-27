@@ -8,11 +8,14 @@ import com.ccc.dto.ItemDto;
 import com.ccc.dto.OrderDetailDto;
 import com.ccc.dto.OrderDto;
 import com.ccc.pojo.Orders;
+import com.ccc.pojo.User;
 import com.ccc.service.OrderService;
+import com.ccc.service.UserService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,9 +36,13 @@ public class ApiOrderController {
     @Autowired
     private OrderService orderService;
     
+    @Autowired
+    private UserService userService;
+    
     @GetMapping("/secure/orders")
     public ResponseEntity<List<OrderDto>> getOrders(){
-        return new ResponseEntity<>(this.orderService.getOrders(), HttpStatus.OK);
+        User u = userService.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        return new ResponseEntity<>(this.orderService.getOrders(u), HttpStatus.OK);
     }
     
     @GetMapping("/secure/orders/{orderId}")
@@ -49,12 +56,5 @@ public class ApiOrderController {
         return new ResponseEntity<>(url, HttpStatus.CREATED);
     }
     
-    @CrossOrigin
-    @PatchMapping("/secure/orders/{orderId}")
-    public ResponseEntity<OrderDetailDto> confirmCashOrder(@PathVariable(value = "orderId") int orderId){
-        this.orderService.updateOrderStatus(orderId, "COMPLETED");
-        OrderDetailDto dto = this.orderService.getOrderById(orderId);
-        return new ResponseEntity<>(dto, HttpStatus.OK);
-    }
     
 }

@@ -1,13 +1,13 @@
-import { useContext, useEffect, useState } from "react";
-import { MyUserContext } from "../../utils/contexts/MyUserContext";
+import {useContext, useEffect, useState} from "react";
+import {MyUserContext} from "../../utils/contexts/MyUserContext";
 import cookies from "react-cookies";
-import { useNavigate } from "react-router-dom";
-import { Button, Card, Col, Container, Image, Row, Table } from "react-bootstrap";
+import {useNavigate} from "react-router-dom";
+import {Button, Card, Col, Container, Image, Row, Table} from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
-import Apis, { authApis, endpoints } from "../../configs/Apis";
+import Apis, {authApis, endpoints} from "../../configs/Apis";
 
 const Profile = () => {
-  const { user, dispatch } = useContext(MyUserContext);
+  const {user, dispatch} = useContext(MyUserContext);
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState([]);
   const nav = useNavigate();
@@ -17,23 +17,12 @@ const Profile = () => {
     setLoading(true);
     try {
       const token = cookies.load("token");
-      let res = await authApis(token).get(endpoints["order-detail"](""));
+      let res = await authApis(token).get(endpoints["get-orders"]);
       setOrders(res.data);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const confirmOrder = async (orderId) => {
-    if (!window.confirm("Bạn có chắc muốn xác nhận thanh toán đơn này?")) return;
-    try {
-      const token = cookies.load("token");
-      await authApis(token).patch(`${endpoints["order-detail"]("")}${orderId}/confirm`);
-      loadOrders();
-    } catch (error) {
-      console.error(error);
     }
   };
 
@@ -73,7 +62,7 @@ const Profile = () => {
                   src={user.avatar || "https://via.placeholder.com/150"}
                   roundedCircle
                   className="border border-3 border-success p-1 shadow-sm"
-                  style={{ width: "130px", height: "130px", objectFit: "cover" }}
+                  style={{width: "130px", height: "130px", objectFit: "cover"}}
                 />
               </div>
 
@@ -120,11 +109,11 @@ const Profile = () => {
           <Card className="shadow-sm border-0 rounded-4 h-100">
             <Card.Body className="p-4">
               {user.userRole === "ROLE_CHEF" ? (
-                <h4 className="fw-bold mb-4" style={{ color: "#2c3e50" }}>
+                <h4 className="fw-bold mb-4" style={{color: "#2c3e50"}}>
                   Lịch sử đặt món
                 </h4>
               ) : (
-                <h4 className="fw-bold mb-4" style={{ color: "#2c3e50" }}>
+                <h4 className="fw-bold mb-4" style={{color: "#2c3e50"}}>
                   Lịch sử giao dịch
                 </h4>
               )}
@@ -187,12 +176,13 @@ const Profile = () => {
 
                             <td>
                               <span
-                                className={`badge ${order.statusPay === "COMPLETED"
+                                className={`badge ${
+                                  order.statusPay === "COMPLETED"
                                     ? "bg-success"
                                     : order.statusPay === "PENDING"
                                       ? "bg-warning text-dark"
                                       : "bg-danger"
-                                  }`}
+                                }`}
                               >
                                 {order.statusPay}
                               </span>
@@ -202,30 +192,14 @@ const Profile = () => {
                               {order.totalPrice.toLocaleString("vi-VN")} ₫
                             </td>
                             <td className="text-center align-middle">
-                              {user.userRole === "ROLE_ADMIN" &&
-                                order.statusPay === "PENDING" ? (
-                                <>
-                                  <Button
-                                    variant="outline-primary"
-                                    size="sm"
-                                    className="rounded-pill fw-semibold px-3 shadow-sm"
-                                    onClick={() => confirmOrder(order.id)}
-                                  >
-                                    Xác nhận thanh toán
-                                  </Button>
-                                </>
-                              ) : (
-                                <Button
-                                  variant="outline-primary"
-                                  size="sm"
-                                  className="rounded-pill fw-semibold px-3 shadow-sm"
-                                  onClick={() =>
-                                    nav(`/order-detail/${order.id}`)
-                                  }
-                                >
-                                  Chi tiết
-                                </Button>
-                              )}
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                className="rounded-pill fw-semibold px-3 shadow-sm"
+                                onClick={() => nav(`/order-detail/${order.id}`)}
+                              >
+                                Chi tiết
+                              </Button>
                             </td>
                           </tr>
                         ))

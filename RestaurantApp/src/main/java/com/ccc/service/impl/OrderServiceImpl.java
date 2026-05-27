@@ -9,10 +9,12 @@ import com.ccc.dto.MomoIpnResponse;
 import com.ccc.dto.OrderDetailDto;
 import com.ccc.dto.OrderDto;
 import com.ccc.dto.OrderItemDto;
+import com.ccc.dto.UserDto;
 import com.ccc.enums.PaymentMethod;
 import com.ccc.payment.PaymentStrategy;
 import com.ccc.pojo.OrderDetail;
 import com.ccc.pojo.Orders;
+import com.ccc.pojo.User;
 import com.ccc.repository.OrderRepository;
 import com.ccc.repository.UserRepository;
 import com.ccc.service.OrderService;
@@ -51,15 +53,16 @@ public class OrderServiceImpl implements OrderService {
     private String secretKey;
 
     @Override
-    public List<OrderDto> getOrders() {
-        List<Orders> orders = this.orderRepo.getOrders();
+    public List<OrderDto> getOrders(User u) {
+        List<Orders> orders = this.orderRepo.getOrders(u);
 
         return orders.stream().map(o -> {
-            OrderDto odto = OrderDto.builder().id(o.getId()).userId(o.getUserId().getId()).totalPrice(o.getTotalPrice())
+            UserDto udto = UserDto.builder().firstName(o.getUserId().getFirstName()).lastName(o.getUserId().getLastName()).build();
+            OrderDto odto = OrderDto.builder().id(o.getId()).user(udto).totalPrice(o.getTotalPrice())
                     .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
                     .reservationId(o.getReservationId() != null
                             ? o.getReservationId().getId()
-                            : null).build();
+                            : null).transactionId(o.getTransactionId() != null ? o.getTransactionId() : null).build();
 
             return odto;
         }).collect(Collectors.toList());
@@ -70,13 +73,16 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDetail> details = this.orderRepo.getOrderDetailsByOrderId(orderId);
         if(details != null && !details.isEmpty()){
             Orders o = details.get(0).getOrderId();
-            OrderDto odto = OrderDto.builder().id(o.getId()).userId(o.getUserId().getId()).totalPrice(o.getTotalPrice())
+            UserDto u = UserDto.builder().firstName(o.getUserId().getFirstName()).lastName(o.getUserId().getLastName()).build();
+
+            OrderDto odto = OrderDto.builder().id(o.getId()).user(u).totalPrice(o.getTotalPrice())
                     .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
                     .reservationId(o.getReservationId() != null ? o.getReservationId().getId() : null).build();
             
             List<OrderItemDto> items = details.stream().map(od ->{
                 OrderItemDto itemDto = OrderItemDto.builder().dishId(od.getDishId().getId()).dishImage(od.getDishId().getImage())
-                        .dishName(od.getDishId().getName()).quantity(od.getQuantity()).unitPrice(od.getUnitPrice()).build();
+                        .dishName(od.getDishId().getName()).quantity(od.getQuantity()).unitPrice(od.getUnitPrice()).chef(UserDto.builder()
+                                .firstName(od.getDishId().getUserId().getFirstName()).lastName(od.getDishId().getUserId().getLastName()).build()).build();
                 return itemDto;
             }).collect(Collectors.toList());
             OrderDetailDto dto = OrderDetailDto.builder().order(odto).items(items).build();
