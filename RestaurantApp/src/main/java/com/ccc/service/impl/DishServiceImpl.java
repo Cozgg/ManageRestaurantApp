@@ -72,6 +72,14 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
+    public List<DishDto> getDishs(Map<String, String> params, User currentChef) {
+        return this.dishRepo.getDishs(params, currentChef)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public DishDto getDishById(Integer id) {
         Dish dish = this.dishRepo.getDishById(id);
         if (dish == null) {
@@ -171,4 +179,5 @@ public class DishServiceImpl implements DishService {
         this.dishRepo.deleteDish(id);
         return true;
     }
+
 }

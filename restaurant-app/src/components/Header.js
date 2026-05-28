@@ -1,27 +1,28 @@
-import { useContext, useEffect, useState, useRef } from "react";
-import Apis, { endpoints } from "../configs/Apis";
+import {useContext, useEffect, useState, useRef} from "react";
+import Apis, {endpoints} from "../configs/Apis";
 import {
   Badge,
   Button,
   Container,
+  Dropdown,
   Form,
   InputGroup,
   Nav,
   Navbar,
 } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
-import { MyOrderContext } from "../utils/contexts/MyOrderContext";
-import { MyUserContext } from "../utils/contexts/MyUserContext";
-import { MyCompareContext } from "../utils/contexts/MyCompareContext";
+import {Link, NavLink, useNavigate} from "react-router-dom";
+import {MyOrderContext} from "../utils/contexts/MyOrderContext";
+import {MyUserContext} from "../utils/contexts/MyUserContext";
+import {MyCompareContext} from "../utils/contexts/MyCompareContext";
 import MySpinner from "../components/MySpinner";
-import { database } from "../firebaseConfig";
-import { ref, onValue, off } from "firebase/database";
-
+import {database} from "../firebaseConfig";
+import {ref, onValue, off} from "firebase/database";
+import "./Header.css";
 const Header = () => {
-  const { totalQuantity } = useContext(MyOrderContext);
+  const {totalQuantity} = useContext(MyOrderContext);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { user } = useContext(MyUserContext);
+  const {user} = useContext(MyUserContext);
   const [compareList, compareDispatch] = useContext(MyCompareContext);
   const [unreadCount, setUnreadCount] = useState(0);
   const unreadListenerRef = useRef(null);
@@ -86,11 +87,12 @@ const Header = () => {
       className="shadow-sm sticky-top py-3 border-bottom"
     >
       <Container>
+        {/* LOGO */}
         <Navbar.Brand
           as={Link}
           to="/"
           className="fw-bold fs-3 d-flex align-items-center gap-2"
-          style={{ color: "#27ae60" }}
+          style={{color: "#27ae60"}}
         >
           <span>eRestaurant</span>
         </Navbar.Brand>
@@ -101,39 +103,87 @@ const Header = () => {
         />
 
         <Navbar.Collapse id="basic-navbar-nav">
-          {/* Danh sách các loại món ăn (Nằm giữa) */}
-          <Nav className="mx-auto fw-semibold align-items-lg-center">
-            <Nav.Link as={Link} to="/" className="px-3 text-dark">
-              Tất cả món
+          {/* CATEGORY NAV */}
+          <Nav className="mx-auto align-items-lg-center gap-lg-2">
+            {/* ALL */}
+            <Nav.Link
+              as={NavLink}
+              to="/"
+              end
+              className={({isActive}) =>
+                `px-3 py-2 rounded-pill fw-semibold border-0 nav-category ${
+                  isActive ? "nav-category-active" : "nav-category-inactive"
+                }`
+              }
+            >
+              🍽 Tất cả món
             </Nav.Link>
 
+            {/* CATEGORY */}
             {categories.map((c) => (
               <Nav.Link
                 key={c.id}
-                as={Link}
+                as={NavLink}
                 to={`/?cateId=${c.id}`}
-                className="px-3 text-secondary"
+                className={({isActive}) =>
+                  `px-3 py-2 rounded-pill fw-medium border-0 nav-category ${
+                    isActive ? "nav-category-active" : "nav-category-inactive"
+                  }`
+                }
               >
                 {c.name}
               </Nav.Link>
             ))}
           </Nav>
 
-          <div className="d-flex align-items-center mt-3 mt-lg-0 gap-3 flex-wrap">
-            <Button
-              variant="outline-warning"
-              onClick={() => nav("/reservation")}
-              className="rounded-pill px-3 fw-bold shadow-sm"
-            >
-              Đặt bàn
-            </Button>
+          {/* RIGHT ACTIONS */}
+          <div className="d-flex align-items-center mt-3 mt-lg-0 gap-2 flex-wrap">
+            {/* FEATURE DROPDOWN */}
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="light"
+                className="rounded-pill px-3 border-0 shadow-sm fw-semibold"
+                style={{
+                  backgroundColor: "#f8fafc",
+                }}
+              >
+                ⚡ Tiện ích
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu className="border-0 shadow rounded-4 overflow-hidden">
+                <Dropdown.Item
+                  onClick={() => nav("/reservation")}
+                  className="py-2"
+                >
+                  🍴 Đặt bàn
+                </Dropdown.Item>
+
+                <Dropdown.Item
+                  onClick={() => nav("/compare")}
+                  className="py-2 position-relative"
+                >
+                  ⚖️ So sánh món ăn
+                  {compareList.length > 0 && (
+                    <Badge bg="danger" className="ms-2">
+                      {compareList.length}
+                    </Badge>
+                  )}
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+
+            {/* CHAT */}
             {user && (
               <Button
-                variant="outline-info"
+                variant="light"
                 onClick={() => nav("/chat")}
-                className="rounded-pill px-3 fw-bold shadow-sm position-relative"
+                className="rounded-pill px-3 border-0 shadow-sm fw-semibold position-relative"
+                style={{
+                  backgroundColor: "#eff6ff",
+                  color: "#2563eb",
+                }}
               >
-                Tin nhắn
+                💬 Chat
                 {unreadCount > 0 && (
                   <Badge
                     bg="danger"
@@ -144,51 +194,41 @@ const Header = () => {
                 )}
               </Button>
             )}
+
+            {/* CART */}
             <Button
-              variant="outline-primary"
-              onClick={() => nav("/compare")}
-              className="rounded-pill px-3 fw-bold shadow-sm position-relative"
-            >
-              So sánh
-              {compareList.length > 0 && (
-                <Badge
-                  bg="danger"
-                  className="position-absolute top-0 start-100 translate-middle rounded-pill"
-                >
-                  {compareList.length}
-                </Badge>
-              )}
-            </Button>
-            <Button
-              variant="outline-success"
               onClick={() => nav("/order")}
-              className="rounded-pill px-4 fw-bold shadow-sm"
+              className="cart-btn border-0 d-flex align-items-center"
             >
-              Giỏ hàng ({totalQuantity})
+              <div className="cart-icon-wrapper">
+                <span className="cart-icon">🛒</span>
+
+                {totalQuantity > 0 && (
+                  <span className="cart-badge">{totalQuantity}</span>
+                )}
+              </div>
+
+              <span className="cart-text">Giỏ hàng</span>
             </Button>
+
+            {/* PROFILE */}
             {user ? (
               <Button
                 onClick={() => nav("/profile")}
-                variant="success"
-                className="rounded-pill px-3 fw-bold text-white d-flex align-items-center gap-2 shadow-sm"
+                className="profile-btn border-0 d-flex align-items-center"
               >
                 <img
                   src={user.avatar || "https://via.placeholder.com/40"}
                   alt="avatar"
-                  className="rounded-circle bg-white p-1"
-                  style={{
-                    width: "34px",
-                    height: "34px",
-                    objectFit: "cover",
-                  }}
+                  className="profile-avatar"
                 />
-                <span>{user.username}</span>
+
+                <span className="profile-name">{user.username}</span>
               </Button>
             ) : (
               <Button
                 onClick={() => nav("/login")}
-                variant="success"
-                className="rounded-pill px-4 fw-bold text-white shadow-sm"
+                className="login-btn border-0"
               >
                 Đăng nhập
               </Button>

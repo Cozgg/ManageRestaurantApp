@@ -37,7 +37,8 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
             "com.ccc.controllers",
             "com.ccc.repository",
             "com.ccc.service",
-            "com.ccc.payment"
+            "com.ccc.payment",
+            "com.ccc.consumer"
         }
 )
 @Order(2)

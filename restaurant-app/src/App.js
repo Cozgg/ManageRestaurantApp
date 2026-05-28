@@ -1,50 +1,104 @@
 import "./App.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { Container } from "react-bootstrap";
+import {Container} from "react-bootstrap";
 import Home from "./screens/Home/Home";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { MyOrderProvider } from "./utils/contexts/MyOrderContext";
-import { MyCompareContext } from "./utils/contexts/MyCompareContext";
+import {MyOrderProvider} from "./utils/contexts/MyOrderContext";
+import {MyCompareContext} from "./utils/contexts/MyCompareContext";
+import {MyOrderSocketContext} from "./utils/contexts/MyOrderSocketContext";
 import MyCompareReducer from "./utils/reducers/MyCompareReducer";
 import Order from "./screens/Order/Order";
 import ThankYou from "./screens/Order/ThankYou";
 import Login from "./screens/User/Login";
 import Register from "./screens/User/Register";
-import { MyUserContext } from "./utils/contexts/MyUserContext";
+import {MyUserContext} from "./utils/contexts/MyUserContext";
 import MyUserReducer from "./utils/reducers/MyUserReducer";
-import { useReducer } from "react";
+import {useEffect, useReducer, useState} from "react";
 import Profile from "./screens/User/Profile";
 import Compare from "./screens/Compare/Compare";
 import Reservation from "./screens/Reservation/Reservation";
 import OrderDetail from "./screens/Order/OrderDetail";
 import Chat from "./screens/Chat/Chat";
+import ChefDashboard from "./screens/Chef/ChefDashboard";
+import MainLayout from "./layouts/MainLayout";
+import ChefLayout from "./layouts/ChefLayout";
+import ChefProfile from "./screens/Chef/ChefProfile";
+import ChefOrderDetail from "./screens/Chef/ChefOrderDetail";
+import RealtimeOrders from "./screens/Chef/RealtimeOrders";
+import SockJS from "sockjs-client";
+import {Client} from "@stomp/stompjs";
 
 const App = () => {
   const [user, dispatch] = useReducer(MyUserReducer, null);
   const [compareList, compareDispatch] = useReducer(MyCompareReducer, []);
+
+  const [orders, setOrders] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!user || user.userRole !== "ROLE_CHEF") return;
+
+    const socket = new SockJS("http://localhost:8080/RestaurantApp/ws");
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      onConnect: () => {
+        stompClient.subscribe("/topic/chef/orders", (message) => {
+          const data = JSON.parse(message.body);
+          setOrders((prev) => [data, ...prev]);
+          setUnreadCount((prev) => prev + 1);
+        });
+      },
+    });
+
+    stompClient.activate();
+    return () => stompClient.deactivate();
+  }, [user]);
   return (
     <BrowserRouter>
-      <MyUserContext.Provider value={{ user, dispatch }}>
+      <MyUserContext.Provider value={{user, dispatch}}>
         <MyCompareContext.Provider value={[compareList, compareDispatch]}>
-          <MyOrderProvider>
-            <Header />
-            <Container>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/order" element={<Order />} />
-                <Route path="/thank-you" element={<ThankYou />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/compare" element={<Compare />} />
-                <Route path="/reservation" element={<Reservation />} />
-                <Route path="/chat" element={<Chat />} />
-              </Routes>
-            </Container>
-            <Footer />
-          </MyOrderProvider>
+          <MyOrderSocketContext.Provider
+            value={{orders, unreadCount, setUnreadCount}}
+          >
+            <MyOrderProvider>
+              <Container>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route element={<MainLayout />}>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/order" element={<Order />} />
+                    <Route path="/thank-you" element={<ThankYou />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/compare" element={<Compare />} />
+                    <Route path="/reservation" element={<Reservation />} />
+                    <Route path="/chat" element={<Chat />} />
+                    <Route
+                      path="/order-detail/:orderId"
+                      element={<OrderDetail />}
+                    />
+                  </Route>
+
+                  {/* Chef layout */}
+                  <Route element={<ChefLayout />}>
+                    <Route path="/chef-profile" element={<ChefProfile />} />
+                    <Route path="/chef" element={<ChefDashboard />} />
+                    <Route
+                      path="/chef-order-detail/:orderId"
+                      element={<ChefOrderDetail />}
+                    />
+                    <Route
+                      path="/realtime-orders"
+                      element={<RealtimeOrders />}
+                    />
+                  </Route>
+                </Routes>
+              </Container>
+              <Footer />
+            </MyOrderProvider>
+          </MyOrderSocketContext.Provider>
         </MyCompareContext.Provider>
       </MyUserContext.Provider>
     </BrowserRouter>

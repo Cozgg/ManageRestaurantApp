@@ -1,12 +1,12 @@
 import {useContext, useEffect, useState} from "react";
 import {MyUserContext} from "../../utils/contexts/MyUserContext";
-import cookies from "react-cookies";
 import {useNavigate} from "react-router-dom";
+import cookies from "react-cookies";
+import {authApis, endpoints} from "../../configs/Apis";
 import {Button, Card, Col, Container, Image, Row, Table} from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
-import Apis, {authApis, endpoints} from "../../configs/Apis";
 
-const Profile = () => {
+const ChefProfile = () => {
   const {user, dispatch} = useContext(MyUserContext);
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState([]);
@@ -48,7 +48,6 @@ const Profile = () => {
       </Container>
     );
   }
-
   return (
     <Container className="my-5">
       <Row className="g-4">
@@ -77,11 +76,8 @@ const Profile = () => {
                     Vai trò:
                   </Col>
                   <Col xs={7} className="fw-bold">
-                    {user.userRole === "ROLE_CHEF"
-                      ? "Đầu bếp"
-                      : user.userRole === "ROLE_USER"
-                        ? "Khách hàng"
-                        : "Quản trị viên"}
+                    {" "}
+                    "Đầu bếp"
                   </Col>
                 </Row>
                 <Row className="mb-2">
@@ -109,7 +105,7 @@ const Profile = () => {
           <Card className="shadow-sm border-0 rounded-4 h-100">
             <Card.Body className="p-4">
               <h4 className="fw-bold mb-4" style={{color: "#2c3e50"}}>
-                Lịch sử giao dịch
+                Lịch sử đặt món
               </h4>
               {loading ? (
                 <div className="text-center py-5">
@@ -131,21 +127,12 @@ const Profile = () => {
                     <tbody>
                       {orders.length === 0 ? (
                         <tr>
-                          {user.userRole === "ROLE_CHEF" ? (
-                            <td
-                              colSpan="6"
-                              className="text-center py-4 text-muted"
-                            >
-                              Bạn chưa có đơn hàng nào.
-                            </td>
-                          ) : (
-                            <td
-                              colSpan="6"
-                              className="text-center py-4 text-muted"
-                            >
-                              Bạn chưa có giao dịch nào.
-                            </td>
-                          )}
+                          <td
+                            colSpan="6"
+                            className="text-center py-4 text-muted"
+                          >
+                            Bạn chưa có đơn hàng nào.
+                          </td>
                         </tr>
                       ) : (
                         orders.map((order) => (
@@ -189,7 +176,9 @@ const Profile = () => {
                                 variant="outline-primary"
                                 size="sm"
                                 className="rounded-pill fw-semibold px-3 shadow-sm"
-                                onClick={() => nav(`/order-detail/${order.id}`)}
+                                onClick={() =>
+                                  nav(`/chef-order-detail/${order.id}`)
+                                }
                               >
                                 Chi tiết
                               </Button>
@@ -209,4 +198,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ChefProfile;

@@ -9,6 +9,8 @@ import com.ccc.enums.UserRole;
 import com.ccc.pojo.Rating;
 import com.ccc.pojo.User;
 import com.ccc.service.DishService;
+import com.ccc.service.RatingService;
+import com.ccc.service.UserService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -38,14 +40,20 @@ public class ApiDishController {
     private DishService dishService;
     
     @Autowired
-    private com.ccc.service.RatingService ratingService;
+    private RatingService ratingService;
     
     @Autowired
-    private com.ccc.service.UserService userService;
+    private UserService userService;
 
     @GetMapping("/dishes")
     public ResponseEntity<List<DishDto>> list(@RequestParam Map<String, String> params) {
         return new ResponseEntity<>(this.dishService.getDishs(params), HttpStatus.OK);
+    }
+    
+    @GetMapping("/secure/chef/dishes")
+    public ResponseEntity<List<DishDto>> list(@RequestParam Map<String, String> params, Principal principal) {
+        User currentChef = this.userService.getUserByUsername(principal.getName());
+        return new ResponseEntity<>(this.dishService.getDishs(params, currentChef), HttpStatus.OK);
     }
 
     @GetMapping("/dishes/{id}")

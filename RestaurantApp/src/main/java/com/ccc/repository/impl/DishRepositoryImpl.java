@@ -5,7 +5,9 @@
 package com.ccc.repository.impl;
 
 import com.ccc.pojo.Dish;
+import com.ccc.pojo.User;
 import com.ccc.repository.DishRepository;
+import com.ccc.repository.UserRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -33,10 +35,10 @@ public class DishRepositoryImpl implements DishRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
-
+    
     @Autowired
     private Environment env;
-    
+
     @Override
     public List<Dish> getDishs(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
@@ -111,5 +113,46 @@ public class DishRepositoryImpl implements DishRepository {
         q.setParameter("toId", toUserId);
         q.setParameter("fromId", fromUserId);
         q.executeUpdate();
+    }
+
+    @Override
+    public List<Dish> getDishs(Map<String, String> params, User currentChef) {
+        Session session = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Dish> q = b.createQuery(Dish.class);
+        Root root = q.from(Dish.class);
+        q.select(root);
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(b.equal(root.get("userId").get("id"), currentChef.getId()));
+        if (params != null) {
+            
+            String kw = params.get("kw");
+            if (kw != null && !kw.isEmpty()) {
+                predicates.add(b.like(root.get("name"), String.format("%%%s%%", kw)));
+            }
+
+            String categoryId = params.get("cateId");
+            if (categoryId != null && !categoryId.isEmpty()) {
+                predicates.add(b.equal(root.get("categoryId").as(Integer.class), categoryId));
+            }
+            
+
+            q.where(predicates.toArray(Predicate[]::new));
+        }
+
+        q.orderBy(b.desc(root.get("id")));
+
+        Query query = session.createQuery(q);
+
+        if (params != null) {
+            int pageSize = this.env.getProperty("dishes.page_size", Integer.class);
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            int start = (page - 1) * pageSize;
+
+            query.setMaxResults(pageSize);
+            query.setFirstResult(start);
+        }
+
+        return query.getResultList();
     }
 }

@@ -11,6 +11,7 @@ import com.ccc.pojo.Orders;
 import com.ccc.pojo.User;
 import com.ccc.service.OrderService;
 import com.ccc.service.UserService;
+import java.security.Principal;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,12 @@ public class ApiOrderController {
     @GetMapping("/secure/orders/{orderId}")
     public ResponseEntity<OrderDetailDto> getOrderDetail(@PathVariable(value = "orderId") int orderId){
         return new ResponseEntity<>(this.orderService.getOrderById(orderId), HttpStatus.OK);
+    }
+    
+    @GetMapping("/secure/chef/orders/{orderId}")
+    public ResponseEntity<OrderDetailDto> getOrderDetail(@PathVariable(value = "orderId") int orderId, Principal principal){
+        User currentChef = userService.getUserByUsername(principal.getName());
+        return new ResponseEntity<>(this.orderService.getOrderById(orderId, currentChef), HttpStatus.OK);
     }
     
     @PostMapping("/secure/orders")
