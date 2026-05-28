@@ -5,6 +5,7 @@
 package com.ccc.service;
 
 import com.ccc.dto.DishDto;
+import com.ccc.pojo.User;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface DishService {
 
     List<DishDto> getDishs(Map<String, String> params);
+    List<DishDto> getDishs(Map<String, String> params, User currentChef);
     DishDto getDishById(Integer id);
     DishDto addDish(Map<String, String> params, MultipartFile image) throws IOException;
     DishDto updateDish(Integer id, Map<String, String> params, MultipartFile image) throws IOException;

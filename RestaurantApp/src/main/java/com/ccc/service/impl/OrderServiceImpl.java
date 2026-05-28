@@ -91,6 +91,30 @@ public class OrderServiceImpl implements OrderService {
         
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy chi tiết đơn hàng cho ID: " + orderId);
     }
+    
+    @Override
+    public OrderDetailDto getOrderById(int orderId, User currentChef) {
+        List<OrderDetail> details = this.orderRepo.getOrderDetailsByOrderId(orderId, currentChef);
+        if(details != null && !details.isEmpty()){
+            Orders o = details.get(0).getOrderId();
+            UserDto u = UserDto.builder().firstName(o.getUserId().getFirstName()).lastName(o.getUserId().getLastName()).build();
+
+            OrderDto odto = OrderDto.builder().id(o.getId()).user(u).totalPrice(o.getTotalPrice())
+                    .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
+                    .reservationId(o.getReservationId() != null ? o.getReservationId().getId() : null).build();
+            
+            List<OrderItemDto> items = details.stream().map(od ->{
+                OrderItemDto itemDto = OrderItemDto.builder().dishId(od.getDishId().getId()).dishImage(od.getDishId().getImage())
+                        .dishName(od.getDishId().getName()).quantity(od.getQuantity()).unitPrice(od.getUnitPrice()).chef(UserDto.builder()
+                                .firstName(od.getDishId().getUserId().getFirstName()).lastName(od.getDishId().getUserId().getLastName()).build()).build();
+                return itemDto;
+            }).collect(Collectors.toList());
+            OrderDetailDto dto = OrderDetailDto.builder().order(odto).items(items).build();
+            return dto;
+        }
+        
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy chi tiết đơn hàng cho ID: " + orderId);
+    }
 
     @Override
     public String addOrder(ItemDto items) {
@@ -185,5 +209,6 @@ public class OrderServiceImpl implements OrderService {
     public void updateOrderStatus(int orderId, String status) {
         this.orderRepo.updateOrderStatus(orderId, status);
     }
+
 
 }

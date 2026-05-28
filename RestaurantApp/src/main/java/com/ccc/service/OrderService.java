@@ -18,6 +18,7 @@ import java.util.List;
 public interface OrderService {
     List<OrderDto> getOrders(User u);
     OrderDetailDto getOrderById(int orderId);
+    OrderDetailDto getOrderById(int orderId, User currentChef);
     String addOrder(ItemDto items);
     boolean verifyMomoSignature(MomoIpnResponse payload);
     void updateOrderStatus(int orderId, String status, Long transId);

@@ -55,8 +55,11 @@ const Login = () => {
           type: "login",
           payload: userProfile,
         });
-        const next = params.get("next") || "/";
-        nav(next);
+        if (userProfile.userRole === "ROLE_CHEF") nav("/chef");
+        else {
+          const next = params.get("next") || "/";
+          nav(next);
+        }
       }
     } catch (error) {
       message.error(error.message);
