@@ -55,8 +55,8 @@
                                     <small class="text-muted" th:text="${r.tableLocation}"></small>
                                 </td>
                                 <td th:text="${r.numberPeople}"></td>
-                                <td th:text="${#temporals.format(r.startTime, 'dd/MM/yyyy HH:mm')}"></td>
-                                <td th:text="${#temporals.format(r.endTime, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${#dates.format(r.startTime, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td th:text="${#dates.format(r.endTime, 'dd/MM/yyyy HH:mm')}"></td>
                                 <td class="text-center">
                                     <span th:if="${r.status == 'PENDING'}" class="badge bg-warning text-dark">Chờ xác nhận</span>
                                     <span th:if="${r.status == 'CONFIRMED'}" class="badge bg-success">Đã xác nhận</span>
@@ -106,7 +106,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form th:action="@{/admin/walk-in}" method="post">
+                    <form th:action="@{/admin/walk-in}" method="post" id="walkInForm">
                         <div class="mb-3">
                             <label class="form-label">Tên khách</label>
                             <input type="text" class="form-control" id="customerName" name="customerName" required>
@@ -121,11 +121,11 @@
                             <label class="form-label">Số người</label>
                             <input type="number" class="form-control" id="numberPeople" name="numberPeople" min="1" value="1" required>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button type="submit" class="btn btn-primary">Khóa bàn</button>
-                        </div>
                     </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="walkInForm" class="btn btn-primary">Khóa bàn</button>
                 </div>
             </div>
         </div>
@@ -143,7 +143,7 @@
             const startTimeStr = now.toISOString().slice(0, 16);
             const endTimeStr = endTime.toISOString().slice(0, 16);
             
-            fetch(`/api/available-tables?startTime=${startTimeStr}&endTime=${endTimeStr}`)
+            fetch(`/admin/available-tables?startTime=${startTimeStr}&endTime=${endTimeStr}`)
                 .then(response => response.json())
                 .then(data => {
                     availableTables = data;

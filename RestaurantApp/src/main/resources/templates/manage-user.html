@@ -51,21 +51,20 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <span th:if="${u.userRole.name() == 'ROLE_CHEF' and !u.active}" 
+                                    <span th:if="${u.userRole.name() == 'ROLE_USER'}" 
                                           class="badge bg-secondary">Chờ duyệt</span>
-                                    <span th:if="${u.userRole.name() == 'ROLE_CHEF' and u.active}" 
+                                    <span th:if="${u.userRole.name() == 'ROLE_CHEF'}" 
                                           class="badge bg-success">Đã duyệt</span>
-                                    <span th:if="${u.userRole.name() != 'ROLE_CHEF'}" 
-                                          class="badge bg-success">Hoạt động</span>
+                                    <span th:if="${u.userRole.name() == 'ROLE_ADMIN'}" 
+                                          class="badge bg-danger">Admin</span>
                                 </td>
 
                                 <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-2" th:if="${u.userRole != 'ROLE_ADMIN'}">
-                                        <form th:if="${u.userRole.name() == 'ROLE_CHEF' and !u.active}"
-                                              th:action="@{/admin/users/{userId}/approve(userId=${u.id})}"
+                                    <div class="d-flex justify-content-center gap-2" th:if="${u.userRole.name() == 'ROLE_USER'}">
+                                        <form th:action="@{/admin/users/{userId}/approve(userId=${u.id})}"
                                               method="post" style="display: inline;">
                                             <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
-                                                Duyệt
+                                                Duyệt thành Đầu bếp
                                             </button>
                                         </form>
                                         <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
@@ -92,7 +91,7 @@
     <script>
         function deleteUser(userId) {
             if (confirm('Bạn có chắc muốn xóa người dùng này?')) {
-                fetch(`/api/users/${userId}`, {
+                fetch(`/admin/users/${userId}`, {
                     method: 'DELETE'
                 })
                 .then(response => {

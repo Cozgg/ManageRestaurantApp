@@ -188,7 +188,8 @@ public class UserServiceImpl implements UserService{
     @org.springframework.transaction.annotation.Transactional
     public void approveUser(int id) {
         User u = this.userRepo.getUserById(id);
-        if (u != null && u.getUserRole() == UserRole.ROLE_CHEF) {
+        if (u != null && u.getUserRole() == UserRole.ROLE_USER) {
+            u.setUserRole(UserRole.ROLE_CHEF);
             u.setActive(true);
             this.userRepo.updateUser(u);
         }
