@@ -68,29 +68,19 @@ public class ApiDishController {
         return new ResponseEntity<>(dish, HttpStatus.OK);
     }
 
-    @PostMapping("/dishes")
+    @PostMapping("/secure/chef/dishes")
     public ResponseEntity<?> addDish(
             @RequestParam Map<String, String> params,
-            @RequestParam(value = "image", required = false) MultipartFile image,
-            Principal principal) throws IOException {
-        User currentUser = this.userService.getUserByUsername(principal.getName());
-        if (currentUser.getUserRole() != UserRole.ROLE_CHEF && currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
-            return new ResponseEntity<>("Bạn không có quyền thêm món ăn", HttpStatus.FORBIDDEN);
-        }
+            @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
         DishDto created = this.dishService.addDish(params, image);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
-    @PatchMapping("/dishes/{id}")
+    @PatchMapping("/secure/chef/dishes/{id}")
     public ResponseEntity<?> updateDish(
             @PathVariable Integer id,
             @RequestParam Map<String, String> params,
-            @RequestParam(value = "image", required = false) MultipartFile image,
-            Principal principal) throws IOException {
-        User currentUser = this.userService.getUserByUsername(principal.getName());
-        if (currentUser.getUserRole() != UserRole.ROLE_CHEF && currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
-            return new ResponseEntity<>("Bạn không có quyền sửa món ăn", HttpStatus.FORBIDDEN);
-        }
+            @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
         DishDto updated = this.dishService.updateDish(id, params, image);
         if (updated == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -98,12 +88,8 @@ public class ApiDishController {
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
-    @DeleteMapping("/dishes/{id}")
-    public ResponseEntity<Void> deleteDish(@PathVariable Integer id, Principal principal) {
-        User currentUser = this.userService.getUserByUsername(principal.getName());
-        if (currentUser.getUserRole() != UserRole.ROLE_CHEF && currentUser.getUserRole() != UserRole.ROLE_ADMIN) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    @DeleteMapping("/secure/chef/dishes/{id}")
+    public ResponseEntity<Void> deleteDish(@PathVariable Integer id) {
         boolean deleted = this.dishService.deleteDish(id);
         if (!deleted) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -111,14 +97,11 @@ public class ApiDishController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping("/dishes/{id}/rating")
+    @PostMapping("/secure/dishes/{id}/rating")
     public ResponseEntity<?> addRating(@PathVariable Integer id, 
                                                          @RequestParam Map<String, String> params, 
                                                          Principal principal) {
         User currentUser = this.userService.getUserByUsername(principal.getName());
-        if (currentUser.getUserRole() != UserRole.ROLE_USER) {
-            return new ResponseEntity<>("Bạn không có quyền đánh giá", HttpStatus.FORBIDDEN);
-        }
         params.put("dishId", id.toString());
         Rating r = this.ratingService.addRating(params, currentUser);
         return new ResponseEntity<>(r, HttpStatus.CREATED);
