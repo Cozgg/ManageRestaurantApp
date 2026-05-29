@@ -44,7 +44,7 @@ function loadChartData() {
     };
 
     if (statType === 'REVENUE') {
-        url = `http://localhost:8080/RestaurantApp/api/stat-revenue?time=${time}&year=${year}`;
+        url = `http://localhost:8080/RestaurantApp/api/statistics/stat-revenue?time=${time}&year=${year}`;
     } else if (statType === 'DISHES') {
         url = `http://localhost:8080/RestaurantApp/api/statistics/dishes?top=5`;
     } else if (statType === 'RESERVATIONS') {

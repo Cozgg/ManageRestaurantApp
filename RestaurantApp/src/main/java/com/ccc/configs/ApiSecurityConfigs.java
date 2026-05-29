@@ -35,9 +35,15 @@ public class ApiSecurityConfigs {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/secure/chef/**").hasAnyRole("CHEF", "ADMIN")
+                .requestMatchers(HttpMethod.POST,
+                        "/api/secure/dishes/*/rating").hasRole("USER")
+                .requestMatchers("/api/statistics/**").hasRole("ADMIN")
+                .requestMatchers("/api/secure/table/**").hasRole("ADMIN")
+                .requestMatchers("/api/users/*/approve").hasRole("ADMIN")
                 .requestMatchers("/api/secure/**").authenticated()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().permitAll()
                 ).addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new RateLimitFilter(), JwtFilter.class);
