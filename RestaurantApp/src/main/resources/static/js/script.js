@@ -166,9 +166,9 @@ document.addEventListener("DOMContentLoaded", function () {
         radio.addEventListener('change', function () {
             // Thay đổi Tiêu đề thẻ H5 cho phù hợp
             const titleH5 = document.querySelector('.card-header h5');
-            if (this.value === 'REVENUE') titleH5.innerHTML = "📊 Thống kê doanh thu";
-            if (this.value === 'DISHES') titleH5.innerHTML = "🍳 Thống kê món ăn bán chạy";
-            if (this.value === 'RESERVATIONS') titleH5.innerHTML = "📅 Thống kê đặt bàn";
+            if (this.value === 'REVENUE') titleH5.innerHTML = "Thống kê doanh thu";
+            if (this.value === 'DISHES') titleH5.innerHTML = "Thống kê món ăn bán chạy";
+            if (this.value === 'RESERVATIONS') titleH5.innerHTML = "Thống kê đặt bàn";
 
             loadChartData();
         });

@@ -8,6 +8,7 @@ import com.ccc.dto.UserDto;
 import com.ccc.pojo.User;
 import com.ccc.service.ReservationService;
 import com.ccc.service.UserService;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -83,5 +84,35 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable(value = "id") int id) {
         this.userService.deleteUser(id);
+    }
+
+    @PostMapping("/users/{userId}/approve")
+    public String approveUser(@PathVariable("userId") int userId){
+        this.userService.approveUser(userId);
+        return "redirect:/admin/users";
+    }
+    
+    @PostMapping("/reservations/{reservationId}/confirm")
+    public String confirmReservation(@PathVariable("reservationId") int reservationId){
+        this.reservationService.updateReservation(reservationId, Map.of("status", "CONFIRMED"));
+        return "redirect:/admin/reservations";
+    }
+    
+    @PostMapping("/reservations/{reservationId}/cancel")
+    public String cancelReservation(@PathVariable("reservationId") int reservationId){
+        this.reservationService.deleteReservation(reservationId);
+        return "redirect:/admin/reservations";
+    }
+    
+    @PostMapping("/walk-in")
+    public String createWalkIn(@RequestParam Map<String, String> params){
+        this.reservationService.createWalkInReservation(params);
+        return "redirect:/admin/reservations";
+    }
+    
+    @GetMapping("/available-tables")
+    @ResponseBody
+    public List<com.ccc.dto.TableDto> getAvailableTables(@RequestParam String startTime, @RequestParam String endTime){
+        return this.reservationService.getAvailableTables(startTime, endTime);
     }
 }

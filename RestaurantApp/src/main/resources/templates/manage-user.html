@@ -51,21 +51,22 @@
                                 </td>
 
                                 <td class="text-center">
-                                    <span th:if="${u.userRole.name() == 'ROLE_CHEF' and !u.active}" 
+                                    <span th:if="${u.userRole.name() == 'ROLE_USER'}" 
                                           class="badge bg-secondary">Chờ duyệt</span>
-                                    <span th:if="${u.userRole.name() == 'ROLE_CHEF' and u.active}" 
+                                    <span th:if="${u.userRole.name() == 'ROLE_CHEF'}" 
                                           class="badge bg-success">Đã duyệt</span>
-                                    <span th:if="${u.userRole.name() != 'ROLE_CHEF'}" 
-                                          class="badge bg-success">Hoạt động</span>
+                                    <span th:if="${u.userRole.name() == 'ROLE_ADMIN'}" 
+                                          class="badge bg-danger">Admin</span>
                                 </td>
 
                                 <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-2" th:if="${u.userRole != 'ROLE_ADMIN'}">
-                                        <button th:if="${u.userRole.name() == 'ROLE_CHEF' and !u.active}"
-                                                class="btn btn-sm btn-success rounded-pill px-3"
-                                                th:onclick="'approveUser(' + ${u.id} + ')'">
-                                            Duyệt
-                                        </button>
+                                    <div class="d-flex justify-content-center gap-2" th:if="${u.userRole.name() == 'ROLE_USER'}">
+                                        <form th:action="@{/admin/users/{userId}/approve(userId=${u.id})}"
+                                              method="post" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                                                Duyệt thành Đầu bếp
+                                            </button>
+                                        </form>
                                         <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
                                                 th:onclick="'deleteUser(' + ${u.id} + ')'">
                                             Xóa
@@ -87,5 +88,26 @@
     </section>
     <div th:replace="~{base :: footer}"></div>
     <script th:src="@{/js/script.js}"></script>
+    <script>
+        function deleteUser(userId) {
+            if (confirm('Bạn có chắc muốn xóa người dùng này?')) {
+                fetch(`/admin/users/${userId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Đã xóa người dùng thành công!');
+                        location.reload();
+                    } else {
+                        alert('Lỗi khi xóa người dùng!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi kết nối server!');
+                });
+            }
+        }
+    </script>
 </body>
 </html>
