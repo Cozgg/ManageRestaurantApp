@@ -26,7 +26,7 @@ public class ApiStatController {
     private StatService statService;
     
     
-    @GetMapping("/stat-revenue")
+    @GetMapping("/statistics/stat-revenue")
     public ResponseEntity<List<Object[]>> statRevenuebyTime(@RequestParam(value="time", defaultValue = "MONTH") String time, 
             @RequestParam(value="year", defaultValue = "2026") int year){
         List<Object[]> data = this.statService.statsRevenueByTime(time, year);

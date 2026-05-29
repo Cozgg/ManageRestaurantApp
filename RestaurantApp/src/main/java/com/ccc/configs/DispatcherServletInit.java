@@ -23,7 +23,8 @@ public class DispatcherServletInit extends AbstractAnnotationConfigDispatcherSer
             HibernateConfigs.class,
             SpringSecurityConfigs.class,
             ApiSecurityConfigs.class,
-            RabbitMQConfig.class
+            RabbitMQConfig.class,
+            WebSocketConfigs.class
         };
     }
 

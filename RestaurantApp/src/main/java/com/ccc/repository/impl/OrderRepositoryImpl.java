@@ -128,4 +128,18 @@ public class OrderRepositoryImpl implements OrderRepository {
         return s.createQuery(cq).getResultList();
     }
 
+    @Override
+    public List<OrderDetail> getOrderDetailsByOrderId(int orderId, User currentChef) {
+        Session s = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<OrderDetail> cq = b.createQuery(OrderDetail.class);
+        Root<OrderDetail> root = cq.from(OrderDetail.class);
+        //eager load luôn data dish, order tránh n+1 query
+        root.fetch("dishId", JoinType.INNER);
+        root.fetch("orderId", JoinType.INNER);
+        cq.select(root).where(b.and(b.equal(root.get("orderId").get("id"), orderId),
+                b.equal(root.get("dishId").get("userId").get("id"), currentChef.getId()))).distinct(true);
+        return s.createQuery(cq).getResultList();
+    }
+
 }

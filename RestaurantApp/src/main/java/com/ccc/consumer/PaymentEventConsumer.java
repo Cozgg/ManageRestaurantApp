@@ -4,9 +4,14 @@
  */
 package com.ccc.consumer;
 
+import com.ccc.dto.ChefNotificationDto;
 import com.ccc.dto.PaymentEventDto;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,6 +20,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class PaymentEventConsumer {
+    
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     
     @RabbitListener(queues = "q.payment.send_email")
     public void handleSendEmail(PaymentEventDto event) {
@@ -29,9 +37,18 @@ public class PaymentEventConsumer {
     @RabbitListener(queues = "q.payment.notify_chef")
     public void handleNotifyChef(PaymentEventDto event) {
         try {
-            System.out.println("[Bếp] Bắn tín hiệu WebSocket báo món mới cho đơn: " + event.getOrderId());
+            System.out.println("[Bếp] Có đơn hàng mới đã thanh toán: " + event.getOrderId());
+            
+            ChefNotificationDto payload = ChefNotificationDto.builder().type("NEW_ORDER").orderId(event.getOrderId()).
+                    message("Đơn hàng " + event.getOrderId() + " đã thanh toán xong. Vui lòng xem lịch sử đặt món!").build();
+            
+            messagingTemplate.convertAndSend("/topic/chef/orders", payload);
+            
+            System.out.println("[Bếp] Đã phát sóng tin nhắn qua WebSocket thành công!");
+
         } catch (Exception e) {
-            throw new AmqpRejectAndDontRequeueException("WebSocket Failure", e);
+            System.err.println("[Bếp] Lỗi khi phát tin WebSocket, đẩy vào DLQ.");
+            throw new AmqpRejectAndDontRequeueException("Lỗi WebSocket", e);
         }
     }
 

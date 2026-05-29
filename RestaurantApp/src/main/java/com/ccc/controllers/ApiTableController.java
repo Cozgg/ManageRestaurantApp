@@ -4,6 +4,7 @@
  */
 package com.ccc.controllers;
 
+import com.ccc.dto.TableDto;
 import com.ccc.pojo.RestaurantTable;
 import com.ccc.service.TableService;
 import java.util.List;
@@ -33,21 +34,21 @@ public class ApiTableController {
     private TableService tableService;
 
     @GetMapping("/tables")
-    public ResponseEntity<List<com.ccc.dto.TableDto>> list(@RequestParam Map<String, String> params) {
+    public ResponseEntity<List<TableDto>> list(@RequestParam Map<String, String> params) {
         return new ResponseEntity<>(this.tableService.getTables(params), HttpStatus.OK);
     }
 
-    @PostMapping("/tables")
-    public ResponseEntity<com.ccc.dto.TableDto> add(@RequestParam Map<String, String> params) {
+    @PostMapping("/secure/tables")
+    public ResponseEntity<TableDto> add(@RequestParam Map<String, String> params) {
         return new ResponseEntity<>(this.tableService.addTable(params), HttpStatus.CREATED);
     }
 
-    @PatchMapping("/tables/{id}")
-    public ResponseEntity<com.ccc.dto.TableDto> update(@PathVariable int id, @RequestParam Map<String, String> params) {
+    @PatchMapping("/secure/tables/{id}")
+    public ResponseEntity<TableDto> update(@PathVariable int id, @RequestParam Map<String, String> params) {
         return new ResponseEntity<>(this.tableService.updateTable(id, params), HttpStatus.OK);
     }
 
-    @DeleteMapping("/tables/{id}")
+    @DeleteMapping("/secure/tables/{id}")
     public ResponseEntity<Void> delete(@PathVariable int id) {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

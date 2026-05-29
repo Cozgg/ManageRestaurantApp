@@ -78,7 +78,7 @@ public class ApiUserController {
     }
 
 
-    @PatchMapping(path = "/users/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(path = "/secure/users/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> update(@PathVariable int id, 
                                     @RequestParam Map<String, String> params,
                                     @RequestParam(value = "avatar", required = false) MultipartFile avatar,

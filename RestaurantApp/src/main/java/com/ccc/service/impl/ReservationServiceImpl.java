@@ -13,6 +13,7 @@ import com.ccc.repository.ReservationRepository;
 import com.ccc.repository.TableRepository;
 import com.ccc.repository.UserRepository;
 import com.ccc.service.ReservationService;
+import com.ccc.states.impl.OccupiedState;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -168,7 +169,7 @@ public class ReservationServiceImpl implements ReservationService {
                             break;
                         case "OCCUPIED":
                             r.setStatus("OCCUPIED");
-                            r.setState(new com.ccc.states.impl.OccupiedState());
+                            r.setState(new OccupiedState());
                             break;
                         default:
                             r.setStatus(newStatus);

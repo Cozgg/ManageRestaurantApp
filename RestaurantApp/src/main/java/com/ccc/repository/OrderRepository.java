@@ -19,6 +19,7 @@ public interface OrderRepository {
     Orders addOrder(Orders order, ItemDto items);
     List<Orders> getOrders(User u);
     Orders getOrderById(int orderId);
+    List<OrderDetail> getOrderDetailsByOrderId(int orderId, User currentChef);
     List<OrderDetail> getOrderDetailsByOrderId(int orderId);
     void updateOrder(Orders order);
     void updateOrderStatus(int orderId, String status, Long transId);

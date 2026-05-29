@@ -1,0 +1,175 @@
+/* NAVBAR */
+.chef-navbar {
+  background: rgba(255, 255, 255, 0.92) !important;
+
+  backdrop-filter: blur(10px);
+}
+
+/* NAV BUTTON */
+.chef-nav-btn {
+  height: 44px;
+
+  padding: 0 18px !important;
+
+  border-radius: 999px !important;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: #f8fafc !important;
+
+  color: #334155 !important;
+
+  font-weight: 600;
+
+  transition: all 0.22s ease;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.chef-nav-btn:hover {
+  background: #f0fdf4 !important;
+
+  color: #16a34a !important;
+
+  transform: translateY(-1px);
+}
+
+/* REALTIME */
+.chef-realtime-btn {
+  height: 44px;
+
+  padding: 0 18px !important;
+
+  border-radius: 999px !important;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: #eff6ff !important;
+
+  color: #2563eb !important;
+
+  font-weight: 600;
+
+  transition: all 0.22s ease;
+
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+}
+
+.chef-realtime-btn:hover {
+  background: #dbeafe !important;
+
+  transform: translateY(-1px);
+}
+
+/* LIVE DOT */
+.live-dot {
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+
+  background: #22c55e;
+
+  position: relative;
+}
+
+.live-dot::after {
+  content: "";
+
+  position: absolute;
+
+  inset: -4px;
+
+  border-radius: 50%;
+
+  border: 2px solid #22c55e;
+
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* PROFILE */
+.chef-profile-btn {
+  border-radius: 999px !important;
+
+  padding: 6px 14px 6px 6px !important;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  background: linear-gradient(
+    135deg,
+    #22c55e 0%,
+    #16a34a 100%
+  ) !important;
+
+  color: white !important;
+
+  transition: all 0.22s ease;
+
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.18);
+}
+
+.chef-profile-btn:hover {
+  transform: translateY(-1px);
+}
+
+.chef-profile-avatar {
+  width: 40px;
+  height: 40px;
+
+  object-fit: cover;
+
+  border-radius: 50%;
+
+  border: 2px solid white;
+}
+
+.chef-profile-name {
+  font-size: 14px;
+
+  font-weight: 700;
+}
+
+.chef-profile-role {
+  font-size: 11px;
+
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* LOGIN */
+.chef-login-btn {
+  height: 42px;
+
+  padding: 0 18px !important;
+
+  border-radius: 999px !important;
+
+  background: linear-gradient(
+    135deg,
+    #22c55e 0%,
+    #16a34a 100%
+  ) !important;
+
+  color: white !important;
+
+  font-weight: 600;
+
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.18);
+}

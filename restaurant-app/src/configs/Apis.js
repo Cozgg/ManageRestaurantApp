@@ -2,12 +2,14 @@ import axios from "axios";
 
 export const endpoints = {
   categories: "/categories",
-  dishes: "/secure/dishes",
+  dishes: "/dishes",
+  "chef-dishes": "/secure/chef/dishes",
   login: "/login",
   register: "/register",
   profile: "/secure/profile",
   "add-order": "/secure/orders",
   "order-detail": (orderId) => `/secure/orders/${orderId}`,
+  "chef-order-detail": (orderId) => `/secure/chef/orders/${orderId}`,
   tables: "/tables",
   reservations: "/secure/reservations",
   "reservations-user": (userId) => `/secure/reservations/user/${userId}`,
