@@ -1,0 +1,114 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Quản lý Bàn</title>
+    <th:block th:replace="~{base :: css}"></th:block>
+</head>
+<body>
+    <div th:replace="~{base :: header}"></div>
+
+    <section class="container mt-4 mb-5">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-black text-white py-3">
+                <h5 class="mb-0" style="color: #e67e22; font-family: 'Playfair Display', serif;">
+                    Quản lý Bàn
+                </h5>
+            </div>
+
+            <div class="card-body p-4">
+                <div class="row g-4" th:if="${!#lists.isEmpty(tables)}">
+                    <div class="col-12 col-md-6 col-lg-4 col-xl-3" th:each="t: ${tables}">
+                        <div class="card h-100 border-0 shadow-sm rounded-3 table-card" 
+                             th:classappend="${tableStatus.get(t.id) ? 'border-warning border-2' : 'border-success border-2'}"
+                             style="cursor: pointer; transition: transform 0.2s;"
+                             th:data-table-id="${t.id}"
+                             th:data-table-number="${t.tableNumber}"
+                             th:data-table-capacity="${t.capacity}"
+                             onclick="openWalkInModal(this)"
+                             onmouseover="this.style.transform='scale(1.05)'"
+                             onmouseout="this.style.transform='scale(1)'">
+                            <div class="card-body p-4 text-center">
+                                <div class="mb-3">
+                                    <i class="bi bi-table display-4" 
+                                       th:classappend="${tableStatus.get(t.id) ? 'text-warning' : 'text-success'}"></i>
+                                </div>
+                                <h5 class="card-title fw-bold mb-2" th:text="'Bàn ' + ${t.tableNumber}"></h5>
+                                <p class="text-muted mb-2" th:text="${t.location}"></p>
+                                <div class="badge rounded-pill px-3 py-2" 
+                                     th:classappend="${tableStatus.get(t.id) ? 'bg-warning' : 'bg-success'}"
+                                     th:text="${tableStatus.get(t.id) ? 'Có khách' : 'Trống'}"></div>
+                                <div class="badge bg-info rounded-pill px-3 py-2 mt-2" th:text="${t.capacity} + ' người'"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div th:if="${#lists.isEmpty(tables)}" class="text-center py-5">
+                    <i class="bi bi-table display-4 text-muted mb-3"></i>
+                    <p class="text-muted">Không có bàn nào.</p>
+                </div>
+                
+                <!-- Pagination -->
+                <nav th:if="${pages > 1}" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, pages)}">
+                            <a class="page-link" 
+                               th:classappend="${i == currentPage ? 'active' : ''}"
+                               th:href="@{/admin/tables(page=${i})}" 
+                               th:text="${i}"></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </section>
+    <div th:replace="~{base :: footer}"></div>
+    
+    <!-- Walk-in Modal -->
+    <div class="modal fade" id="walkInModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Khách Walk-in - Bàn <span id="modalTableNumber"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/admin/walk-in}" method="post" id="walkInForm">
+                        <input type="hidden" id="tableId" name="tableId">
+                        <div class="mb-3">
+                            <label class="form-label">Tên khách</label>
+                            <input type="text" class="form-control" id="customerName" name="customerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Số người</label>
+                            <input type="number" class="form-control" id="numberPeople" name="numberPeople" min="1" value="1" required>
+                            <small class="text-muted" id="capacityHint"></small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" form="walkInForm" class="btn btn-primary" onclick="this.disabled=true; this.form.submit();">Khóa bàn</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script th:src="@{/js/script.js}"></script>
+    <script>
+        function openWalkInModal(element) {
+            const tableId = element.getAttribute('data-table-id');
+            const tableNumber = element.getAttribute('data-table-number');
+            const capacity = element.getAttribute('data-table-capacity');
+            
+            document.getElementById('tableId').value = tableId;
+            document.getElementById('modalTableNumber').textContent = tableNumber;
+            document.getElementById('capacityHint').textContent = 'Sức chứa tối đa: ' + capacity + ' người';
+            document.getElementById('numberPeople').max = capacity;
+            
+            const modal = new bootstrap.Modal(document.getElementById('walkInModal'));
+            modal.show();
+        }
+    </script>
+</body>
+</html>

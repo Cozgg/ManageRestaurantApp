@@ -4,6 +4,14 @@
  */
 package com.ccc.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.ccc.dto.ReservationDto;
 import com.ccc.dto.TableDto;
 import com.ccc.pojo.Reservation;
@@ -13,13 +21,6 @@ import com.ccc.repository.ReservationRepository;
 import com.ccc.repository.TableRepository;
 import com.ccc.repository.UserRepository;
 import com.ccc.service.ReservationService;
-import com.ccc.states.impl.OccupiedState;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  *
@@ -52,6 +53,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .username(r.getUserId() != null ? r.getUserId().getUsername() : null)
                 .userFirstName(r.getUserId() != null ? r.getUserId().getFirstName() : null)
                 .userLastName(r.getUserId() != null ? r.getUserId().getLastName() : null)
+                .customerName(r.getCustomerName())
                 .createdAt(r.getCreatedAt())
                 .build();
     }
@@ -65,37 +67,37 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationDto addReservation(Map<String, String> params) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-            
+
             if (!params.containsKey("tableId")) {
                 throw new IllegalArgumentException("Table ID is required");
             }
-            
+
             RestaurantTable table = this.tableRepo.getById(Integer.parseInt(params.get("tableId")));
             if (table == null) {
                 throw new IllegalArgumentException("Table not found");
             }
-            
+
             int numberPeople = Integer.parseInt(params.getOrDefault("numberPeople", "1"));
             if (numberPeople > table.getCapacity()) {
                 throw new IllegalArgumentException("Số người vượt quá sức chứa của bàn (" + table.getCapacity() + " người)");
             }
-            
+
             Date startTime = params.containsKey("startTime") ? sdf.parse(params.get("startTime")) : new Date();
             Date endTime = params.containsKey("endTime") ? sdf.parse(params.get("endTime")) : new Date();
-            
+
             if (startTime.after(endTime)) {
                 throw new IllegalArgumentException("Thời gian kết thúc phải sau thời gian bắt đầu");
             }
-            
+
             if (this.reservationRepo.hasTimeConflict(table.getId(), startTime, endTime, null)) {
                 throw new IllegalArgumentException("Bàn này đã được đặt trong khoảng thời gian đã chọn");
             }
-            
+
             Reservation r = new Reservation();
             r.setStartTime(startTime);
             r.setEndTime(endTime);
             r.setNumberPeople(numberPeople);
-            r.setStatus(params.getOrDefault("status", "PENDING"));
+            r.setStatus(params.getOrDefault("status", "RESERVED"));
             r.setCreatedAt(new Date());
             r.setTableId(table);
 
@@ -120,25 +122,29 @@ public class ReservationServiceImpl implements ReservationService {
         if (r != null) {
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-                
+
                 Date startTime = r.getStartTime();
                 Date endTime = r.getEndTime();
                 RestaurantTable table = r.getTableId();
-                
-                if (params.containsKey("startTime")) startTime = sdf.parse(params.get("startTime"));
-                if (params.containsKey("endTime")) endTime = sdf.parse(params.get("endTime"));
-                
+
+                if (params.containsKey("startTime")) {
+                    startTime = sdf.parse(params.get("startTime"));
+                }
+                if (params.containsKey("endTime")) {
+                    endTime = sdf.parse(params.get("endTime"));
+                }
+
                 if (startTime.after(endTime)) {
                     throw new IllegalArgumentException("Thời gian kết thúc phải sau thời gian bắt đầu");
                 }
-                
+
                 if (params.containsKey("tableId")) {
                     table = this.tableRepo.getById(Integer.parseInt(params.get("tableId")));
                     if (table == null) {
                         throw new IllegalArgumentException("Table not found");
                     }
                 }
-                
+
                 if (params.containsKey("numberPeople")) {
                     int numberPeople = Integer.parseInt(params.get("numberPeople"));
                     if (numberPeople > table.getCapacity()) {
@@ -146,36 +152,23 @@ public class ReservationServiceImpl implements ReservationService {
                     }
                     r.setNumberPeople(numberPeople);
                 }
-                
+
                 if (this.reservationRepo.hasTimeConflict(table.getId(), startTime, endTime, id)) {
                     throw new IllegalArgumentException("Bàn này đã được đặt trong khoảng thời gian đã chọn");
                 }
-                
+
                 r.setStartTime(startTime);
                 r.setEndTime(endTime);
-                
-                // Use State Pattern for status transitions
+
+                // Simple status transitions (no State Pattern)
                 if (params.containsKey("status")) {
                     String newStatus = params.get("status");
-                    switch (newStatus) {
-                        case "CONFIRMED":
-                            r.confirm();
-                            break;
-                        case "CANCELLED":
-                            r.cancel();
-                            break;
-                        case "COMPLETED":
-                            r.complete();
-                            break;
-                        case "OCCUPIED":
-                            r.setStatus("OCCUPIED");
-                            r.setState(new OccupiedState());
-                            break;
-                        default:
-                            r.setStatus(newStatus);
-                    }
+                    r.setStatus(newStatus);
+                } else if (id == 0) {
+                    // New reservation defaults to RESERVED
+                    r.setStatus("RESERVED");
                 }
-                
+
                 r.setTableId(table);
 
                 this.reservationRepo.addOrUpdate(r);
@@ -222,35 +215,35 @@ public class ReservationServiceImpl implements ReservationService {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
             Date start = sdf.parse(startTime);
             Date end = sdf.parse(endTime);
-            
+
             List<Reservation> allReservations = this.reservationRepo.getReservations(new java.util.HashMap<>());
             List<com.ccc.dto.TableDto> availableTables = new java.util.ArrayList<>();
-            
+
             Map<String, String> tableParams = new java.util.HashMap<>();
             tableParams.put("active", "true");
             List<RestaurantTable> allTables = this.tableRepo.getTables(tableParams);
-            
+
             for (RestaurantTable table : allTables) {
                 boolean isAvailable = true;
-                
+
                 for (Reservation r : allReservations) {
                     if (r.getTableId().getId() != table.getId()) {
                         continue;
                     }
-                    
+
                     if (r.getStatus().equals("CANCELLED") || r.getStatus().equals("COMPLETED")) {
                         continue;
                     }
-                    
+
                     Date rStart = r.getStartTime();
                     Date rEnd = r.getEndTime();
-                    
+
                     if (!(start.after(rEnd) || end.before(rStart))) {
                         isAvailable = false;
                         break;
                     }
                 }
-                
+
                 if (isAvailable) {
                     com.ccc.dto.TableDto dto = new com.ccc.dto.TableDto();
                     dto.setId(table.getId());
@@ -261,7 +254,7 @@ public class ReservationServiceImpl implements ReservationService {
                     availableTables.add(dto);
                 }
             }
-            
+
             return availableTables;
         } catch (Exception e) {
             e.printStackTrace();
@@ -273,36 +266,36 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationDto createWalkInReservation(Map<String, String> params) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-            
+
             if (!params.containsKey("tableId")) {
                 throw new IllegalArgumentException("Table ID is required");
             }
-            
+
             RestaurantTable table = this.tableRepo.getById(Integer.parseInt(params.get("tableId")));
             if (table == null) {
                 throw new IllegalArgumentException("Table not found");
             }
-            
+
             int numberPeople = Integer.parseInt(params.getOrDefault("numberPeople", "1"));
             if (numberPeople > table.getCapacity()) {
                 throw new IllegalArgumentException("Số người vượt quá sức chứa của bàn (" + table.getCapacity() + " người)");
             }
-            
+
             Date startTime = new Date();
             Date endTime = new Date(System.currentTimeMillis() + 2 * 60 * 60 * 1000);
-            
-            if (this.reservationRepo.hasTimeConflict(table.getId(), startTime, endTime, null)) {
-                throw new IllegalArgumentException("Bàn này đang có khách");
-            }
-            
+
+            // Bỏ check xung đột để cho phép walk-in dù bàn đã có khách
+            // if (this.reservationRepo.hasTimeConflict(table.getId(), startTime, endTime, null)) {
+            //     throw new IllegalArgumentException("Bàn này đang có khách");
+            // }
             Reservation r = new Reservation();
             r.setStartTime(startTime);
             r.setEndTime(endTime);
             r.setNumberPeople(numberPeople);
-            r.setStatus("OCCUPIED");
+            r.setStatus("RESERVED");
             r.setCreatedAt(new Date());
             r.setTableId(table);
-            
+
             if (params.containsKey("customerName")) {
                 r.setCustomerName(params.get("customerName"));
             }
@@ -315,5 +308,10 @@ public class ReservationServiceImpl implements ReservationService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public long countReservations(Map<String, String> params) {
+        return this.reservationRepo.countReservations(params);
     }
 }

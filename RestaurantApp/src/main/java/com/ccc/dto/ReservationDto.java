@@ -5,6 +5,7 @@
 package com.ccc.dto;
 
 import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReservationDto {
+
     private Integer id;
     private Date startTime;
     private Date endTime;
@@ -32,5 +34,6 @@ public class ReservationDto {
     private String username;
     private String userFirstName;
     private String userLastName;
+    private String customerName;
     private Date createdAt;
 }

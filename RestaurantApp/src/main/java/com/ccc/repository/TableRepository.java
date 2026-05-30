@@ -4,17 +4,24 @@
  */
 package com.ccc.repository;
 
-import com.ccc.pojo.RestaurantTable;
 import java.util.List;
 import java.util.Map;
+
+import com.ccc.pojo.RestaurantTable;
 
 /**
  *
  * @author Admin
  */
 public interface TableRepository {
+
     List<RestaurantTable> getTables(Map<String, String> params);
+
     void addOrUpdate(RestaurantTable t);
+
     void delete(int id);
+
     RestaurantTable getById(int id);
+
+    long countTables(Map<String, String> params);
 }

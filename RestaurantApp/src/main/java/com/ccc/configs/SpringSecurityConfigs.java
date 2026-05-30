@@ -41,7 +41,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
             "com.ccc.consumer"
         }
 )
-@Order(2)
+@Order(1)
 public class SpringSecurityConfigs {
     
     @Autowired
@@ -60,15 +60,16 @@ public class SpringSecurityConfigs {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.securityMatcher("/admin/**", "/", "/login").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
+                .requestMatchers("/admin/login").permitAll()
                 .requestMatchers("/", "/admin").hasRole("ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
-        ).formLogin(form -> form.loginPage("/admin/login") // Đường dẫn tới trang đăng nhập
-                .loginProcessingUrl("/login") // Đường dẫn xử lý POST
-                .defaultSuccessUrl("/", true) // Chuyển hướng khi thành công
-                .failureUrl("/admin/login?error=true") // Chuyển hướng khi thất bại
+        ).formLogin(form -> form.loginPage("/admin/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/", true)
+                .failureUrl("/admin/login?error=true")
                 .permitAll()
-        ).logout((logout) -> logout.logoutSuccessUrl("/admin/login").permitAll());
+        ).logout((logout) -> logout.logoutUrl("/logout").logoutSuccessUrl("/admin/login").permitAll());
         
         return http.build();
     }
