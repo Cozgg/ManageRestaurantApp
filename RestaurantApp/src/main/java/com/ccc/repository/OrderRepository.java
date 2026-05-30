@@ -10,6 +10,7 @@ import com.ccc.pojo.OrderItem;
 import com.ccc.pojo.Orders;
 import com.ccc.pojo.User;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public interface OrderRepository {
     Orders addOrder(Orders order, ItemDto items);
-    List<Orders> getOrders(User u);
+    List<Orders> getOrders(User u, Map<String, String> params);
     Orders getOrderById(int orderId);
     List<OrderDetail> getOrderDetailsByOrderId(int orderId, User currentChef);
     List<OrderDetail> getOrderDetailsByOrderId(int orderId);

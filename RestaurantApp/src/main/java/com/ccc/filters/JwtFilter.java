@@ -4,6 +4,8 @@
  */
 package com.ccc.filters;
 
+import com.ccc.pojo.User;
+import com.ccc.service.UserService;
 import com.ccc.utils.JwtUtils;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -13,7 +15,11 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -24,7 +30,6 @@ public class JwtFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         if (httpRequest.getRequestURI().startsWith(String.format("%s/api/secure", httpRequest.getContextPath())) == true) {
 
@@ -39,14 +44,16 @@ public class JwtFilter implements Filter {
                     String username = JwtUtils.validateTokenAndGetUsername(token);
                     if (username != null) {
                         httpRequest.setAttribute("username", username);
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, null);
+                        String role = JwtUtils.getRoleFromToken(token);
+                        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
                         SecurityContextHolder.getContext().setAuthentication(authentication);
 
                         chain.doFilter(request, response);
                         return;
                     }
                 } catch (Exception e) {
-                    // Log lỗi
+                    System.out.println(e);
                 }
             }
 

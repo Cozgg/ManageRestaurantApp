@@ -53,8 +53,8 @@ public class OrderServiceImpl implements OrderService {
     private String secretKey;
 
     @Override
-    public List<OrderDto> getOrders(User u) {
-        List<Orders> orders = this.orderRepo.getOrders(u);
+    public List<OrderDto> getOrders(User u, Map<String, String> params) {
+        List<Orders> orders = this.orderRepo.getOrders(u, params);
 
         return orders.stream().map(o -> {
             UserDto udto = UserDto.builder().firstName(o.getUserId().getFirstName()).lastName(o.getUserId().getLastName()).build();

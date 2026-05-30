@@ -61,7 +61,9 @@ public class ApiUserController {
 
         if (this.userService.authenticate(u.getUsername(), u.getPassword())) {
             try {
-                String token = JwtUtils.generateToken(u.getUsername());
+                User uAuth = this.userService.getUserByUsername(u.getUsername());
+                String role = uAuth.getUserRole().toString();
+                String token = JwtUtils.generateToken(u.getUsername(), role);
                 return ResponseEntity.ok().body(Collections.singletonMap("token", token));
             } catch (Exception e) {
                 return ResponseEntity.status(500).body("Lỗi khi tạo JWT");

@@ -44,7 +44,7 @@ const ChefOrderDetail = () => {
           <Button
             variant="link"
             as={Link}
-            to="/chef-profile"
+            to="/chef-orders"
             className="text-decoration-none text-secondary mb-3 p-0 fw-semibold"
           >
             <i className="fas fa-arrow-left me-2"></i>

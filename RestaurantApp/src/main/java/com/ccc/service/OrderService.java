@@ -10,13 +10,14 @@ import com.ccc.dto.OrderDetailDto;
 import com.ccc.dto.OrderDto;
 import com.ccc.pojo.User;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Admin
  */
 public interface OrderService {
-    List<OrderDto> getOrders(User u);
+    List<OrderDto> getOrders(User u, Map<String, String> params);
     OrderDetailDto getOrderById(int orderId);
     OrderDetailDto getOrderById(int orderId, User currentChef);
     String addOrder(ItemDto items);
