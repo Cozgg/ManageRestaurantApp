@@ -15,153 +15,91 @@
                 </h5>
                 <div class="d-flex gap-2">
                     <select id="statusFilter" class="form-select form-select-sm" style="width: 150px;" onchange="filterReservations()">
-                        <option value="">Tất cả</option>
-                        <option value="PENDING">Chờ xác nhận</option>
-                        <option value="CONFIRMED">Đã xác nhận</option>
-                        <option value="CANCELLED">Đã hủy</option>
-                        <option value="COMPLETED">Hoàn thành</option>
-                        <option value="OCCUPIED">Đang có khách</option>
+                        <option value="" th:selected="${status == null or status == ''}">Tất cả</option>
+                        <option value="RESERVED" th:selected="${status == 'RESERVED'}">Đã đặt / Đang sử dụng</option>
+                        <option value="CANCELLED" th:selected="${status == 'CANCELLED'}">Đã hủy</option>
+                        <option value="COMPLETED" th:selected="${status == 'COMPLETED'}">Hoàn thành</option>
                     </select>
-                    <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#walkInModal">
-                        + Walk-in
-                    </button>
                 </div>
             </div>
 
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="text-center" style="width: 5%">ID</th>
-                                <th style="width: 15%">Khách hàng</th>
-                                <th style="width: 10%">Bàn</th>
-                                <th style="width: 10%">Số người</th>
-                                <th style="width: 15%">Thời gian bắt đầu</th>
-                                <th style="width: 15%">Thời gian kết thúc</th>
-                                <th class="text-center" style="width: 10%">Trạng thái</th>
-                                <th class="text-center" style="width: 20%">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="r: ${reservations}">
-                                <td class="text-center fw-bold" th:text="'#' + ${r.id}"></td>
-                                <td>
-                                    <div class="fw-bold" th:text="${r.userFirstName + ' ' + r.userLastName}"></div>
-                                    <small class="text-muted" th:text="'@' + ${r.username}"></small>
-                                </td>
-                                <td>
-                                    <div class="fw-bold" th:text="'Bàn ' + ${r.tableNumber}"></div>
-                                    <small class="text-muted" th:text="${r.tableLocation}"></small>
-                                </td>
-                                <td th:text="${r.numberPeople}"></td>
-                                <td th:text="${#dates.format(r.startTime, 'dd/MM/yyyy HH:mm')}"></td>
-                                <td th:text="${#dates.format(r.endTime, 'dd/MM/yyyy HH:mm')}"></td>
-                                <td class="text-center">
-                                    <span th:if="${r.status == 'PENDING'}" class="badge bg-warning text-dark">Chờ xác nhận</span>
-                                    <span th:if="${r.status == 'CONFIRMED'}" class="badge bg-success">Đã xác nhận</span>
-                                    <span th:if="${r.status == 'CANCELLED'}" class="badge bg-danger">Đã hủy</span>
-                                    <span th:if="${r.status == 'COMPLETED'}" class="badge bg-info">Hoàn thành</span>
-                                    <span th:if="${r.status == 'OCCUPIED'}" class="badge bg-primary">Đang có khách</span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <form th:if="${r.status == 'PENDING'}"
-                                              th:action="@{/admin/reservations/{reservationId}/confirm(reservationId=${r.id})}"
-                                              method="post" style="display: inline;">
-                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
-                                                Xác nhận
-                                            </button>
-                                        </form>
-                                        <form th:if="${r.status == 'PENDING' or r.status == 'CONFIRMED'}"
-                                              th:action="@{/admin/reservations/{reservationId}/cancel(reservationId=${r.id})}"
-                                              method="post" style="display: inline;">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                                                Hủy
-                                            </button>
-                                        </form>
+            <div class="card-body p-4">
+                <div class="row g-4" th:if="${!#lists.isEmpty(reservations)}">
+                    <div class="col-12 col-md-6 col-lg-4" th:each="r: ${reservations}">
+                        <div class="card h-100 border-0 shadow-sm rounded-3" 
+                             th:classappend="${r.status == 'RESERVED' ? 'border-primary border-2' : r.status == 'COMPLETED' ? 'border-success border-2' : 'border-danger border-2'}">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="card-title fw-bold mb-1" th:text="'Bàn ' + ${r.tableNumber}"></h5>
+                                        <small class="text-muted" th:text="${r.tableLocation}"></small>
                                     </div>
-                                </td>
-                            </tr>
-
-                            <tr th:if="${#lists.isEmpty(reservations)}">
-                                <td colspan="8" class="text-center text-muted py-4">
-                                    Không có đặt bàn nào.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                    <span th:if="${r.status == 'RESERVED'}" class="badge bg-primary rounded-pill px-3 py-2">Đã đặt</span>
+                                    <span th:if="${r.status == 'COMPLETED'}" class="badge bg-success rounded-pill px-3 py-2">Hoàn thành</span>
+                                    <span th:if="${r.status == 'CANCELLED'}" class="badge bg-danger rounded-pill px-3 py-2">Đã hủy</span>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-person me-2 text-muted"></i>
+                                        <span class="fw-semibold" th:text="${r.customerName != null ? r.customerName : r.userFirstName + ' ' + r.userLastName}"></span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-people me-2 text-muted"></i>
+                                        <span th:text="${r.numberPeople} + ' người'"></span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-clock me-2 text-muted"></i>
+                                        <span th:text="${#dates.format(r.startTime, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </div>
+                                </div>
+                                
+                                <div th:if="${r.status == 'RESERVED'}" class="d-flex gap-2 mt-4">
+                                    <form th:action="@{/admin/reservations/{reservationId}/complete(reservationId=${r.id})}" method="post" style="flex: 1;">
+                                        <button type="submit" class="btn btn-success w-100 rounded-pill">
+                                            <i class="bi bi-check-circle me-1"></i>Hoàn thành
+                                        </button>
+                                    </form>
+                                    <form th:action="@{/admin/reservations/{reservationId}/cancel(reservationId=${r.id})}" method="post" style="flex: 1;">
+                                        <button type="submit" class="btn btn-outline-danger w-100 rounded-pill">
+                                            <i class="bi bi-x-circle me-1"></i>Hủy
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                
+                <div th:if="${#lists.isEmpty(reservations)}" class="text-center py-5">
+                    <i class="bi bi-calendar-x display-4 text-muted mb-3"></i>
+                    <p class="text-muted">Không có đặt bàn nào.</p>
+                </div>
+                
+                <!-- Pagination -->
+                <nav th:if="${pages > 1}" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, pages)}">
+                            <a class="page-link" 
+                               th:classappend="${i == currentPage ? 'active' : ''}"
+                               th:href="@{/admin/reservations(status=${status}, page=${i})}" 
+                               th:text="${i}"></a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </section>
     <div th:replace="~{base :: footer}"></div>
     
-    <!-- Walk-in Modal -->
-    <div class="modal fade" id="walkInModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Khách Walk-in</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form th:action="@{/admin/walk-in}" method="post" id="walkInForm">
-                        <div class="mb-3">
-                            <label class="form-label">Tên khách</label>
-                            <input type="text" class="form-control" id="customerName" name="customerName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Bàn</label>
-                            <select class="form-select" id="tableId" name="tableId" required>
-                                <option value="">Chọn bàn</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Số người</label>
-                            <input type="number" class="form-control" id="numberPeople" name="numberPeople" min="1" value="1" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" form="walkInForm" class="btn btn-primary">Khóa bàn</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <script th:src="@{/js/script.js}"></script>
     <script>
-        let availableTables = [];
-        
-        // Load available tables when modal opens
-        document.getElementById('walkInModal').addEventListener('show.bs.modal', function() {
-            const now = new Date();
-            const endTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-            
-            const startTimeStr = now.toISOString().slice(0, 16);
-            const endTimeStr = endTime.toISOString().slice(0, 16);
-            
-            fetch(`/admin/available-tables?startTime=${startTimeStr}&endTime=${endTimeStr}`)
-                .then(response => response.json())
-                .then(data => {
-                    availableTables = data;
-                    const tableSelect = document.getElementById('tableId');
-                    tableSelect.innerHTML = '<option value="">Chọn bàn</option>';
-                    data.forEach(table => {
-                        tableSelect.innerHTML += `<option value="${table.id}">Bàn ${table.tableNumber} - ${table.location} (${table.capacity} người)</option>`;
-                    });
-                })
-                .catch(error => console.error('Error:', error));
-        });
-
         function filterReservations() {
             const status = document.getElementById('statusFilter').value;
             if (status) {
-                window.location.href = `/admin/reservations?status=${status}`;
+                window.location.href = `/RestaurantApp/admin/reservations?status=${status}`;
             } else {
-                window.location.href = '/admin/reservations';
+                window.location.href = '/RestaurantApp/admin/reservations';
             }
         }
     </script>

@@ -87,7 +87,7 @@ function loadChartData() {
 
 function approveUser(userId) {
     if (confirm('Bạn có chắc muốn duyệt tài khoản Đầu bếp này?')) {
-        fetch(`http://localhost:8080/RestaurantApp/api/users/${userId}/approve`, {
+        fetch(`http://localhost:8080/RestaurantApp/admin/users/${userId}/approve`, {
             method: 'POST',
             credentials: 'same-origin',
             headers: {

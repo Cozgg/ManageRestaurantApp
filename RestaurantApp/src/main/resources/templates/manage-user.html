@@ -62,9 +62,10 @@
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2" th:if="${u.userRole.name() == 'ROLE_USER'}">
                                         <form th:action="@{/admin/users/{userId}/approve(userId=${u.id})}"
-                                              method="post" style="display: inline;">
+                                              method="post" style="display: inline;"
+                                              onsubmit="return confirm('Bạn có chắc muốn duyệt tài khoản này thành Đầu bếp?');">
                                             <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
-                                                Duyệt thành Đầu bếp
+                                                Duyệt
                                             </button>
                                         </form>
                                         <button class="btn btn-sm btn-outline-danger rounded-pill px-3"
