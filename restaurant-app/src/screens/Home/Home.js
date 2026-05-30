@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from "react";
-import Apis, { endpoints } from "../../configs/Apis";
+import {useContext, useEffect, useState} from "react";
+import Apis, {endpoints} from "../../configs/Apis";
 import {
   Alert,
   Badge,
@@ -12,12 +12,13 @@ import {
   Row,
 } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
-import { useSearchParams } from "react-router-dom";
-import { MyOrderContext } from "../../utils/contexts/MyOrderContext";
-import { MyCompareContext } from "../../utils/contexts/MyCompareContext";
+import {Link, useSearchParams} from "react-router-dom";
+import {MyOrderContext} from "../../utils/contexts/MyOrderContext";
+import {MyCompareContext} from "../../utils/contexts/MyCompareContext";
+import {Check, Plus, Search} from "lucide-react";
 
 const Home = () => {
-  const { dispatch } = useContext(MyOrderContext);
+  const {dispatch} = useContext(MyOrderContext);
   const [compareList, compareDispatch] = useContext(MyCompareContext);
   const [dishes, setDishes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -95,130 +96,176 @@ const Home = () => {
 
   return (
     <>
-      <Container className="my-5">
-        <Row className="justify-content-center mb-5">
-          <Col xs={12} md={8} lg={6}>
-            <InputGroup className="shadow-sm overflow-hidden">
-              <Form.Control
-                className="border-success border-start-0 shadow-none py-2"
+      <Container className="max-w-5xl mx-auto">
+        {/* Comparison CTA Sticky Bar */}
+        {compareList.length > 0 && (
+          <div className="sticky top-16 z-40 bg-accent/10 border-b border-accent/20 backdrop-blur">
+            <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+              <span className="text-foreground font-medium">
+                {compareList.length} món ăn đã chọn
+              </span>
+              <Link to="/compare">
+                <button className="bg-accent hover:bg-accent/90 text-accent-foreground px-4 py-2 rounded-md font-medium transition-colors">
+                  So sánh ngay
+                </button>
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Menu Section */}
+        <section className="py-16 max-w-7xl mx-auto px-4">
+          {/* Search Bar - Tích hợp UI mới cho thanh tìm kiếm cũ */}
+          <div className="max-w-2xl mx-auto mb-12">
+            <div className="relative flex items-center shadow-sm rounded-full overflow-hidden border border-input focus-within:ring-2 focus-within:ring-primary transition-all">
+              <Search className="absolute left-4 w-5 h-5 text-muted-foreground" />
+              <input
+                type="text"
+                className="w-full py-3 pl-12 pr-4 bg-background focus:outline-none"
                 placeholder="Bạn muốn thưởng thức món gì hôm nay?..."
-                aria-label="Tìm kiếm món ăn"
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
               />
-            </InputGroup>
-          </Col>
-        </Row>
+            </div>
+          </div>
+          {/* Thông báo rỗng */}
+          {dishes.length === 0 && !loading && (
+            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-2xl p-6 text-center shadow-sm">
+              <h5 className="text-lg font-medium mb-0">
+                Rất tiếc, không tìm thấy món ăn nào phù hợp!
+              </h5>
+            </div>
+          )}
 
-        {dishes.length === 0 && !loading && (
-          <Alert
-            variant="warning"
-            className="text-center rounded-4 shadow-sm py-4 border-0"
-          >
-            <h5 className="mb-0 text-muted">
-              Rất tiếc, không tìm thấy món ăn nào phù hợp!
-            </h5>
-          </Alert>
-        )}
-
-        <Row className="g-4">
-          {dishes.map((d) => (
-            <Col xs={12} sm={6} md={4} lg={3} key={d.id}>
-              <Card className="h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-                <div className="position-relative">
-                  <Card.Img
-                    variant="top"
-                    src={d.image}
-                    alt={d.name}
-                    style={{ height: "200px", objectFit: "cover" }}
-                  />
-
-                  <Badge
-                    bg="warning"
-                    text="dark"
-                    className="position-absolute top-0 end-0 m-2 px-2 py-1 shadow-sm"
-                  >
-                    {d.timePrepare} phút
-                  </Badge>
-                </div>
-
-                <Card.Body className="d-flex flex-column">
-                  <Card.Title
-                    className="fw-bold fs-5 text-truncate"
-                    title={d.name}
-                  >
-                    {d.name}
-                  </Card.Title>
-
-                  <Card.Text
-                    className="text-muted small mb-2"
-                    style={{
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {d.description}
-                  </Card.Text>
-
-                  <Card.Text
-                    className="small mb-3 text-secondary text-truncate"
-                    title={d.material}
-                  >
-                    <strong>Nguyên liệu:</strong> {d.material}
-                  </Card.Text>
-
-                  <div className="mt-auto">
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                      <span className="fw-bold fs-5 text-danger">
-                        {d.price.toLocaleString()} ₫
-                      </span>
-                      <span
-                        className="text-muted small"
-                        style={{ fontSize: "0.8rem" }}
-                      >
-                        {d.user.lastName} {d.user.firstName}
-                      </span>
-                    </div>
-                    <div className="d-flex gap-2">
-                      <Button
-                        variant="success"
-                        className="flex-grow-1 rounded-pill fw-bold shadow-sm"
-                        onClick={() => handleAddToCart(d)}
-                      >
-                        Thêm
-                      </Button>
-                      <Button
-                        variant={isInCompare(d.id) ? "secondary" : "outline-primary"}
-                        className="rounded-pill fw-bold shadow-sm"
-                        onClick={() => handleAddToCompare(d)}
-                        disabled={isInCompare(d.id)}
-                      >
-                        {isInCompare(d.id) ? "Đã so sánh" : "So sánh"}
-                      </Button>
-                    </div>
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-        {dishes.length > 0 && (
-          <div className="text-center mt-5">
-            {loading ? (
+          {/* Grid Danh sách món ăn */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {dishes === null ? (
               <MySpinner />
             ) : (
-              <Button
-                variant="outline-success"
-                className="rounded-pill px-5 py-2 fw-bold shadow-sm"
-                onClick={loadMore}
-              >
-                Xem thêm món ngon
-              </Button>
+              dishes.map((dish) => (
+                <div
+                  key={dish.id}
+                  className="bg-card text-card-foreground rounded-xl border shadow-sm overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
+                >
+                  {/* Image Box */}
+                  <div className="w-full h-48 relative bg-muted">
+                    <img
+                      src={dish.image}
+                      alt={dish.name}
+                      className="w-full h-full object-cover"
+                    />
+
+                    {/* Badge Thời gian chuẩn bị */}
+                    <span className="absolute top-2 left-2 bg-warning text-warning-foreground text-xs font-bold px-2 py-1 rounded shadow-sm">
+                      {dish.timePrepare} phút
+                    </span>
+
+                    {/* Compare Checkbox */}
+                    <button
+                      onClick={() =>
+                        !isInCompare(dish.id) && handleAddToCompare(dish)
+                      }
+                      disabled={isInCompare(dish.id)}
+                      className={`absolute top-2 right-2 w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-colors ${
+                        isInCompare(dish.id)
+                          ? "bg-primary border-primary cursor-not-allowed"
+                          : "bg-white border-border hover:border-primary"
+                      }`}
+                      title={
+                        isInCompare(dish.id)
+                          ? "Đã chọn so sánh"
+                          : "Thêm vào so sánh"
+                      }
+                    >
+                      {isInCompare(dish.id) && (
+                        <Check className="w-4 h-4 text-primary-foreground" />
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Card Content */}
+                  <div className="p-5 flex flex-col flex-grow">
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                      <h3
+                        className="text-lg font-semibold text-foreground line-clamp-1"
+                        title={dish.name}
+                      >
+                        {dish.name}
+                      </h3>
+                      <p className="text-xl font-bold text-primary mb-3">
+                        {dish.price?.toLocaleString()} ₫
+                      </p>
+                    </div>
+
+                    <p
+                      className="text-sm text-muted-foreground mb-2 line-clamp-2"
+                      title={dish.description}
+                    >
+                      {dish.description}
+                    </p>
+
+                    <p
+                      className="text-sm text-muted-foreground mb-4 truncate"
+                      title={dish.material}
+                    >
+                      <strong className="text-foreground">Nguyên liệu:</strong>{" "}
+                      {dish.material}
+                    </p>
+
+                    <div className="flex items-center gap-2 mb-4 mt-auto">
+                      <span className="inline-flex items-center rounded-full bg-green-50 text-green-700 px-3 py-1 text-xs font-medium">
+                        👨‍🍳 {dish.user?.lastName} {dish.user?.firstName}
+                      </span>
+                    </div>
+
+                    {/* Add to Cart Button */}
+                    <button
+                      onClick={() => handleAddToCart(dish)}
+                      className="w-full flex items-center justify-center bg-success hover:bg-primary/90 text-primary-foreground py-2.5 rounded-md font-medium transition-colors"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Thêm vào giỏ
+                    </button>
+                  </div>
+                </div>
+              ))
             )}
           </div>
-        )}
+
+          {/* Load More & Spinner */}
+          {dishes.length > 0 && (
+            <div className="text-center mt-12">
+              {loading ? (
+                <MySpinner />
+              ) : (
+                <Button
+                  onClick={loadMore}
+                  variant="success"
+                  className="rounded-pill px-5"
+                >
+                  Xem thêm món ngon
+                </Button>
+              )}
+            </div>
+          )}
+        </section>
+
+        {/* CTA Section */}
+        <section className="bg-primary/5 py-16">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <h2 className="text-3xl font-bold text-foreground mb-6">
+              Sẵn sàng để đặt món
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8 text-balance">
+              Xem thực đơn đầy đủ và đặt món chỉ với vài cú nhấp chuột.
+            </p>
+            <Link to="/order">
+              <button className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8 py-4 rounded-md font-bold transition-colors shadow-sm">
+                Xem chi tiết
+              </button>
+            </Link>
+          </div>
+        </section>
       </Container>
     </>
   );

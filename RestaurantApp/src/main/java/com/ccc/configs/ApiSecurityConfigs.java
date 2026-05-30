@@ -24,7 +24,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * @author Admin
  */
 @Configuration
-@Order(2)
+@Order(1)
 public class ApiSecurityConfigs {
 
     @Bean

@@ -29,6 +29,7 @@ import ChefOrderDetail from "./screens/Chef/ChefOrderDetail";
 import RealtimeOrders from "./screens/Chef/RealtimeOrders";
 import SockJS from "sockjs-client";
 import {Client} from "@stomp/stompjs";
+import ChefOrders from "./screens/Chef/ChefOrders";
 
 const App = () => {
   const [user, dispatch] = useReducer(MyUserReducer, null);
@@ -93,6 +94,7 @@ const App = () => {
                       path="/realtime-orders"
                       element={<RealtimeOrders />}
                     />
+                    <Route path="/chef-orders" element={<ChefOrders />} />
                   </Route>
                 </Routes>
               </Container>

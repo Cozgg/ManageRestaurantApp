@@ -22,9 +22,12 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
@@ -36,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 @Transactional
+@PropertySource("classpath:configs.properties")
 public class OrderRepositoryImpl implements OrderRepository {
 
     @Autowired
@@ -46,6 +50,9 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Autowired
     private DishRepository dishRepo;
+    
+    @Autowired
+    private Environment env;
 
     @Override
     public Orders addOrder(Orders order, ItemDto items) {
@@ -64,7 +71,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<Orders> getOrders(User u) {
+    public List<Orders> getOrders(User u, Map<String, String> params) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<Orders> cq = b.createQuery(Orders.class);
@@ -81,7 +88,17 @@ public class OrderRepositoryImpl implements OrderRepository {
             default ->
                 cq.where(b.equal(root.get("userId").get("id"), u.getId()));
         }
+        cq.orderBy(b.desc(root.get("createdAt")));
         Query q = s.createQuery(cq);
+        if(params != null){
+            int pageSize = this.env.getProperty("orders.page_size", Integer.class);
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            int start = (page - 1) * pageSize;
+
+            q.setMaxResults(pageSize);
+            q.setFirstResult(start);
+        }
+        
         return q.getResultList();
     }
 

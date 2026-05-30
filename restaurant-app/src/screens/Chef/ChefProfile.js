@@ -5,26 +5,11 @@ import cookies from "react-cookies";
 import {authApis, endpoints} from "../../configs/Apis";
 import {Button, Card, Col, Container, Image, Row, Table} from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
+import {LogOut, Phone, ShieldCheck} from "lucide-react";
 
 const ChefProfile = () => {
   const {user, dispatch} = useContext(MyUserContext);
-  const [loading, setLoading] = useState(false);
-  const [orders, setOrders] = useState([]);
   const nav = useNavigate();
-
-  const loadOrders = async () => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      const token = cookies.load("token");
-      let res = await authApis(token).get(endpoints["get-orders"]);
-      setOrders(res.data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const logout = () => {
     dispatch({
@@ -35,12 +20,6 @@ const ChefProfile = () => {
     nav("/");
   };
 
-  useEffect(() => {
-    if (user) {
-      loadOrders();
-    }
-  }, [user]);
-
   if (!user) {
     return (
       <Container className="mt-5 text-center">
@@ -49,152 +28,71 @@ const ChefProfile = () => {
     );
   }
   return (
-    <Container className="my-5">
-      <Row className="g-4">
-        <Col lg={4} md={5}>
-          <Card className="shadow-sm border-0 rounded-4 h-100">
-            <Card.Body className="p-4 text-center d-flex flex-column">
-              <h4 className="fw-bold mb-4 text-success">Thông tin cá nhân</h4>
+    <div className="max-w-md mx-auto px-4 py-8">
+      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 sm:p-8 text-center">
+        {/* Tiêu đề */}
+        <h4 className="text-xl font-bold text-primary mb-6">
+          Thông tin cá nhân
+        </h4>
 
-              <div className="d-flex justify-content-center mb-3">
-                <Image
-                  src={user.avatar || "https://via.placeholder.com/150"}
-                  roundedCircle
-                  className="border border-3 border-success p-1 shadow-sm"
-                  style={{width: "130px", height: "130px", objectFit: "cover"}}
-                />
-              </div>
+        {/* Avatar */}
+        <div className="relative w-32 h-32 mx-auto mb-4">
+          <img
+            src={user?.avatar || "https://via.placeholder.com/150"}
+            alt="Avatar"
+            className="w-full h-full object-cover rounded-full border-4 border-primary/20 shadow-sm"
+          />
+          {/* Dấu tích xanh nhỏ góc avatar (Tùy chọn cho sinh động) */}
+          <div className="absolute bottom-2 right-2 bg-primary text-white p-1.5 rounded-full border-2 border-white">
+            <ShieldCheck className="w-4 h-4" />
+          </div>
+        </div>
 
-              <h5 className="fw-bold mb-1">
-                {user.firstName} {user.lastName}
-              </h5>
-              <p className="text-muted mb-4">@{user.username}</p>
+        {/* Tên & Username */}
+        <h5 className="text-2xl font-bold text-foreground mb-1">
+          {user?.firstName} {user?.lastName}
+        </h5>
+        <p className="text-muted-foreground font-medium mb-6">
+          @{user?.username}
+        </p>
 
-              <div className="bg-light p-3 rounded-3 text-start mb-auto">
-                <Row className="mb-2">
-                  <Col xs={5} className="text-muted fw-semibold">
-                    Vai trò:
-                  </Col>
-                  <Col xs={7} className="fw-bold">
-                    {" "}
-                    "Đầu bếp"
-                  </Col>
-                </Row>
-                <Row className="mb-2">
-                  <Col xs={5} className="text-muted fw-semibold">
-                    Điện thoại:
-                  </Col>
-                  <Col xs={7} className="fw-bold">
-                    {user.phone || "Chưa cập nhật"}
-                  </Col>
-                </Row>
-              </div>
+        {/* Khối thông tin chi tiết */}
+        <div className="bg-secondary/30 rounded-xl p-4 space-y-4 text-left mb-8">
+          {/* Vai trò */}
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-full text-primary">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-0.5">Vai trò</p>
+              <p className="text-sm font-bold text-foreground">Đầu bếp</p>
+            </div>
+          </div>
 
-              <Button
-                variant="outline-danger"
-                className="w-100 rounded-pill fw-bold mt-4"
-                onClick={logout}
-              >
-                Đăng xuất
-              </Button>
-            </Card.Body>
-          </Card>
-        </Col>
+          {/* Số điện thoại */}
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-full text-primary">
+              <Phone className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-0.5">Điện thoại</p>
+              <p className="text-sm font-bold text-foreground">
+                {user?.phone || "Chưa cập nhật"}
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <Col lg={8} md={7}>
-          <Card className="shadow-sm border-0 rounded-4 h-100">
-            <Card.Body className="p-4">
-              <h4 className="fw-bold mb-4" style={{color: "#2c3e50"}}>
-                Lịch sử đặt món
-              </h4>
-              {loading ? (
-                <div className="text-center py-5">
-                  <MySpinner />
-                </div>
-              ) : (
-                <div className="table-responsive">
-                  <Table hover className="align-middle border-top">
-                    <thead className="table-light text-muted">
-                      <tr>
-                        <th>Mã Đơn</th>
-                        <th>Ngày đặt</th>
-                        <th>Thanh toán</th>
-                        <th>Trạng thái</th>
-                        <th className="text-end">Tổng tiền</th>
-                        <th>Thao tác</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.length === 0 ? (
-                        <tr>
-                          <td
-                            colSpan="6"
-                            className="text-center py-4 text-muted"
-                          >
-                            Bạn chưa có đơn hàng nào.
-                          </td>
-                        </tr>
-                      ) : (
-                        orders.map((order) => (
-                          <tr key={order.id}>
-                            <td className="fw-bold">#{order.id}</td>
-
-                            <td>
-                              {new Date(order.createdDate).toLocaleString(
-                                "vi-VN",
-                                {
-                                  day: "2-digit",
-                                  month: "2-digit",
-                                  year: "numeric",
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                },
-                              )}
-                            </td>
-
-                            <td>{order.payment}</td>
-
-                            <td>
-                              <span
-                                className={`badge ${
-                                  order.statusPay === "COMPLETED"
-                                    ? "bg-success"
-                                    : order.statusPay === "PENDING"
-                                      ? "bg-warning text-dark"
-                                      : "bg-danger"
-                                }`}
-                              >
-                                {order.statusPay}
-                              </span>
-                            </td>
-
-                            <td className="text-end fw-semibold text-danger">
-                              {order.totalPrice.toLocaleString("vi-VN")} ₫
-                            </td>
-                            <td className="text-center align-middle">
-                              <Button
-                                variant="outline-primary"
-                                size="sm"
-                                className="rounded-pill fw-semibold px-3 shadow-sm"
-                                onClick={() =>
-                                  nav(`/chef-order-detail/${order.id}`)
-                                }
-                              >
-                                Chi tiết
-                              </Button>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </Table>
-                </div>
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+        {/* Nút Đăng xuất */}
+        <button
+          onClick={logout}
+          className="w-full flex items-center justify-center gap-2 border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white py-2.5 rounded-xl font-bold transition-colors shadow-sm"
+        >
+          <LogOut className="w-5 h-5" />
+          Đăng xuất
+        </button>
+      </div>
+    </div>
   );
 };
 

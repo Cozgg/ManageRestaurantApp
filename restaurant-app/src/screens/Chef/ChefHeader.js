@@ -22,7 +22,7 @@ const ChefHeader = () => {
         <Navbar.Brand
           as={Link}
           to="/chef"
-          className="fw-bold fs-3 d-flex align-items-center gap-2"
+          className="text-2xl font-bold text-success flex items-center gap-2 no-underline hover:no-underline"
           style={{color: "#27ae60"}}
         >
           <span>eRestaurant</span>
@@ -46,7 +46,7 @@ const ChefHeader = () => {
             {/* ORDER */}
             <Button
               as={Link}
-              to="/chef-profile"
+              to="/chef-orders"
               className="chef-nav-btn border-0"
             >
               <i className="fas fa-receipt"></i>

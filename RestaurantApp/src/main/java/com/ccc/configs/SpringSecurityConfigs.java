@@ -41,7 +41,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
             "com.ccc.consumer"
         }
 )
-@Order(1)
+@Order(2)
 public class SpringSecurityConfigs {
     
     @Autowired
