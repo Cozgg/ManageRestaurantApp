@@ -1,15 +1,9 @@
 package com.ccc.enums;
 
-/**
- * Enum cho các trạng thái của Reservation
- * Áp dụng State Pattern để quản lý trạng thái một cách an toàn
- */
 public enum ReservationStatus {
-    PENDING("Chờ xác nhận"),
-    CONFIRMED("Đã xác nhận"),
-    CANCELLED("Đã hủy"),
+    RESERVED("Đã đặt / Đang sử dụng"),
     COMPLETED("Hoàn thành"),
-    OCCUPIED("Đang có khách");
+    CANCELLED("Đã hủy");
 
     private final String displayName;
 
@@ -23,15 +17,11 @@ public enum ReservationStatus {
 
     public boolean canTransitionTo(ReservationStatus newStatus) {
         switch (this) {
-            case PENDING:
-                return newStatus == CONFIRMED || newStatus == CANCELLED;
-            case CONFIRMED:
-                return newStatus == CANCELLED || newStatus == COMPLETED;
-            case OCCUPIED:
+            case RESERVED:
                 return newStatus == COMPLETED || newStatus == CANCELLED;
             case CANCELLED:
             case COMPLETED:
-                return false; 
+                return false;
             default:
                 return false;
         }

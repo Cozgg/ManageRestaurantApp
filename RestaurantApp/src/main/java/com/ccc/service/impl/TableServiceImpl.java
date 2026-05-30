@@ -4,13 +4,15 @@
  */
 package com.ccc.service.impl;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.ccc.pojo.RestaurantTable;
 import com.ccc.repository.TableRepository;
 import com.ccc.service.TableService;
-import java.util.List;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  *
@@ -53,10 +55,18 @@ public class TableServiceImpl implements TableService {
     public com.ccc.dto.TableDto updateTable(int id, Map<String, String> params) {
         RestaurantTable t = this.tableRepo.getById(id);
         if (t != null) {
-            if (params.containsKey("tableNumber")) t.setTableNumber(params.get("tableNumber"));
-            if (params.containsKey("capacity")) t.setCapacity(Integer.parseInt(params.get("capacity")));
-            if (params.containsKey("location")) t.setLocation(params.get("location"));
-            if (params.containsKey("active")) t.setActive(Boolean.parseBoolean(params.get("active")));
+            if (params.containsKey("tableNumber")) {
+                t.setTableNumber(params.get("tableNumber"));
+            }
+            if (params.containsKey("capacity")) {
+                t.setCapacity(Integer.parseInt(params.get("capacity")));
+            }
+            if (params.containsKey("location")) {
+                t.setLocation(params.get("location"));
+            }
+            if (params.containsKey("active")) {
+                t.setActive(Boolean.parseBoolean(params.get("active")));
+            }
             this.tableRepo.addOrUpdate(t);
             return toDto(t);
         }
@@ -71,5 +81,10 @@ public class TableServiceImpl implements TableService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public long countTables(Map<String, String> params) {
+        return this.tableRepo.countTables(params);
     }
 }
