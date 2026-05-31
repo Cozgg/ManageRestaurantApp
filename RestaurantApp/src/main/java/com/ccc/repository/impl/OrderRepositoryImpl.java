@@ -4,34 +4,32 @@
  */
 package com.ccc.repository.impl;
 
-import com.ccc.dto.ItemDto;
-import com.ccc.enums.PaymentMethod;
-import com.ccc.pojo.Dish;
-import com.ccc.pojo.OrderDetail;
-import com.ccc.pojo.OrderItem;
-import com.ccc.pojo.Orders;
-import com.ccc.pojo.User;
-import com.ccc.enums.UserRole;
-import com.ccc.repository.DishRepository;
-import com.ccc.repository.OrderRepository;
-import com.ccc.repository.UserRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Root;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ccc.dto.ItemDto;
+import com.ccc.pojo.Dish;
+import com.ccc.pojo.OrderDetail;
+import com.ccc.pojo.Orders;
+import com.ccc.pojo.User;
+import com.ccc.repository.DishRepository;
+import com.ccc.repository.OrderRepository;
+import com.ccc.repository.UserRepository;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
 
 /**
  *
@@ -50,7 +48,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Autowired
     private DishRepository dishRepo;
-    
+
     @Autowired
     private Environment env;
 
@@ -90,7 +88,7 @@ public class OrderRepositoryImpl implements OrderRepository {
         }
         cq.orderBy(b.desc(root.get("createdAt")));
         Query q = s.createQuery(cq);
-        if(params != null){
+        if (params != null) {
             int pageSize = this.env.getProperty("orders.page_size", Integer.class);
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
@@ -98,7 +96,7 @@ public class OrderRepositoryImpl implements OrderRepository {
             q.setMaxResults(pageSize);
             q.setFirstResult(start);
         }
-        
+
         return q.getResultList();
     }
 
@@ -157,6 +155,26 @@ public class OrderRepositoryImpl implements OrderRepository {
         cq.select(root).where(b.and(b.equal(root.get("orderId").get("id"), orderId),
                 b.equal(root.get("dishId").get("userId").get("id"), currentChef.getId()))).distinct(true);
         return s.createQuery(cq).getResultList();
+    }
+
+    @Override
+    public boolean hasUserPurchasedDish(User user, int dishId) {
+        Session s = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = b.createQuery(Long.class);
+        Root<Orders> root = cq.from(Orders.class);
+        Join<Orders, OrderDetail> orderJoin = root.join("orderDetailSet", JoinType.INNER);
+
+        cq.select(b.count(root)).where(
+                b.and(
+                        b.equal(root.get("userId").get("id"), user.getId()),
+                        b.equal(root.get("statusPay"), "COMPLETED"),
+                        b.equal(orderJoin.get("dishId").get("id"), dishId)
+                )
+        );
+
+        Long count = s.createQuery(cq).getSingleResult();
+        return count != null && count > 0;
     }
 
 }

@@ -17,7 +17,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -72,8 +71,6 @@ public class Reservation implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
     private User userId;
-    @OneToOne(mappedBy = "reservationId")
-    private Orders orders;
 
     public Reservation() {
     }
@@ -141,14 +138,6 @@ public class Reservation implements Serializable {
 
     public void setUserId(User userId) {
         this.userId = userId;
-    }
-
-    public Orders getOrders() {
-        return orders;
-    }
-
-    public void setOrders(Orders orders) {
-        this.orders = orders;
     }
 
     @Override

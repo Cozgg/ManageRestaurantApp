@@ -1,5 +1,5 @@
-import {useContext, useEffect, useState} from "react";
-import Apis, {endpoints} from "../../configs/Apis";
+import { useContext, useEffect, useState } from "react";
+import Apis, { endpoints } from "../../configs/Apis";
 import {
   Alert,
   Badge,
@@ -12,14 +12,15 @@ import {
   Row,
 } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
-import {Link, useSearchParams} from "react-router-dom";
-import {MyOrderContext} from "../../utils/contexts/MyOrderContext";
-import {MyCompareContext} from "../../utils/contexts/MyCompareContext";
-import {Check, Plus, Search} from "lucide-react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { MyOrderContext } from "../../utils/contexts/MyOrderContext";
+import { MyCompareContext } from "../../utils/contexts/MyCompareContext";
+import { Check, Plus, Search } from "lucide-react";
 
 const Home = () => {
-  const {dispatch} = useContext(MyOrderContext);
+  const { dispatch } = useContext(MyOrderContext);
   const [compareList, compareDispatch] = useContext(MyCompareContext);
+  const navigate = useNavigate();
   const [dishes, setDishes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -166,11 +167,10 @@ const Home = () => {
                         !isInCompare(dish.id) && handleAddToCompare(dish)
                       }
                       disabled={isInCompare(dish.id)}
-                      className={`absolute top-2 right-2 w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-colors ${
-                        isInCompare(dish.id)
-                          ? "bg-primary border-primary cursor-not-allowed"
-                          : "bg-white border-border hover:border-primary"
-                      }`}
+                      className={`absolute top-2 right-2 w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-colors ${isInCompare(dish.id)
+                        ? "bg-primary border-primary cursor-not-allowed"
+                        : "bg-white border-border hover:border-primary"
+                        }`}
                       title={
                         isInCompare(dish.id)
                           ? "Đã chọn so sánh"
@@ -218,14 +218,23 @@ const Home = () => {
                       </span>
                     </div>
 
-                    {/* Add to Cart Button */}
-                    <button
-                      onClick={() => handleAddToCart(dish)}
-                      className="w-full flex items-center justify-center bg-success hover:bg-primary/90 text-primary-foreground py-2.5 rounded-md font-medium transition-colors"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Thêm vào giỏ
-                    </button>
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 mt-auto">
+                      <button
+                        onClick={() => handleAddToCart(dish)}
+                        className="flex-1 flex items-center justify-center bg-success hover:bg-primary/90 text-primary-foreground py-2.5 rounded-md font-medium transition-colors"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Thêm vào giỏ
+                      </button>
+                      <button
+                        onClick={() => navigate(`/chat?chefId=${dish.user?.id}`)}
+                        className="flex items-center justify-center bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-md font-medium transition-colors"
+                        title="Chat với đầu bếp"
+                      >
+                        💬
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))

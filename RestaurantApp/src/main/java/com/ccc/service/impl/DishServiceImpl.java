@@ -4,6 +4,15 @@
  */
 package com.ccc.service.impl;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.ccc.dto.DishDto;
 import com.ccc.dto.UserDto;
 import com.ccc.pojo.Category;
@@ -13,13 +22,6 @@ import com.ccc.repository.DishRepository;
 import com.ccc.service.DishService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -48,6 +50,7 @@ public class DishServiceImpl implements DishService {
         }
         if (d.getUserId() != null) {
             UserDto u = new UserDto();
+            u.setId(d.getUserId().getId());
             u.setFirstName(d.getUserId().getFirstName());
             u.setLastName(d.getUserId().getLastName());
             dto.setUser(u);

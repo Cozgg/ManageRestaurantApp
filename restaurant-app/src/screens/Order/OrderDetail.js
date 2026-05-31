@@ -1,17 +1,27 @@
-import {useEffect, useState} from "react";
-import {Link, useParams} from "react-router-dom";
-import {authApis, endpoints} from "../../configs/Apis";
+import { useEffect, useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { authApis, endpoints } from "../../configs/Apis";
 import cookies from "react-cookies";
-import {message} from "antd";
-import {Badge, Button, Card, Col, Container, Image, Row} from "react-bootstrap";
+import { message } from "antd";
+import { Badge, Button, Card, Col, Container, Form, Image, Modal, Row, Star } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
+import { Star as StarIcon } from "lucide-react";
 const OrderDetail = () => {
   const params = useParams();
+  const navigate = useNavigate();
   const orderId = params.orderId;
   const [loading, setLoading] = useState(false);
   const [orderData, setOrderData] = useState(null);
   const order = orderData?.order;
   const items = orderData?.items || [];
+
+  // Rating states
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [selectedDish, setSelectedDish] = useState(null);
+  const [rating, setRating] = useState(5);
+  const [ratingContent, setRatingContent] = useState('');
+  const [submittingRating, setSubmittingRating] = useState(false);
+  const [dishRatings, setDishRatings] = useState({});
 
   const loadOrderDetail = async (orderId) => {
     try {
@@ -30,6 +40,63 @@ const OrderDetail = () => {
   useEffect(() => {
     loadOrderDetail(orderId);
   }, [orderId]);
+
+  const loadDishRatings = async (dishId) => {
+    try {
+      const res = await authApis(cookies.load("token")).get(endpoints["dish-ratings"](dishId));
+      setDishRatings(prev => ({ ...prev, [dishId]: res.data }));
+    } catch (error) {
+      console.error('Lỗi tải đánh giá:', error);
+    }
+  };
+
+  const handleShowRatingModal = (dish) => {
+    setSelectedDish(dish);
+    setRating(5);
+    setRatingContent('');
+    setShowRatingModal(true);
+  };
+
+  const handleCloseRatingModal = () => {
+    setShowRatingModal(false);
+    setSelectedDish(null);
+    setRating(5);
+    setRatingContent('');
+  };
+
+  const handleSubmitRating = async () => {
+    if (!selectedDish) return;
+
+    setSubmittingRating(true);
+    try {
+      const token = cookies.load("token");
+      const params = new URLSearchParams();
+      params.append('point', rating);
+      params.append('content', ratingContent);
+
+      await authApis(token).post(endpoints["dish-rating"](selectedDish.dishId), params, {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      });
+
+      message.success('Đánh giá thành công!');
+      handleCloseRatingModal();
+      loadDishRatings(selectedDish.dishId);
+    } catch (error) {
+      console.error('Lỗi đánh giá:', error);
+      message.error('Có lỗi xảy ra khi đánh giá!');
+    } finally {
+      setSubmittingRating(false);
+    }
+  };
+
+  const renderStars = (point) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <StarIcon
+        key={i}
+        className={`w-4 h-4 ${i < point ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+      />
+    ));
+  };
   return (
     <>
       {loading === true || !orderData || !orderData.order ? (
@@ -37,7 +104,7 @@ const OrderDetail = () => {
           <MySpinner />
         </div>
       ) : (
-        <Container className="my-5" style={{maxWidth: "700px"}}>
+        <Container className="my-5" style={{ maxWidth: "700px" }}>
           <Button
             variant="link"
             as={Link}
@@ -108,6 +175,28 @@ const OrderDetail = () => {
                         {item.quantity} x{" "}
                         {item.unitPrice.toLocaleString("vi-VN")} ₫
                       </span>
+                      <div className="mt-2 d-flex gap-2">
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={() => navigate(`/chat?chefId=${item.chef.id}`)}
+                          className="d-flex align-items-center gap-2"
+                        >
+                          <i className="fas fa-comments"></i>
+                          Chat với đầu bếp
+                        </Button>
+                        {order.statusPay === "COMPLETED" && (
+                          <Button
+                            variant="outline-warning"
+                            size="sm"
+                            onClick={() => handleShowRatingModal(item)}
+                            className="d-flex align-items-center gap-2"
+                          >
+                            <StarIcon className="w-4 h-4" />
+                            Đánh giá
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     <div className="fw-bold text-danger fs-5">
                       {(item.quantity * item.unitPrice).toLocaleString("vi-VN")}{" "}
@@ -125,6 +214,68 @@ const OrderDetail = () => {
               </div>
             </Card.Body>
           </Card>
+
+          {/* MODAL ĐÁNH GIÁ */}
+          <Modal show={showRatingModal} onHide={handleCloseRatingModal} centered>
+            <Modal.Header closeButton className="border-b border-border">
+              <Modal.Title className="text-foreground font-bold">
+                Đánh giá món ăn
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="bg-card">
+              {selectedDish && (
+                <div className="mb-3">
+                  <p className="text-muted mb-2">Món: <strong>{selectedDish.dishName}</strong></p>
+                </div>
+              )}
+
+              <Form.Group className="mb-3">
+                <Form.Label className="text-foreground font-semibold text-sm">Số sao *</Form.Label>
+                <div className="d-flex gap-2 mb-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className={`p-1 border-0 bg-transparent transition-colors ${star <= rating ? 'text-yellow-400' : 'text-gray-300'
+                        }`}
+                    >
+                      <StarIcon className="w-6 h-6" fill={star <= rating ? 'currentColor' : 'none'} />
+                    </button>
+                  ))}
+                </div>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label className="text-foreground font-semibold text-sm">Nội dung đánh giá</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={ratingContent}
+                  onChange={(e) => setRatingContent(e.target.value)}
+                  placeholder="Chia sẻ trải nghiệm của bạn về món này..."
+                  className="bg-background border-border text-foreground focus:border-primary"
+                />
+              </Form.Group>
+
+              <div className="d-flex justify-end gap-2 mt-4">
+                <Button
+                  variant="secondary"
+                  onClick={handleCloseRatingModal}
+                  disabled={submittingRating}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleSubmitRating}
+                  disabled={submittingRating}
+                >
+                  {submittingRating ? 'Đang gửi...' : 'Gửi đánh giá'}
+                </Button>
+              </div>
+            </Modal.Body>
+          </Modal>
         </Container>
       )}
     </>

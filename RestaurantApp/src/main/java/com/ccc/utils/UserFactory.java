@@ -4,12 +4,14 @@
  */
 package com.ccc.utils;
 
-import com.ccc.pojo.User;
-import com.ccc.enums.UserRole;
 import java.util.Map;
+
+import com.ccc.enums.UserRole;
+import com.ccc.pojo.User;
 
 /**
  * Factory Pattern for User creation
+ *
  * @author Admin
  */
 public class UserFactory {
@@ -20,14 +22,15 @@ public class UserFactory {
         user.setFirstName(params.get("firstName"));
         user.setLastName(params.get("lastName"));
         user.setPhone(params.get("phone"));
+        user.setEmail(params.get("email"));
         user.setUserRole(role);
-        
+
         switch (role) {
             case ROLE_ADMIN:
-                user.setActive(true); 
+                user.setActive(true);
                 break;
             case ROLE_CHEF:
-                user.setActive(false); 
+                user.setActive(false);
                 break;
             case ROLE_USER:
                 user.setActive(true);
@@ -35,7 +38,7 @@ public class UserFactory {
             default:
                 user.setActive(true);
         }
-        
+
         return user;
     }
 }
