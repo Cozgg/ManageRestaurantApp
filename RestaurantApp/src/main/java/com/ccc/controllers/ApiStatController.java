@@ -19,7 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
  * @author Admin
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/admin")
 public class ApiStatController {
     
     @Autowired
