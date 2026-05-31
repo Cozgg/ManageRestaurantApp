@@ -49,17 +49,10 @@ public class ApiUserController {
     }
 
     @PostMapping(path = "/register",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> register(@RequestBody User u) {
-        u.setPassword(this.userService.encodePassword(u.getPassword()));
-        if (u.getUserRole() == null) {
-            u.setUserRole(com.ccc.enums.UserRole.ROLE_USER);
-        }
-        if (u.getActive() == null) {
-            u.setActive(true);
-        }
-        User newUser = this.userService.addUserDirect(u);
+    public ResponseEntity<User> register(@RequestParam Map<String, String> params, @RequestParam(value = "avatar") MultipartFile avatar) {
+        User newUser = this.userService.addUser(params, avatar);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 

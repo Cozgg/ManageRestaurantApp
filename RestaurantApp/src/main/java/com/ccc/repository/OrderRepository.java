@@ -30,9 +30,9 @@ public interface OrderRepository {
 
     void updateOrder(Orders order);
 
-    void updateOrderStatus(int orderId, String status, Long transId);
+    boolean updateOrderStatus(int orderId, String status, Long transId);
 
-    void updateOrderStatus(int orderId, String status);
+    boolean updateOrderStatus(int orderId, String status);
 
     boolean hasUserPurchasedDish(User user, int dishId);
 }

@@ -20,7 +20,7 @@ public interface DishService {
     List<DishDto> getDishs(Map<String, String> params);
     List<DishDto> getDishs(Map<String, String> params, User currentChef);
     DishDto getDishById(Integer id);
-    DishDto addDish(Map<String, String> params, MultipartFile image) throws IOException;
+    DishDto addDish(Map<String, String> params, MultipartFile image, User chef) throws IOException;
     DishDto updateDish(Integer id, Map<String, String> params, MultipartFile image) throws IOException;
     boolean deleteDish(Integer id);
 }
