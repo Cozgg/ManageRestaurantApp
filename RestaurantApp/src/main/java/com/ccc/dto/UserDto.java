@@ -4,8 +4,9 @@
  */
 package com.ccc.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,11 +23,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
+
+    private Integer id;
     private String firstName;
     private String lastName;
     private String username;
     private String password;
     private String phone;
+    private String email;
     private String userRole;
     private MultipartFile avatar;
 

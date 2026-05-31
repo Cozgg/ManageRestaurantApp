@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Container,
   Row,
@@ -12,22 +12,38 @@ import {
   Alert,
   InputGroup,
   Form,
+  Modal,
 } from "react-bootstrap";
-import {MyUserContext} from "../../utils/contexts/MyUserContext";
-import Apis, {authApis, endpoints} from "../../configs/Apis";
+import { MyUserContext } from "../../utils/contexts/MyUserContext";
+import Apis, { authApis, endpoints } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
-import {useSearchParams} from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import cookies from "react-cookies";
-import {Edit2, Plus, Search, ShieldAlert, Trash2} from "lucide-react";
+import { Edit2, Plus, Search, ShieldAlert, Trash2 } from "lucide-react";
 
 const ChefDashboard = () => {
-  const {user} = useContext(MyUserContext);
+  const { user } = useContext(MyUserContext);
   const [dishes, setDishes] = useState([]);
   const [page, setPage] = useState(1);
 
   const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState("");
   const [q] = useSearchParams();
+
+  // Modal states
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
+  const [selectedDish, setSelectedDish] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    price: '',
+    material: '',
+    timePrepare: '',
+    image: '',
+    categoryId: ''
+  });
+  const [submitting, setSubmitting] = useState(false);
 
   const loadDishes = async () => {
     try {
@@ -75,6 +91,104 @@ const ChefDashboard = () => {
     setPage(page + 1);
   };
 
+  const handleShowModal = (mode, dish = null) => {
+    setModalMode(mode);
+    if (mode === 'edit' && dish) {
+      setSelectedDish(dish);
+      setFormData({
+        name: dish.name || '',
+        description: dish.description || '',
+        price: dish.price || '',
+        material: dish.material || '',
+        timePrepare: dish.timePrepare || '',
+        image: dish.image || '',
+        categoryId: dish.categoryId || ''
+      });
+    } else {
+      setSelectedDish(null);
+      setFormData({
+        name: '',
+        description: '',
+        price: '',
+        material: '',
+        timePrepare: '',
+        image: '',
+        categoryId: ''
+      });
+    }
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedDish(null);
+    setFormData({
+      name: '',
+      description: '',
+      price: '',
+      material: '',
+      timePrepare: '',
+      image: '',
+      categoryId: ''
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const token = cookies.load("token");
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('description', formData.description);
+      formDataToSend.append('price', formData.price);
+      formDataToSend.append('material', formData.material);
+      formDataToSend.append('timePrepare', formData.timePrepare);
+      formDataToSend.append('image', formData.image);
+      formDataToSend.append('categoryId', formData.categoryId);
+
+      if (modalMode === 'add') {
+        await authApis(token).post(endpoints["chef-dishes"], formDataToSend, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else if (modalMode === 'edit' && selectedDish) {
+        await authApis(token).patch(`${endpoints["chef-dishes"]}/${selectedDish.id}`, formDataToSend, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
+
+      handleCloseModal();
+      setPage(1);
+      loadDishes();
+    } catch (error) {
+      console.error('Lỗi khi lưu món ăn:', error);
+      alert('Có lỗi xảy ra khi lưu món ăn!');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (dishId) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa món ăn này?')) {
+      return;
+    }
+
+    try {
+      const token = cookies.load("token");
+      await authApis(token).delete(`${endpoints["chef-dishes"]}/${dishId}`);
+      setDishes(dishes.filter(d => d.id !== dishId));
+    } catch (error) {
+      console.error('Lỗi khi xóa món ăn:', error);
+      alert('Có lỗi xảy ra khi xóa món ăn!');
+    }
+  };
+
   if (!user || user.userRole !== "ROLE_CHEF") {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-4">
@@ -120,7 +234,10 @@ const ChefDashboard = () => {
           </div>
 
           {/* Nút thêm món */}
-          <button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold transition-colors shadow-sm whitespace-nowrap">
+          <button
+            onClick={() => handleShowModal('add')}
+            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold transition-colors shadow-sm whitespace-nowrap"
+          >
             <Plus className="w-4 h-4" />
             Thêm món
           </button>
@@ -223,12 +340,14 @@ const ChefDashboard = () => {
                     <td className="py-3 px-5 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button
+                          onClick={() => handleShowModal('edit', dish)}
                           className="p-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg transition-colors shadow-sm"
                           title="Chỉnh sửa"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
+                          onClick={() => handleDelete(dish.id)}
                           className="p-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition-colors shadow-sm"
                           title="Xóa món"
                         >
@@ -261,6 +380,141 @@ const ChefDashboard = () => {
           )}
         </div>
       )}
+
+      {/* MODAL THÊM/SỬA MÓN ĂN */}
+      <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
+        <Modal.Header closeButton className="border-b border-border">
+          <Modal.Title className="text-foreground font-bold">
+            {modalMode === 'add' ? 'Thêm món ăn mới' : 'Chỉnh sửa món ăn'}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="bg-card">
+          <Form onSubmit={handleSubmit}>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-foreground font-semibold text-sm">Tên món ăn *</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    className="bg-background border-border text-foreground focus:border-primary"
+                    placeholder="Nhập tên món ăn"
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-foreground font-semibold text-sm">Giá bán (VNĐ) *</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleInputChange}
+                    required
+                    min="0"
+                    className="bg-background border-border text-foreground focus:border-primary"
+                    placeholder="Nhập giá bán"
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-foreground font-semibold text-sm">Thời gian chuẩn bị (phút) *</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="timePrepare"
+                    value={formData.timePrepare}
+                    onChange={handleInputChange}
+                    required
+                    min="1"
+                    className="bg-background border-border text-foreground focus:border-primary"
+                    placeholder="Nhập thời gian nấu"
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label className="text-foreground font-semibold text-sm">Danh mục</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="categoryId"
+                    value={formData.categoryId}
+                    onChange={handleInputChange}
+                    className="bg-background border-border text-foreground focus:border-primary"
+                  >
+                    <option value="">Chọn danh mục</option>
+                    <option value="1">Món chính</option>
+                    <option value="2">Món khai vị</option>
+                    <option value="3">Tráng miệng</option>
+                    <option value="4">Đồ uống</option>
+                  </Form.Control>
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Form.Group className="mb-3">
+              <Form.Label className="text-foreground font-semibold text-sm">Nguyên liệu</Form.Label>
+              <Form.Control
+                type="text"
+                name="material"
+                value={formData.material}
+                onChange={handleInputChange}
+                className="bg-background border-border text-foreground focus:border-primary"
+                placeholder="Nhập nguyên liệu (ví dụ: Thịt bò, rau củ..."
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label className="text-foreground font-semibold text-sm">Mô tả</Form.Label>
+              <Form.Control
+                as="textarea"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={3}
+                className="bg-background border-border text-foreground focus:border-primary"
+                placeholder="Mô tả về món ăn"
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label className="text-foreground font-semibold text-sm">URL hình ảnh</Form.Label>
+              <Form.Control
+                type="text"
+                name="image"
+                value={formData.image}
+                onChange={handleInputChange}
+                className="bg-background border-border text-foreground focus:border-primary"
+                placeholder="Nhập URL hình ảnh"
+              />
+            </Form.Group>
+
+            <div className="d-flex justify-end gap-2 mt-4">
+              <Button
+                variant="secondary"
+                onClick={handleCloseModal}
+                className="px-4"
+              >
+                Hủy
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={submitting}
+                className="px-4"
+              >
+                {submitting ? 'Đang lưu...' : (modalMode === 'add' ? 'Thêm món' : 'Lưu thay đổi')}
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

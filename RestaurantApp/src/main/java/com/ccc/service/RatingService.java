@@ -4,16 +4,21 @@
  */
 package com.ccc.service;
 
-import com.ccc.pojo.Rating;
-import com.ccc.pojo.User;
 import java.util.List;
 import java.util.Map;
+
+import com.ccc.pojo.Rating;
+import com.ccc.pojo.User;
 
 /**
  *
  * @author Admin
  */
 public interface RatingService {
+
     Rating addRating(Map<String, String> params, User user);
+
     List<Rating> getRatingsByDishId(int dishId);
+
+    Rating getRatingByUserAndDish(User user, int dishId);
 }

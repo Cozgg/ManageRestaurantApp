@@ -4,14 +4,20 @@
  */
 package com.ccc.repository;
 
-import com.ccc.pojo.Rating;
 import java.util.List;
+
+import com.ccc.pojo.Rating;
+import com.ccc.pojo.User;
 
 /**
  *
  * @author Admin
  */
 public interface RatingRepository {
+
     Rating addRating(Rating r);
+
     List<Rating> getRatingsByDishId(int dishId);
+
+    Rating getRatingByUserAndDish(User user, int dishId);
 }

@@ -4,6 +4,19 @@
  */
 package com.ccc.service.impl;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.ccc.dto.ItemDto;
 import com.ccc.dto.MomoIpnResponse;
 import com.ccc.dto.OrderDetailDto;
@@ -18,17 +31,6 @@ import com.ccc.pojo.User;
 import com.ccc.repository.OrderRepository;
 import com.ccc.repository.UserRepository;
 import com.ccc.service.OrderService;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  *
@@ -60,9 +62,7 @@ public class OrderServiceImpl implements OrderService {
             UserDto udto = UserDto.builder().firstName(o.getUserId().getFirstName()).lastName(o.getUserId().getLastName()).build();
             OrderDto odto = OrderDto.builder().id(o.getId()).user(udto).totalPrice(o.getTotalPrice())
                     .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
-                    .reservationId(o.getReservationId() != null
-                            ? o.getReservationId().getId()
-                            : null).transactionId(o.getTransactionId() != null ? o.getTransactionId() : null).build();
+                    .transactionId(o.getTransactionId() != null ? o.getTransactionId() : null).build();
 
             return odto;
         }).collect(Collectors.toList());
@@ -71,48 +71,46 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDetailDto getOrderById(int orderId) {
         List<OrderDetail> details = this.orderRepo.getOrderDetailsByOrderId(orderId);
-        if(details != null && !details.isEmpty()){
+        if (details != null && !details.isEmpty()) {
             Orders o = details.get(0).getOrderId();
             UserDto u = UserDto.builder().firstName(o.getUserId().getFirstName()).lastName(o.getUserId().getLastName()).build();
 
             OrderDto odto = OrderDto.builder().id(o.getId()).user(u).totalPrice(o.getTotalPrice())
-                    .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
-                    .reservationId(o.getReservationId() != null ? o.getReservationId().getId() : null).build();
-            
-            List<OrderItemDto> items = details.stream().map(od ->{
+                    .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay()).build();
+
+            List<OrderItemDto> items = details.stream().map(od -> {
                 OrderItemDto itemDto = OrderItemDto.builder().dishId(od.getDishId().getId()).dishImage(od.getDishId().getImage())
                         .dishName(od.getDishId().getName()).quantity(od.getQuantity()).unitPrice(od.getUnitPrice()).chef(UserDto.builder()
-                                .firstName(od.getDishId().getUserId().getFirstName()).lastName(od.getDishId().getUserId().getLastName()).build()).build();
+                        .firstName(od.getDishId().getUserId().getFirstName()).lastName(od.getDishId().getUserId().getLastName()).build()).build();
                 return itemDto;
             }).collect(Collectors.toList());
             OrderDetailDto dto = OrderDetailDto.builder().order(odto).items(items).build();
             return dto;
         }
-        
+
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy chi tiết đơn hàng cho ID: " + orderId);
     }
-    
+
     @Override
     public OrderDetailDto getOrderById(int orderId, User currentChef) {
         List<OrderDetail> details = this.orderRepo.getOrderDetailsByOrderId(orderId, currentChef);
-        if(details != null && !details.isEmpty()){
+        if (details != null && !details.isEmpty()) {
             Orders o = details.get(0).getOrderId();
             UserDto u = UserDto.builder().firstName(o.getUserId().getFirstName()).lastName(o.getUserId().getLastName()).build();
 
             OrderDto odto = OrderDto.builder().id(o.getId()).user(u).totalPrice(o.getTotalPrice())
-                    .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
-                    .reservationId(o.getReservationId() != null ? o.getReservationId().getId() : null).build();
-            
-            List<OrderItemDto> items = details.stream().map(od ->{
+                    .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay()).build();
+
+            List<OrderItemDto> items = details.stream().map(od -> {
                 OrderItemDto itemDto = OrderItemDto.builder().dishId(od.getDishId().getId()).dishImage(od.getDishId().getImage())
                         .dishName(od.getDishId().getName()).quantity(od.getQuantity()).unitPrice(od.getUnitPrice()).chef(UserDto.builder()
-                                .firstName(od.getDishId().getUserId().getFirstName()).lastName(od.getDishId().getUserId().getLastName()).build()).build();
+                        .firstName(od.getDishId().getUserId().getFirstName()).lastName(od.getDishId().getUserId().getLastName()).build()).build();
                 return itemDto;
             }).collect(Collectors.toList());
             OrderDetailDto dto = OrderDetailDto.builder().order(odto).items(items).build();
             return dto;
         }
-        
+
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy chi tiết đơn hàng cho ID: " + orderId);
     }
 
@@ -209,6 +207,5 @@ public class OrderServiceImpl implements OrderService {
     public boolean updateOrderStatus(int orderId, String status) {
         return this.orderRepo.updateOrderStatus(orderId, status);
     }
-
 
 }

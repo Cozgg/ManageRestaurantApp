@@ -16,6 +16,8 @@ export const endpoints = {
   "reservations-table": (tableId) => `/secure/reservations/table/${tableId}`,
   "reservation-detail": (id) => `/secure/reservations/${id}`,
   "get-orders": "/secure/orders",
+  "dish-rating": (dishId) => `/secure/dishes/${dishId}/rating`,
+  "dish-ratings": (dishId) => `/dishes/${dishId}/rating`,
 };
 
 export default axios.create({

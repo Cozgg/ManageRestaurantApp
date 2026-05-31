@@ -4,25 +4,35 @@
  */
 package com.ccc.repository;
 
-import com.ccc.dto.ItemDto;
-import com.ccc.pojo.OrderDetail;
-import com.ccc.pojo.OrderItem;
-import com.ccc.pojo.Orders;
-import com.ccc.pojo.User;
 import java.util.List;
 import java.util.Map;
+
+import com.ccc.dto.ItemDto;
+import com.ccc.pojo.OrderDetail;
+import com.ccc.pojo.Orders;
+import com.ccc.pojo.User;
 
 /**
  *
  * @author Admin
  */
 public interface OrderRepository {
+
     Orders addOrder(Orders order, ItemDto items);
+
     List<Orders> getOrders(User u, Map<String, String> params);
+
     Orders getOrderById(int orderId);
+
     List<OrderDetail> getOrderDetailsByOrderId(int orderId, User currentChef);
+
     List<OrderDetail> getOrderDetailsByOrderId(int orderId);
+
     void updateOrder(Orders order);
-    boolean updateOrderStatus(int orderId, String status, Long transId);
-    boolean updateOrderStatus(int orderId, String status);
+
+    void updateOrderStatus(int orderId, String status, Long transId);
+
+    void updateOrderStatus(int orderId, String status);
+
+    boolean hasUserPurchasedDish(User user, int dishId);
 }

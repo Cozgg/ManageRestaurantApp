@@ -4,14 +4,6 @@
  */
 package com.ccc.service.impl;
 
-import com.ccc.dto.UserDto;
-import com.ccc.pojo.User;
-import com.ccc.enums.UserRole;
-import com.ccc.repository.UserRepository;
-import com.ccc.service.UserService;
-import com.ccc.utils.UserFactory;
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -20,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,25 +22,34 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ccc.dto.UserDto;
+import com.ccc.enums.UserRole;
+import com.ccc.pojo.User;
+import com.ccc.repository.UserRepository;
+import com.ccc.service.UserService;
+import com.ccc.utils.UserFactory;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+
 /**
  *
  * @author Admin
  */
 @Service("userDetailsService")
-public class UserServiceImpl implements UserService{
-    
+public class UserServiceImpl implements UserService {
+
     @Autowired
     private UserRepository userRepo;
-    
+
     @Autowired
     private Cloudinary cloudinary;
-    
+
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
-    
+
     @Autowired
     private com.ccc.repository.DishRepository dishRepo;
-    
+
     @Override
     public User getUserByUsername(String username) {
         return this.userRepo.getUserByUsername(username);
@@ -58,7 +60,7 @@ public class UserServiceImpl implements UserService{
         UserRole role = UserRole.valueOf(params.getOrDefault("userRole", "ROLE_USER"));
         User u = UserFactory.createUser(params, role);
         u.setPassword(this.passwordEncoder.encode(params.get("password")));
-        
+
         if (avatar != null && !avatar.isEmpty()) {
             try {
                 Map res = this.cloudinary.uploader().upload(avatar.getBytes(),
@@ -71,13 +73,14 @@ public class UserServiceImpl implements UserService{
 
         return this.userRepo.addUser(u);
     }
-    
+
     @Override
     public User addUser(UserDto udto) {
         User u = new User();
         u.setFirstName(udto.getFirstName());
         u.setLastName(udto.getLastName());
         u.setPhone(udto.getPhone());
+        u.setEmail(udto.getEmail());
         u.setUsername(udto.getUsername());
         u.setPassword(passwordEncoder.encode(udto.getPassword()));
         String userRole = udto.getUserRole();
@@ -95,15 +98,37 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public User addUserFromJson(User u) {
+        u.setPassword(this.passwordEncoder.encode(u.getPassword()));
+        if (u.getUserRole() == null) {
+            u.setUserRole(UserRole.ROLE_USER);
+        }
+        if (u.getActive() == null) {
+            u.setActive(true);
+        }
+        return this.userRepo.addUser(u);
+    }
+
+    @Override
+    public User addUserDirect(User u) {
+        return this.userRepo.addUser(u);
+    }
+
+    @Override
+    public String encodePassword(String rawPassword) {
+        return this.passwordEncoder.encode(rawPassword);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User u = this.userRepo.getUserByUsername(username);
         if (u == null) {
             throw new UsernameNotFoundException("Không tồn tại!");
         }
-        
+
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority(String.valueOf(u.getUserRole())));
-        
+
         return new org.springframework.security.core.userdetails.User(u.getUsername(),
                 u.getPassword(), authorities);
     }
@@ -122,7 +147,7 @@ public class UserServiceImpl implements UserService{
     public List<UserRole> getUserRoles() {
         return Arrays.asList(UserRole.values());
     }
-    
+
     @Override
     public boolean authenticate(String username, String password) {
         return this.userRepo.authenticate(username, password);
@@ -138,9 +163,9 @@ public class UserServiceImpl implements UserService{
                 // Tìm một ADMIN hoặc CHEF khác để chuyển giao
                 List<User> users = this.userRepo.getUsers();
                 User successor = users.stream()
-                        .filter(user -> (user.getUserRole() == UserRole.ROLE_ADMIN || 
-                                        (user.getUserRole() == UserRole.ROLE_CHEF && user.getId() != id)) 
-                                        && user.getActive() == true)
+                        .filter(user -> (user.getUserRole() == UserRole.ROLE_ADMIN
+                        || (user.getUserRole() == UserRole.ROLE_CHEF && user.getId() != id))
+                        && user.getActive() == true)
                         .findFirst()
                         .orElse(null);
 
@@ -166,10 +191,16 @@ public class UserServiceImpl implements UserService{
     public User updateUser(int id, Map<String, String> params, MultipartFile avatar) {
         User u = this.userRepo.getUserById(id);
         if (u != null) {
-            if (params.containsKey("firstName")) u.setFirstName(params.get("firstName"));
-            if (params.containsKey("lastName")) u.setLastName(params.get("lastName"));
-            if (params.containsKey("phone")) u.setPhone(params.get("phone"));
-            
+            if (params.containsKey("firstName")) {
+                u.setFirstName(params.get("firstName"));
+            }
+            if (params.containsKey("lastName")) {
+                u.setLastName(params.get("lastName"));
+            }
+            if (params.containsKey("phone")) {
+                u.setPhone(params.get("phone"));
+            }
+
             if (avatar != null && !avatar.isEmpty()) {
                 try {
                     Map res = this.cloudinary.uploader().upload(avatar.getBytes(),
