@@ -50,7 +50,7 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Autowired
     private DishRepository dishRepo;
-    
+
     @Autowired
     private Environment env;
 
@@ -90,7 +90,7 @@ public class OrderRepositoryImpl implements OrderRepository {
         }
         cq.orderBy(b.desc(root.get("createdAt")));
         Query q = s.createQuery(cq);
-        if(params != null){
+        if (params != null) {
             int pageSize = this.env.getProperty("orders.page_size", Integer.class);
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int start = (page - 1) * pageSize;
@@ -98,7 +98,7 @@ public class OrderRepositoryImpl implements OrderRepository {
             q.setMaxResults(pageSize);
             q.setFirstResult(start);
         }
-        
+
         return q.getResultList();
     }
 
@@ -115,20 +115,33 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public void updateOrderStatus(int orderId, String status, Long transId) {
-        Session s = this.factory.getObject().getCurrentSession();
-        Orders o = this.getOrderById(orderId);
-        o.setStatusPay(status);
-        o.setTransactionId(String.valueOf(transId));
-        s.merge(o);
+    public boolean updateOrderStatus(int orderId, String status, Long transId) {
+        try {
+            Session s = this.factory.getObject().getCurrentSession();
+            Orders o = this.getOrderById(orderId);
+            o.setStatusPay(status);
+            o.setTransactionId(String.valueOf(transId));
+            s.merge(o);
+            return true;
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
     }
 
     @Override
-    public void updateOrderStatus(int orderId, String status) {
-        Session s = this.factory.getObject().getCurrentSession();
-        Orders o = this.getOrderById(orderId);
-        o.setStatusPay(status);
-        s.merge(o);
+    public boolean updateOrderStatus(int orderId, String status) {
+        try {
+            Session s = this.factory.getObject().getCurrentSession();
+            Orders o = this.getOrderById(orderId);
+            o.setStatusPay(status);
+            s.merge(o);
+            return true;
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+
     }
 
     @Override

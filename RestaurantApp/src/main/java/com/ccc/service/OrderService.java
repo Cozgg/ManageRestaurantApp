@@ -22,6 +22,6 @@ public interface OrderService {
     OrderDetailDto getOrderById(int orderId, User currentChef);
     String addOrder(ItemDto items);
     boolean verifyMomoSignature(MomoIpnResponse payload);
-    void updateOrderStatus(int orderId, String status, Long transId);
-    void updateOrderStatus(int orderId, String status);
+    boolean updateOrderStatus(int orderId, String status, Long transId);
+    boolean updateOrderStatus(int orderId, String status);
 }

@@ -201,13 +201,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void updateOrderStatus(int orderId, String status, Long transId) {
-        this.orderRepo.updateOrderStatus(orderId, status, transId);
+    public boolean updateOrderStatus(int orderId, String status, Long transId) {
+        return this.orderRepo.updateOrderStatus(orderId, status, transId);
     }
 
     @Override
-    public void updateOrderStatus(int orderId, String status) {
-        this.orderRepo.updateOrderStatus(orderId, status);
+    public boolean updateOrderStatus(int orderId, String status) {
+        return this.orderRepo.updateOrderStatus(orderId, status);
     }
 
 

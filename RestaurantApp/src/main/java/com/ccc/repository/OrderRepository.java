@@ -23,6 +23,6 @@ public interface OrderRepository {
     List<OrderDetail> getOrderDetailsByOrderId(int orderId, User currentChef);
     List<OrderDetail> getOrderDetailsByOrderId(int orderId);
     void updateOrder(Orders order);
-    void updateOrderStatus(int orderId, String status, Long transId);
-    void updateOrderStatus(int orderId, String status);
+    boolean updateOrderStatus(int orderId, String status, Long transId);
+    boolean updateOrderStatus(int orderId, String status);
 }

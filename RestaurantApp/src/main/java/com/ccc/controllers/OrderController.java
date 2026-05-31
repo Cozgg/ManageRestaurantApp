@@ -5,11 +5,13 @@
 package com.ccc.controllers;
 
 import com.ccc.dto.OrderDetailDto;
+import com.ccc.dto.PaymentEventDto;
 import com.ccc.pojo.User;
 import com.ccc.service.OrderService;
 import com.ccc.service.UserService;
 import java.security.Principal;
 import java.util.Map;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +35,12 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
-    
+
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @GetMapping("/orders")
     public String ordersView(Model model, Principal principal, @RequestParam Map<String, String> params) {
@@ -43,11 +48,38 @@ public class OrderController {
         model.addAttribute("orders", this.orderService.getOrders(u, params));
         return "manage-order";
     }
-    
+
     @PostMapping("/orders/{orderId}/confirm")
-    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public void confirmOrder(@PathVariable(value = "orderId") int orderId){
-        this.orderService.updateOrderStatus(orderId, "COMPLETED");
+    public ResponseEntity<?> confirmOrder(@PathVariable(value = "orderId") int orderId) {
+        try {
+            boolean isUpdated = this.orderService.updateOrderStatus(orderId, "COMPLETED");
+
+            if (isUpdated) {
+                OrderDetailDto o = this.orderService.getOrderById(orderId);
+
+                if (o != null && o.getOrder() != null) {
+                    PaymentEventDto event = PaymentEventDto.builder()
+                            .orderId(String.valueOf(orderId))
+                            .transactionId(o.getOrder().getTransactionId())
+                            .amount(o.getOrder().getTotalPrice())
+                            .build();
+
+                    rabbitTemplate.convertAndSend("ex.payment_success", "", event);
+                    System.out.println("Đã bắn sự kiện thanh toán lên RabbitMQ cho đơn: " + orderId);
+
+                    return ResponseEntity.ok("Cập nhật trạng thái và bắn sự kiện thành công!");
+                } else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body("Cập nhật thành công nhưng không lấy được thông tin chi tiết đơn hàng.");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Không thể cập nhật trạng thái đơn hàng. Sự kiện chưa được gửi.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Đã xảy ra lỗi hệ thống: " + e.getMessage());
+        }
     }
 }

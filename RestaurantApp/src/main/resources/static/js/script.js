@@ -44,11 +44,11 @@ function loadChartData() {
     };
 
     if (statType === 'REVENUE') {
-        url = `http://localhost:8080/RestaurantApp/api/statistics/stat-revenue?time=${time}&year=${year}`;
+        url = `http://localhost:8080/RestaurantApp/api/admin/statistics/stat-revenue?time=${time}&year=${year}`;
     } else if (statType === 'DISHES') {
-        url = `http://localhost:8080/RestaurantApp/api/statistics/dishes?top=5`;
+        url = `http://localhost:8080/RestaurantApp/api/admin/statistics/dishes?top=5`;
     } else if (statType === 'RESERVATIONS') {
-        url = `http://localhost:8080/RestaurantApp/api/statistics/reservations?time=${time}&year=${year}`;
+        url = `http://localhost:8080/RestaurantApp/api/admin/statistics/reservations?time=${time}&year=${year}`;
     }
 
     fetch(url, { headers: headers })
@@ -131,7 +131,7 @@ function deleteUser(userId) {
 }
 
 function confirmOrder(orderId) {
-    if (confirm('Bạn có chắc muốn xóa người dùng này?')) {
+    if (confirm('Bạn có chắc muốn xác nhận đơn hàng này?')) {
         fetch(`http://localhost:8080/RestaurantApp/admin/orders/${orderId}/confirm`, {
             method: 'POST',
             credentials: 'same-origin'

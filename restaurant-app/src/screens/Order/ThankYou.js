@@ -20,7 +20,7 @@ const ThankYou = () => {
       const token = cookies.load("token");
       let res = await authApis(token).get(endpoints["order-detail"](id));
       const order = res.data;
-
+      console.log(order);
       setTotalAmount(order.totalPrice);
       setPaymentMethod(order.payment);
     } catch (error) {
