@@ -38,7 +38,6 @@ public class ApiSecurityConfigs {
                 .requestMatchers("/api/secure/chef/**").hasAnyRole("CHEF", "ADMIN")
                 .requestMatchers(HttpMethod.POST,
                         "/api/secure/dishes/*/rating").hasRole("USER")
-                .requestMatchers("/api/statistics/**").hasRole("ADMIN")
                 .requestMatchers("/api/secure/table/**").hasRole("ADMIN")
                 .requestMatchers("/api/users/*/approve").hasRole("ADMIN")
                 .requestMatchers("/api/secure/**").authenticated()

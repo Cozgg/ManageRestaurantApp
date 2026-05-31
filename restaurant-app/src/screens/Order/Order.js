@@ -23,7 +23,7 @@ import "./Order.css";
 import {Link, useNavigate} from "react-router-dom";
 import cookies from "react-cookies";
 import {authApis, endpoints} from "../../configs/Apis";
-import {message} from "antd";
+import {message, Popconfirm} from "antd";
 import MySpinner from "../../components/MySpinner";
 import {
   ArrowLeft,
@@ -65,14 +65,12 @@ const Order = () => {
   };
 
   const handleRemoveFromCart = (id) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa món này khỏi giỏ hàng?")) {
-      dispatch({
-        type: "REMOVE_FROM_CART",
-        payload: {
-          id: id,
-        },
-      });
-    }
+    dispatch({
+      type: "REMOVE_FROM_CART",
+      payload: {
+        id: id,
+      },
+    });
   };
 
   const pay = async (paymentMethod) => {
@@ -229,14 +227,20 @@ const Order = () => {
                       {(item.price * item.quantity).toLocaleString()} ₫
                     </p>
                   </div>
-
-                  <button
-                    onClick={() => handleRemoveFromCart(item.id)}
-                    className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors bg-transparent border-0"
-                    title="Xóa món"
+                  <Popconfirm
+                    title="Xóa món ăn"
+                    description="Bạn có chắc chắn muốn xóa món này khỏi giỏ hàng?"
+                    okText="Xóa"
+                    cancelText="Hủy"
+                    onConfirm={() => handleRemoveFromCart(item.id)}
                   >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+                    <button
+                      className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors bg-transparent border-0"
+                      title="Xóa món"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </Popconfirm>
                 </div>
               </div>
             </div>
@@ -340,7 +344,7 @@ const Order = () => {
               </Link>
             ) : (
               <button
-                onClick={handleCheckout}
+                onClick={() => handleCheckout(selectedPayment)}
                 disabled={loading}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3.5 rounded-lg font-bold transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
               >

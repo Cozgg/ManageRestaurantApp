@@ -113,20 +113,33 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public void updateOrderStatus(int orderId, String status, Long transId) {
-        Session s = this.factory.getObject().getCurrentSession();
-        Orders o = this.getOrderById(orderId);
-        o.setStatusPay(status);
-        o.setTransactionId(String.valueOf(transId));
-        s.merge(o);
+    public boolean updateOrderStatus(int orderId, String status, Long transId) {
+        try {
+            Session s = this.factory.getObject().getCurrentSession();
+            Orders o = this.getOrderById(orderId);
+            o.setStatusPay(status);
+            o.setTransactionId(String.valueOf(transId));
+            s.merge(o);
+            return true;
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
     }
 
     @Override
-    public void updateOrderStatus(int orderId, String status) {
-        Session s = this.factory.getObject().getCurrentSession();
-        Orders o = this.getOrderById(orderId);
-        o.setStatusPay(status);
-        s.merge(o);
+    public boolean updateOrderStatus(int orderId, String status) {
+        try {
+            Session s = this.factory.getObject().getCurrentSession();
+            Orders o = this.getOrderById(orderId);
+            o.setStatusPay(status);
+            s.merge(o);
+            return true;
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+
     }
 
     @Override
