@@ -49,7 +49,8 @@ const Login = () => {
         }
       }
     } catch (error) {
-      message.error(error.message);
+      console.log(error);
+      message.error("Sai tài khoản hoặc mật khẩu");
     } finally {
       setLoading(false);
     }

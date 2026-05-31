@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ccc.dto.DishDto;
+import com.ccc.enums.UserRole;
 import com.ccc.pojo.Rating;
 import com.ccc.pojo.User;
 import com.ccc.repository.OrderRepository;
@@ -62,7 +63,7 @@ public class ApiDishController {
     }
 
     @GetMapping("/dishes/{id}")
-    public ResponseEntity<DishDto> getDish(@PathVariable Integer id, Principal principal) {
+    public ResponseEntity<DishDto> getDish(@PathVariable(value = "id") Integer id, Principal principal) {
         if (principal == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -76,14 +77,18 @@ public class ApiDishController {
     @PostMapping("/secure/chef/dishes")
     public ResponseEntity<?> addDish(
             @RequestParam Map<String, String> params,
-            @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
-        DishDto created = this.dishService.addDish(params, image);
+            @RequestParam(value = "image", required = false) MultipartFile image, Principal principal) throws IOException {
+        User u = this.userService.getUserByUsername(principal.getName());
+        if(u.getUserRole() != UserRole.ROLE_CHEF){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        DishDto created = this.dishService.addDish(params, image, u);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PatchMapping("/secure/chef/dishes/{id}")
     public ResponseEntity<?> updateDish(
-            @PathVariable Integer id,
+            @PathVariable(value = "id") Integer id,
             @RequestParam Map<String, String> params,
             @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
         DishDto updated = this.dishService.updateDish(id, params, image);
@@ -94,7 +99,7 @@ public class ApiDishController {
     }
 
     @DeleteMapping("/secure/chef/dishes/{id}")
-    public ResponseEntity<Void> deleteDish(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteDish(@PathVariable(value = "id") Integer id) {
         boolean deleted = this.dishService.deleteDish(id);
         if (!deleted) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -103,7 +108,7 @@ public class ApiDishController {
     }
 
     @PostMapping("/secure/dishes/{id}/rating")
-    public ResponseEntity<?> addRating(@PathVariable Integer id,
+    public ResponseEntity<?> addRating(@PathVariable(value = "id") Integer id,
             @RequestParam Map<String, String> params,
             Principal principal) {
         User currentUser = this.userService.getUserByUsername(principal.getName());
@@ -126,7 +131,7 @@ public class ApiDishController {
     }
 
     @GetMapping("/dishes/{id}/rating")
-    public ResponseEntity<List<Rating>> getRatings(@PathVariable Integer id) {
+    public ResponseEntity<List<Rating>> getRatings(@PathVariable(value = "id") Integer id) {
         return new ResponseEntity<>(this.ratingService.getRatingsByDishId(id), HttpStatus.OK);
     }
 }

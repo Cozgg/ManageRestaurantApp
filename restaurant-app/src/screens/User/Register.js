@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import {message} from "antd";
 import Apis, {endpoints} from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
@@ -23,6 +23,8 @@ const Register = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const avatar = useRef();
+
   // Logic kiểm tra mật khẩu an toàn
   const passwordRequirements = {
     length: user.password.length >= 8,
@@ -39,7 +41,6 @@ const Register = () => {
     setUser((prev) => ({...prev, [name]: value}));
   };
 
-  // Giữ nguyên logic Validate của bạn
   const validate = () => {
     if (
       !user.username ||
@@ -62,16 +63,27 @@ const Register = () => {
     return true;
   };
 
-  // Giữ nguyên logic API của bạn
   const register = async (e) => {
     e.preventDefault();
     if (!validate()) return;
     try {
       setLoading(true);
-      // Loại bỏ confirmPassword trước khi gửi lên API
-      const {confirmPassword, ...payload} = user;
+      let form = new FormData();
+      for (let key in user) {
+        if (key !== "confirmPassword") {
+          form.append(key, user[key]);
+        }
+      }
 
-      let res = await Apis.post(endpoints["register"], payload);
+      if (avatar.current && avatar.current.files.length > 0) {
+        form.append("avatar", avatar.current.files[0]);
+      }
+
+      let res = await Apis.post(endpoints["register"], form, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       if (res.status === 201) {
         message.success("Đăng ký thành công! Vui lòng đăng nhập.");
         nav("/login");
@@ -177,6 +189,25 @@ const Register = () => {
                 onChange={handleChange}
                 placeholder="you@example.com"
                 className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-1.5">
+                Ảnh đại diện (Avatar) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="file"
+                name="avatar"
+                ref={avatar}
+                required
+                onChange={handleChange}
+                accept="image/*"
+                className="w-full px-4 py-2.5 rounded-lg border border-border bg-secondary/20 text-foreground focus:bg-background focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none cursor-pointer
+      file:mr-4 file:py-2 file:px-4 
+      file:rounded-full file:border-0 
+      file:text-sm file:font-bold 
+      file:bg-primary/10 file:text-primary 
+      hover:file:bg-primary/20 file:cursor-pointer file:transition-colors"
               />
             </div>
 

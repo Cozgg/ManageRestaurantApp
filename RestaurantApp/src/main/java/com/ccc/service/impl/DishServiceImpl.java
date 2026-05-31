@@ -92,13 +92,14 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public DishDto addDish(Map<String, String> params, MultipartFile image) throws IOException {
+    public DishDto addDish(Map<String, String> params, MultipartFile image, User chef) throws IOException {
         String imageUrl = null;
         if (image != null && !image.isEmpty()) {
             imageUrl = uploadImage(image);
         }
-
+        
         Dish dish = Dish.builder()
+                .userId(chef)
                 .name(params.get("name"))
                 .price(Integer.parseInt(params.get("price")))
                 .description(params.get("description"))
