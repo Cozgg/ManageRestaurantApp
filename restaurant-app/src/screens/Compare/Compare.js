@@ -1,6 +1,5 @@
 import {useContext} from "react";
 import {MyCompareContext} from "../../utils/contexts/MyCompareContext";
-import {Button, Card, Col, Container, Image, Row, Table} from "react-bootstrap";
 import {Link} from "react-router-dom";
 import {ArrowLeft, Scale, Star, Trash2, X} from "lucide-react";
 
@@ -44,7 +43,6 @@ const Compare = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 min-h-screen">
-      {/* Nút Back */}
       <Link
         to="/"
         className="inline-flex items-center gap-2 text-primary hover:text-primary/80 mb-6 no-underline font-medium"
@@ -52,7 +50,6 @@ const Compare = () => {
         <ArrowLeft className="w-4 h-4" /> Tiếp tục chọn món
       </Link>
 
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <h2 className="text-2xl font-bold text-foreground">
           So sánh món ăn{" "}
@@ -61,7 +58,6 @@ const Compare = () => {
           </span>
         </h2>
 
-        {/* Nút xóa làm viền đỏ, nền trắng cho sáng và rõ nét */}
         <button
           onClick={handleClear}
           className="inline-flex items-center justify-center gap-2 bg-white text-red-500 border-2 border-red-500 hover:bg-red-500 hover:text-red px-5 py-2 rounded-lg font-bold transition-colors shadow-sm"
@@ -71,13 +67,10 @@ const Compare = () => {
         </button>
       </div>
 
-      {/* Bảng so sánh */}
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-x-auto">
         <table className="w-full text-left border-collapse table-fixed min-w-[700px]">
-          {/* THEAD - Tên và Hình ảnh */}
           <thead>
             <tr>
-              {/* Cột tiêu chí thu hẹp lại (w-40) */}
               <th className="px-4 py-3 font-semibold text-foreground bg-muted/30 border-b border-r border-border w-40 align-middle">
                 Tiêu chí
               </th>
@@ -86,7 +79,6 @@ const Compare = () => {
                   key={dish.id}
                   className="px-4 py-5 text-center bg-background border-b border-r last:border-r-0 border-border relative group"
                 >
-                  {/* Nút Xóa Món */}
                   <button
                     onClick={() => handleRemove(dish.id)}
                     className="absolute top-2 right-2 text-muted-foreground hover:text-red-500 bg-white hover:bg-red-50 p-1.5 rounded-full transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shadow-sm"
@@ -108,9 +100,7 @@ const Compare = () => {
             </tr>
           </thead>
 
-          {/* TBODY - Chi tiết */}
           <tbody className="divide-y divide-border text-sm">
-            {/* Giá */}
             <tr className="hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3 font-semibold text-foreground border-r border-border bg-muted/10">
                 Giá
@@ -127,7 +117,6 @@ const Compare = () => {
               ))}
             </tr>
 
-            {/* Thời gian chuẩn bị */}
             <tr className="hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3 font-semibold text-foreground border-r border-border bg-muted/10">
                 Thời gian chuẩn bị
@@ -144,7 +133,6 @@ const Compare = () => {
               ))}
             </tr>
 
-            {/* Đầu bếp */}
             <tr className="hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3 font-semibold text-foreground border-r border-border bg-muted/10">
                 Đầu bếp
@@ -159,7 +147,6 @@ const Compare = () => {
               ))}
             </tr>
 
-            {/* Mô tả */}
             <tr className="hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3 font-semibold text-foreground border-r border-border bg-muted/10 align-top">
                 Mô tả
@@ -174,7 +161,6 @@ const Compare = () => {
               ))}
             </tr>
 
-            {/* Nguyên liệu */}
             <tr className="hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3 font-semibold text-foreground border-r border-border bg-muted/10 align-top">
                 Nguyên liệu
@@ -189,7 +175,6 @@ const Compare = () => {
               ))}
             </tr>
 
-            {/* Đánh giá */}
             <tr className="hover:bg-secondary/20 transition-colors">
               <td className="px-4 py-3 font-semibold text-foreground border-r border-border bg-muted/10">
                 Đánh giá

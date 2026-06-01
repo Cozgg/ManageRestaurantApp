@@ -21,6 +21,7 @@ import com.ccc.repository.ReservationRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
@@ -41,6 +42,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<Reservation> q = b.createQuery(Reservation.class);
         Root<Reservation> root = q.from(Reservation.class);
+        root.fetch("tableId", JoinType.LEFT);
+        root.fetch("userId", JoinType.LEFT);
         q.select(root);
 
         List<Predicate> predicates = new ArrayList<>();

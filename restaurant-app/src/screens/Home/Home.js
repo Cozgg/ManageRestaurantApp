@@ -1,16 +1,6 @@
 import {useContext, useEffect, useState} from "react";
 import Apis, {endpoints} from "../../configs/Apis";
-import {
-  Alert,
-  Badge,
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Row,
-} from "react-bootstrap";
+import {Button, Container} from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 import {Link, useSearchParams, useNavigate} from "react-router-dom";
 import {MyOrderContext} from "../../utils/contexts/MyOrderContext";

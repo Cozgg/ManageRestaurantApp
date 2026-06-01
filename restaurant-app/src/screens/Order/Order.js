@@ -1,29 +1,12 @@
-import { useContext, useState } from "react";
-import { MyOrderContext } from "../../utils/contexts/MyOrderContext";
-import { MyUserContext } from "../../utils/contexts/MyUserContext";
-import {
-  Alert,
-  Button,
-  Card,
-  Col,
-  Container,
-  Dropdown,
-  Form,
-  Image,
-  InputGroup,
-  Row,
-  Table,
-} from "react-bootstrap";
-import {
-  CreditCardOutlined,
-  QrcodeOutlined,
-  WalletOutlined,
-} from "@ant-design/icons";
+import {useContext, useState} from "react";
+import {MyOrderContext} from "../../utils/contexts/MyOrderContext";
+import {MyUserContext} from "../../utils/contexts/MyUserContext";
+import {Alert} from "react-bootstrap";
 import "./Order.css";
-import { Link, useNavigate } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import cookies from "react-cookies";
-import { authApis, endpoints } from "../../configs/Apis";
-import { message, Popconfirm } from "antd";
+import {authApis, endpoints} from "../../configs/Apis";
+import {message, Popconfirm} from "antd";
 import MySpinner from "../../components/MySpinner";
 import {
   ArrowLeft,
@@ -37,8 +20,8 @@ import {
 } from "lucide-react";
 
 const Order = () => {
-  const { cart, dispatch } = useContext(MyOrderContext);
-  const { user } = useContext(MyUserContext);
+  const {cart, dispatch} = useContext(MyOrderContext);
+  const {user} = useContext(MyUserContext);
   const [loading, setLoading] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState("CASH");
   const [err, setErr] = useState("");
@@ -112,7 +95,7 @@ const Order = () => {
 
     setErr("");
     return true;
-  }
+  };
 
   const handleCheckout = async (paymentMethod) => {
     if (validate()) {
@@ -170,7 +153,11 @@ const Order = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 min-h-screen">
-      {err && <Alert variant="danger" className="mb-4">{err}</Alert>}
+      {err && (
+        <Alert variant="danger" className="mb-4">
+          {err}
+        </Alert>
+      )}
 
       <Link
         to="/"
@@ -187,21 +174,18 @@ const Order = () => {
       </h1>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* ================= DANH SÁCH MÓN ĂN ================= */}
         <div className="lg:col-span-2 space-y-4">
           {cart.map((item) => (
             <div
               key={item.id}
               className="bg-card border border-border rounded-xl p-4 flex flex-col sm:flex-row gap-4 items-center sm:items-center shadow-sm"
             >
-              {/* 1. Ảnh món (Kích thước cố định) */}
               <img
                 src={item.image || "https://via.placeholder.com/150"}
                 alt={item.name}
                 className="w-full sm:w-24 h-24 object-cover rounded-lg border border-border/50 shadow-sm flex-shrink-0"
               />
 
-              {/* 2. Thông tin món ăn (Căn trái và chiếm không gian giữa) */}
               <div className="flex-1 w-full text-center sm:text-left">
                 <h3
                   className="font-bold text-lg text-foreground line-clamp-1 mb-1"
@@ -214,9 +198,7 @@ const Order = () => {
                 </p>
               </div>
 
-              {/* 3. Khu vực thao tác (Gom lại nằm bên phải trên Desktop) */}
               <div className="flex flex-wrap sm:flex-nowrap items-center justify-between sm:justify-end w-full sm:w-auto gap-4 sm:gap-6 mt-2 sm:mt-0">
-                {/* Tăng giảm số lượng */}
                 <div className="flex items-center gap-2 bg-secondary/50 rounded-lg p-1 border border-border">
                   <button
                     onClick={() =>
@@ -245,7 +227,6 @@ const Order = () => {
                   </button>
                 </div>
 
-                {/* Cụm Tổng tiền & Nút xóa */}
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="text-right min-w-[90px]">
                     <p className="font-bold text-red-500 text-lg m-0">
@@ -272,14 +253,12 @@ const Order = () => {
           ))}
         </div>
 
-        {/* ================= TỔNG KẾT & THANH TOÁN ================= */}
         <div>
           <div className="bg-card border border-border rounded-xl p-6 shadow-sm sticky top-24">
             <h2 className="text-lg font-bold text-foreground mb-4 pb-4 border-b border-border">
               Tổng đơn hàng
             </h2>
 
-            {/* Tóm tắt tiền */}
             <div className="space-y-3 pb-4 border-b border-border mb-6 text-sm">
               <div className="flex justify-between text-muted-foreground">
                 <span>Tạm tính ({cart.length} món)</span>
