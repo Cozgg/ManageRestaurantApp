@@ -47,6 +47,22 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
+    public Rating updateRating(Map<String, String> params, User user) {
+        int dishId = Integer.parseInt(params.get("dishId"));
+        Rating existingRating = this.ratingRepo.getRatingByUserAndDish(user, dishId);
+
+        if (existingRating == null) {
+            return null;
+        }
+
+        existingRating.setPoint(Integer.parseInt(params.get("point")));
+        existingRating.setContent(params.get("content"));
+        existingRating.setCreatedAt(new Date());
+
+        return this.ratingRepo.updateRating(existingRating);
+    }
+
+    @Override
     public List<Rating> getRatingsByDishId(int dishId) {
         return this.ratingRepo.getRatingsByDishId(dishId);
     }

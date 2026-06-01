@@ -62,12 +62,10 @@ public class DishRepositoryImpl implements DishRepository {
                 predicates.add(b.equal(root.get("categoryId").as(Integer.class), categoryId));
             }
 
-            // Chỉ lấy các dish đang active
             predicates.add(b.equal(root.get("active"), true));
 
             q.where(predicates.toArray(Predicate[]::new));
         } else {
-            // Nếu không có params, vẫn lọc active = true
             q.where(b.equal(root.get("active"), true));
         }
 
@@ -133,7 +131,6 @@ public class DishRepositoryImpl implements DishRepository {
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(b.equal(root.get("userId").get("id"), currentChef.getId()));
 
-        // Chỉ lấy các dish đang active
         predicates.add(b.equal(root.get("active"), true));
 
         if (params != null) {

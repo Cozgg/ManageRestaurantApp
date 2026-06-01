@@ -15,13 +15,13 @@ const OrderDetail = () => {
   const order = orderData?.order;
   const items = orderData?.items || [];
 
-  // Rating states
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [selectedDish, setSelectedDish] = useState(null);
   const [rating, setRating] = useState(5);
   const [ratingContent, setRatingContent] = useState('');
   const [submittingRating, setSubmittingRating] = useState(false);
   const [dishRatings, setDishRatings] = useState({});
+  const [myRatings, setMyRatings] = useState({});
 
   const loadOrderDetail = async (orderId) => {
     try {
@@ -41,6 +41,14 @@ const OrderDetail = () => {
     loadOrderDetail(orderId);
   }, [orderId]);
 
+  useEffect(() => {
+    if (orderData && orderData.items) {
+      orderData.items.forEach(item => {
+        loadMyRating(item.dishId);
+      });
+    }
+  }, [orderData]);
+
   const loadDishRatings = async (dishId) => {
     try {
       const res = await authApis(cookies.load("token")).get(endpoints["dish-ratings"](dishId));
@@ -50,10 +58,32 @@ const OrderDetail = () => {
     }
   };
 
-  const handleShowRatingModal = (dish) => {
+  const loadMyRating = async (dishId) => {
+    try {
+      const res = await authApis(cookies.load("token")).get(endpoints["my-rating"](dishId));
+      if (res.status === 200) {
+        setMyRatings(prev => ({ ...prev, [dishId]: res.data }));
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 204) {
+        setMyRatings(prev => ({ ...prev, [dishId]: null }));
+      } else {
+        console.error('Lỗi tải đánh giá của bạn:', error);
+      }
+    }
+  };
+
+  const handleShowRatingModal = async (dish) => {
     setSelectedDish(dish);
-    setRating(5);
-    setRatingContent('');
+    await loadMyRating(dish.dishId);
+    const myRating = myRatings[dish.dishId];
+    if (myRating) {
+      setRating(myRating.point);
+      setRatingContent(myRating.content);
+    } else {
+      setRating(5);
+      setRatingContent('');
+    }
     setShowRatingModal(true);
   };
 
@@ -74,13 +104,22 @@ const OrderDetail = () => {
       params.append('point', rating);
       params.append('content', ratingContent);
 
-      await authApis(token).post(endpoints["dish-rating"](selectedDish.dishId), params, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-      });
+      const myRating = myRatings[selectedDish.dishId];
+      if (myRating) {
+        await authApis(token).patch(endpoints["update-rating"](selectedDish.dishId), params, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+        message.success('Cập nhật đánh giá thành công!');
+      } else {
+        await authApis(token).post(endpoints["dish-rating"](selectedDish.dishId), params, {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+        message.success('Đánh giá thành công!');
+      }
 
-      message.success('Đánh giá thành công!');
       handleCloseRatingModal();
       loadDishRatings(selectedDish.dishId);
+      loadMyRating(selectedDish.dishId);
     } catch (error) {
       console.error('Lỗi đánh giá:', error);
       message.error('Có lỗi xảy ra khi đánh giá!');
@@ -193,7 +232,7 @@ const OrderDetail = () => {
                             className="d-flex align-items-center gap-2"
                           >
                             <StarIcon className="w-4 h-4" />
-                            Đánh giá
+                            {myRatings[item.dishId] ? 'Cập nhật đánh giá' : 'Đánh giá'}
                           </Button>
                         )}
                       </div>

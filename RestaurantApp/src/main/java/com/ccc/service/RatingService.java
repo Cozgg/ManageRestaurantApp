@@ -18,6 +18,8 @@ public interface RatingService {
 
     Rating addRating(Map<String, String> params, User user);
 
+    Rating updateRating(Map<String, String> params, User user);
+
     List<Rating> getRatingsByDishId(int dishId);
 
     Rating getRatingByUserAndDish(User user, int dishId);

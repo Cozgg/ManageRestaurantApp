@@ -30,13 +30,9 @@ public interface OrderService {
     String addOrder(ItemDto items);
 
     boolean verifyMomoSignature(MomoIpnResponse payload);
-<<<<<<< Updated upstream
+
     boolean updateOrderStatus(int orderId, String status, Long transId);
+
     boolean updateOrderStatus(int orderId, String status);
-=======
 
-    void updateOrderStatus(int orderId, String status, Long transId);
-
-    void updateOrderStatus(int orderId, String status);
->>>>>>> Stashed changes
 }
