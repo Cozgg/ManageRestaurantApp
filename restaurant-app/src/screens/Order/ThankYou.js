@@ -19,10 +19,9 @@ const ThankYou = () => {
     try {
       const token = cookies.load("token");
       let res = await authApis(token).get(endpoints["order-detail"](id));
-      const order = res.data;
-      console.log(order);
-      setTotalAmount(order.totalPrice);
-      setPaymentMethod(order.payment);
+      const result = res.data;
+      setTotalAmount(result.order.totalPrice);
+      setPaymentMethod(result.order.payment);
     } catch (error) {
       message.error("Lỗi lấy chi tiết đơn hàng");
       console.log(error);
@@ -168,7 +167,7 @@ const ThankYou = () => {
                 <Col xs={12} md={6}>
                   <Button
                     as={Link}
-                    to="/order-history"
+                    to="/profile"
                     size="lg"
                     className="w-100 rounded-pill fw-bold text-white btn-checkout-history shadow"
                   >
