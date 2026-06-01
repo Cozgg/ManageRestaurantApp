@@ -4,17 +4,10 @@
  */
 package com.ccc.repository.impl;
 
-import com.ccc.pojo.Dish;
-import com.ccc.pojo.User;
-import com.ccc.repository.DishRepository;
-import com.ccc.repository.UserRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +16,15 @@ import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ccc.pojo.Dish;
+import com.ccc.pojo.User;
+import com.ccc.repository.DishRepository;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 /**
  *
@@ -35,7 +37,7 @@ public class DishRepositoryImpl implements DishRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
-    
+
     @Autowired
     private Environment env;
 
@@ -60,7 +62,13 @@ public class DishRepositoryImpl implements DishRepository {
                 predicates.add(b.equal(root.get("categoryId").as(Integer.class), categoryId));
             }
 
+            // Chỉ lấy các dish đang active
+            predicates.add(b.equal(root.get("active"), true));
+
             q.where(predicates.toArray(Predicate[]::new));
+        } else {
+            // Nếu không có params, vẫn lọc active = true
+            q.where(b.equal(root.get("active"), true));
         }
 
         q.orderBy(b.desc(root.get("id")));
@@ -124,8 +132,12 @@ public class DishRepositoryImpl implements DishRepository {
         q.select(root);
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(b.equal(root.get("userId").get("id"), currentChef.getId()));
+
+        // Chỉ lấy các dish đang active
+        predicates.add(b.equal(root.get("active"), true));
+
         if (params != null) {
-            
+
             String kw = params.get("kw");
             if (kw != null && !kw.isEmpty()) {
                 predicates.add(b.like(root.get("name"), String.format("%%%s%%", kw)));
@@ -135,8 +147,9 @@ public class DishRepositoryImpl implements DishRepository {
             if (categoryId != null && !categoryId.isEmpty()) {
                 predicates.add(b.equal(root.get("categoryId").as(Integer.class), categoryId));
             }
-            
 
+            q.where(predicates.toArray(Predicate[]::new));
+        } else {
             q.where(predicates.toArray(Predicate[]::new));
         }
 

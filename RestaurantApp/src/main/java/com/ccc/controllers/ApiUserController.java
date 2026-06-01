@@ -6,6 +6,7 @@ package com.ccc.controllers;
 
 import java.security.Principal;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -107,5 +109,14 @@ public class ApiUserController {
         }
         this.userService.approveUser(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/secure/admin/users")
+    public ResponseEntity<List<User>> getUsers(@RequestParam Map<String, String> params, Principal principal) {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != com.ccc.enums.UserRole.ROLE_ADMIN) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(this.userService.getUsers(params), HttpStatus.OK);
     }
 }

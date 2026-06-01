@@ -54,8 +54,15 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public String usersView(Model model) {
-        model.addAttribute("users", this.userService.getUsers());
+    public String usersView(Model model, @RequestParam Map<String, String> params) {
+        int page = Integer.parseInt(params.getOrDefault("page", "1"));
+        int pageSize = Integer.parseInt(params.getOrDefault("pageSize", "10"));
+        params.put("page", String.valueOf(page));
+        params.put("pageSize", String.valueOf(pageSize));
+
+        model.addAttribute("users", this.userService.getUsers(params));
+        model.addAttribute("currentPage", page);
+        model.addAttribute("pageSize", pageSize);
         return "manage-user";
     }
 

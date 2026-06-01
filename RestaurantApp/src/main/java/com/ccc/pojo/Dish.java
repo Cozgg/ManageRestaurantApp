@@ -4,6 +4,9 @@
  */
 package com.ccc.pojo;
 
+import java.io.Serializable;
+import java.util.Set;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,8 +22,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -72,6 +73,7 @@ public class Dish implements Serializable {
     @Column(name = "material")
     private String material;
     @Column(name = "active")
+    @Builder.Default
     private Boolean active = true;
 
     private static final long serialVersionUID = 1L;
@@ -92,7 +94,6 @@ public class Dish implements Serializable {
     private Set<Rating> ratingSet;
     @OneToMany(mappedBy = "dishId")
     private Set<OrderDetail> orderDetailSet;
-
 
     @Override
     public int hashCode() {
@@ -118,7 +119,6 @@ public class Dish implements Serializable {
     public String toString() {
         return "com.ccc.pojo.Dish[ id=" + id + " ]";
     }
-
 
     public int getTimePrepare() {
         return timePrepare;
@@ -151,7 +151,6 @@ public class Dish implements Serializable {
     public void setImage(String image) {
         this.image = image;
     }
-
 
     public String getMaterial() {
         return material;

@@ -35,35 +35,42 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 public class ApiOrderController {
-    
+
     @Autowired
     private OrderService orderService;
-    
+
     @Autowired
     private UserService userService;
-    
+
     @GetMapping("/secure/orders")
-    public ResponseEntity<List<OrderDto>> getOrders(@RequestParam Map<String, String> params){
+    public ResponseEntity<List<OrderDto>> getOrders(@RequestParam Map<String, String> params) {
         User u = userService.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         return new ResponseEntity<>(this.orderService.getOrders(u, params), HttpStatus.OK);
     }
-    
+
     @GetMapping("/secure/orders/{orderId}")
-    public ResponseEntity<OrderDetailDto> getOrderDetail(@PathVariable(value = "orderId") int orderId){
+    public ResponseEntity<OrderDetailDto> getOrderDetail(@PathVariable(value = "orderId") int orderId) {
         return new ResponseEntity<>(this.orderService.getOrderById(orderId), HttpStatus.OK);
     }
-    
+
     @GetMapping("/secure/chef/orders/{orderId}")
-    public ResponseEntity<OrderDetailDto> getOrderDetail(@PathVariable(value = "orderId") int orderId, Principal principal){
+    public ResponseEntity<OrderDetailDto> getOrderDetail(@PathVariable(value = "orderId") int orderId, Principal principal) {
         User currentChef = userService.getUserByUsername(principal.getName());
         return new ResponseEntity<>(this.orderService.getOrderById(orderId, currentChef), HttpStatus.OK);
     }
-    
+
     @PostMapping("/secure/orders")
-    public ResponseEntity<String> addOrder(@RequestBody ItemDto request){
+    public ResponseEntity<String> addOrder(@RequestBody ItemDto request) {
         String url = this.orderService.addOrder(request);
         return new ResponseEntity<>(url, HttpStatus.CREATED);
     }
-    
-    
+
+    @GetMapping("/secure/admin/orders")
+    public ResponseEntity<List<OrderDto>> getAllOrders(@RequestParam Map<String, String> params, Principal principal) {
+        User currentUser = userService.getUserByUsername(principal.getName());
+        if (currentUser.getUserRole() != com.ccc.enums.UserRole.ROLE_ADMIN) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(this.orderService.getAllOrders(params), HttpStatus.OK);
+    }
 }
