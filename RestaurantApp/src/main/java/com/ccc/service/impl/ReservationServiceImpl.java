@@ -21,6 +21,9 @@ import com.ccc.repository.ReservationRepository;
 import com.ccc.repository.TableRepository;
 import com.ccc.repository.UserRepository;
 import com.ccc.service.ReservationService;
+import java.text.ParseException;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -60,7 +63,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationDto> getReservations(Map<String, String> params) {
-        return this.reservationRepo.getReservations(params).stream().map(this::toDto).collect(java.util.stream.Collectors.toList());
+        return this.reservationRepo.getReservations(params).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
@@ -110,7 +113,7 @@ public class ReservationServiceImpl implements ReservationService {
             return toDto(r);
         } catch (IllegalArgumentException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (ParseException e) {
             e.printStackTrace();
             return null;
         }
@@ -201,12 +204,12 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationDto> getReservationsByUserId(int userId) {
-        return this.reservationRepo.getReservationsByUserId(userId).stream().map(this::toDto).collect(java.util.stream.Collectors.toList());
+        return this.reservationRepo.getReservationsByUserId(userId).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
     public List<ReservationDto> getReservationsByTableId(int tableId) {
-        return this.reservationRepo.getReservationsByTableId(tableId).stream().map(this::toDto).collect(java.util.stream.Collectors.toList());
+        return this.reservationRepo.getReservationsByTableId(tableId).stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
@@ -227,7 +230,7 @@ public class ReservationServiceImpl implements ReservationService {
                 boolean isAvailable = true;
 
                 for (Reservation r : allReservations) {
-                    if (r.getTableId().getId() != table.getId()) {
+                    if (!Objects.equals(r.getTableId().getId(), table.getId())) {
                         continue;
                     }
 
