@@ -34,6 +34,8 @@ public interface UserService extends UserDetailsService {
 
     List<User> getUsers();
 
+    List<User> getUsers(Map<String, String> params);
+
     User getUserById(int userId);
 
     List<UserRole> getUserRoles();

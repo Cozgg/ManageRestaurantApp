@@ -4,9 +4,9 @@
  */
 package com.ccc.repository.impl;
 
-import com.ccc.pojo.User;
-import com.ccc.repository.UserRepository;
 import java.util.List;
+import java.util.Map;
+
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,9 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ccc.pojo.User;
+import com.ccc.repository.UserRepository;
 
 /**
  *
@@ -25,7 +28,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Autowired
     private LocalSessionFactoryBean factory;
-    
+
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
@@ -53,13 +56,30 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public List<User> getUsers(Map<String, String> params) {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query q = s.createNamedQuery("User.findAll", User.class);
+
+        if (params != null) {
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            int pageSize = Integer.parseInt(params.getOrDefault("pageSize", "10"));
+            int start = (page - 1) * pageSize;
+
+            q.setFirstResult(start);
+            q.setMaxResults(pageSize);
+        }
+
+        return q.getResultList();
+    }
+
+    @Override
     public User getUserById(int userId) {
         Session s = this.factory.getObject().getCurrentSession();
         Query q = s.createNamedQuery("User.findById", User.class);
         q.setParameter("id", userId);
         return (User) q.getSingleResult();
     }
-    
+
     @Override
     public boolean authenticate(String username, String password) {
         User u = this.getUserByUsername(username);

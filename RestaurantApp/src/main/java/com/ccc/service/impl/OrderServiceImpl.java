@@ -79,6 +79,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<OrderDto> getAllOrders(Map<String, String> params) {
+        // Create a dummy admin user to get all orders
+        User adminUser = new User();
+        adminUser.setUserRole(com.ccc.enums.UserRole.ROLE_ADMIN);
+
+        List<Orders> orders = this.orderRepo.getOrders(adminUser, params);
+
+        return orders.stream().map(o -> {
+            UserDto udto = UserDto.builder().firstName(o.getUserId().getFirstName()).lastName(o.getUserId().getLastName()).build();
+            OrderDto odto = OrderDto.builder().id(o.getId()).user(udto).totalPrice(o.getTotalPrice())
+                    .payment(o.getPaymentMethod()).createdDate(o.getCreatedAt()).statusPay(o.getStatusPay())
+                    .transactionId(o.getTransactionId() != null ? o.getTransactionId() : null).build();
+
+            return odto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
     public OrderDetailDto getOrderById(int orderId) {
         if (orderId <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id đơn hàng phải lớn hơn 0");

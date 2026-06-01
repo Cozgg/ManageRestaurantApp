@@ -185,7 +185,8 @@ public class DishServiceImpl implements DishService {
         if (dish == null) {
             return false;
         }
-        this.dishRepo.deleteDish(id);
+        dish.setActive(false);
+        this.dishRepo.updateDish(dish);
         return true;
     }
 

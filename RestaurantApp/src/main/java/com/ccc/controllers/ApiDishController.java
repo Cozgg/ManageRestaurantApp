@@ -113,13 +113,11 @@ public class ApiDishController {
             Principal principal) {
         User currentUser = this.userService.getUserByUsername(principal.getName());
 
-        // Kiểm tra user đã đánh giá món này chưa
         Rating existingRating = this.ratingService.getRatingByUserAndDish(currentUser, id);
         if (existingRating != null) {
             return new ResponseEntity<>("Bạn đã đánh giá món này rồi!", HttpStatus.BAD_REQUEST);
         }
 
-        // Kiểm tra user đã mua món này chưa (chỉ cho phép đánh giá nếu đã mua và đơn hàng hoàn thành)
         boolean hasPurchased = this.orderRepository.hasUserPurchasedDish(currentUser, id);
         if (!hasPurchased) {
             return new ResponseEntity<>("Bạn chưa mua món này hoặc đơn hàng chưa hoàn thành!", HttpStatus.FORBIDDEN);
