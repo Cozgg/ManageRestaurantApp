@@ -23,6 +23,8 @@ public interface UserRepository {
 
     List<User> getUsers(Map<String, String> params);
 
+    long countUsers(Map<String, String> params);
+
     User getUserById(int userId);
 
     boolean authenticate(String username, String password);

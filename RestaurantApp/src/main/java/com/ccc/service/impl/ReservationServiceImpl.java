@@ -4,10 +4,13 @@
  */
 package com.ccc.service.impl;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,9 +24,6 @@ import com.ccc.repository.ReservationRepository;
 import com.ccc.repository.TableRepository;
 import com.ccc.repository.UserRepository;
 import com.ccc.service.ReservationService;
-import java.text.ParseException;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -81,6 +81,9 @@ public class ReservationServiceImpl implements ReservationService {
             }
 
             int numberPeople = Integer.parseInt(params.getOrDefault("numberPeople", "1"));
+            if (numberPeople <= 0) {
+                throw new IllegalArgumentException("Số người phải lớn hơn 0");
+            }
             if (numberPeople > table.getCapacity()) {
                 throw new IllegalArgumentException("Số người vượt quá sức chứa của bàn (" + table.getCapacity() + " người)");
             }
@@ -109,13 +112,20 @@ public class ReservationServiceImpl implements ReservationService {
                 r.setUserId(user);
             }
 
+            if (params.containsKey("customerName")) {
+                String customerName = params.get("customerName").trim();
+                if (customerName.isEmpty()) {
+                    throw new IllegalArgumentException("Tên khách không được để trống");
+                }
+                r.setCustomerName(customerName);
+            }
+
             this.reservationRepo.addOrUpdate(r);
             return toDto(r);
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
+            throw new IllegalArgumentException("Format thời gian không hợp lệ (yyyy-MM-dd'T'HH:mm)");
         }
     }
 
@@ -150,6 +160,9 @@ public class ReservationServiceImpl implements ReservationService {
 
                 if (params.containsKey("numberPeople")) {
                     int numberPeople = Integer.parseInt(params.get("numberPeople"));
+                    if (numberPeople <= 0) {
+                        throw new IllegalArgumentException("Số người phải lớn hơn 0");
+                    }
                     if (numberPeople > table.getCapacity()) {
                         throw new IllegalArgumentException("Số người vượt quá sức chứa của bàn (" + table.getCapacity() + " người)");
                     }
@@ -163,13 +176,17 @@ public class ReservationServiceImpl implements ReservationService {
                 r.setStartTime(startTime);
                 r.setEndTime(endTime);
 
-                // Simple status transitions (no State Pattern)
                 if (params.containsKey("status")) {
                     String newStatus = params.get("status");
                     r.setStatus(newStatus);
-                } else if (id == 0) {
-                    // New reservation defaults to RESERVED
-                    r.setStatus("RESERVED");
+                }
+
+                if (params.containsKey("customerName")) {
+                    String customerName = params.get("customerName").trim();
+                    if (customerName.isEmpty()) {
+                        throw new IllegalArgumentException("Tên khách không được để trống");
+                    }
+                    r.setCustomerName(customerName);
                 }
 
                 r.setTableId(table);
@@ -179,11 +196,10 @@ public class ReservationServiceImpl implements ReservationService {
             } catch (IllegalArgumentException e) {
                 throw e;
             } catch (Exception e) {
-                e.printStackTrace();
-                return null;
+                throw new IllegalArgumentException("Lỗi cập nhật reservation: " + e.getMessage());
             }
         }
-        return null;
+        throw new IllegalArgumentException("Không tìm thấy reservation với ID: " + id);
     }
 
     @Override
@@ -268,8 +284,6 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public ReservationDto createWalkInReservation(Map<String, String> params) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-
             if (!params.containsKey("tableId")) {
                 throw new IllegalArgumentException("Table ID is required");
             }
@@ -287,7 +301,6 @@ public class ReservationServiceImpl implements ReservationService {
             Date startTime = new Date();
             Date endTime = new Date(System.currentTimeMillis() + 2 * 60 * 60 * 1000);
 
-            // Bỏ check xung đột để cho phép walk-in dù bàn đã có khách
             // if (this.reservationRepo.hasTimeConflict(table.getId(), startTime, endTime, null)) {
             //     throw new IllegalArgumentException("Bàn này đang có khách");
             // }

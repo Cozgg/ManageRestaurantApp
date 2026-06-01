@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext, useRef} from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   Container,
   Row,
@@ -14,15 +14,15 @@ import {
   Form,
   Modal,
 } from "react-bootstrap";
-import {MyUserContext} from "../../utils/contexts/MyUserContext";
-import Apis, {authApis, endpoints} from "../../configs/Apis";
+import { MyUserContext } from "../../utils/contexts/MyUserContext";
+import Apis, { authApis, endpoints } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
-import {useSearchParams} from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import cookies from "react-cookies";
-import {Edit2, Plus, Search, ShieldAlert, Trash2, X} from "lucide-react";
+import { Edit2, Plus, Search, ShieldAlert, Trash2, X } from "lucide-react";
 
 const ChefDashboard = () => {
-  const {user} = useContext(MyUserContext);
+  const { user } = useContext(MyUserContext);
   const [dishes, setDishes] = useState([]);
   const [page, setPage] = useState(1);
 
@@ -44,6 +44,7 @@ const ChefDashboard = () => {
     categoryId: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [err, setErr] = useState("");
 
   const imageDish = useRef();
 
@@ -124,6 +125,7 @@ const ChefDashboard = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedDish(null);
+    setErr("");
     setFormData({
       name: "",
       description: "",
@@ -136,21 +138,66 @@ const ChefDashboard = () => {
   };
 
   const handleInputChange = (e) => {
-    const {name, value} = e.target;
-    setFormData((prev) => ({...prev, [name]: value}));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  const validate = () => {
+    if (!formData.name || formData.name.trim().isEmpty()) {
+      setErr("Tên món ăn không được để trống!");
+      return false;
+    }
+
+    if (!formData.price || parseFloat(formData.price) <= 0) {
+      setErr("Giá bán phải lớn hơn 0!");
+      return false;
+    }
+
+    if (!formData.timePrepare || parseInt(formData.timePrepare) <= 0) {
+      setErr("Thời gian nấu phải lớn hơn 0!");
+      return false;
+    }
+
+    if (!formData.categoryId) {
+      setErr("Vui lòng chọn danh mục!");
+      return false;
+    }
+
+    if (!formData.material || formData.material.trim().isEmpty()) {
+      setErr("Nguyên liệu không được để trống!");
+      return false;
+    }
+
+    if (!formData.description || formData.description.trim().isEmpty()) {
+      setErr("Mô tả không được để trống!");
+      return false;
+    }
+
+    if (modalMode === "add" && (!imageDish.current || imageDish.current.files.length === 0)) {
+      setErr("Vui lòng chọn hình ảnh!");
+      return false;
+    }
+
+    setErr("");
+    return true;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validate()) {
+      return;
+    }
+
     setSubmitting(true);
     try {
       const token = cookies.load("token");
 
       const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("description", formData.description);
+      formDataToSend.append("name", formData.name.trim());
+      formDataToSend.append("description", formData.description.trim());
       formDataToSend.append("price", formData.price);
-      formDataToSend.append("material", formData.material);
+      formDataToSend.append("material", formData.material.trim());
       formDataToSend.append("timePrepare", formData.timePrepare);
       formDataToSend.append("categoryId", formData.categoryId);
       if (imageDish.current && imageDish.current.files.length > 0) {
@@ -159,14 +206,14 @@ const ChefDashboard = () => {
 
       if (modalMode === "add") {
         await authApis(token).post(endpoints["chef-dishes"], formDataToSend, {
-          headers: {"Content-Type": "multipart/form-data"},
+          headers: { "Content-Type": "multipart/form-data" },
         });
       } else if (modalMode === "edit" && selectedDish) {
         await authApis(token).patch(
           `${endpoints["chef-dishes"]}/${selectedDish.id}`,
           formDataToSend,
           {
-            headers: {"Content-Type": "multipart/form-data"},
+            headers: { "Content-Type": "multipart/form-data" },
           },
         );
       }
@@ -176,13 +223,18 @@ const ChefDashboard = () => {
       loadDishes();
     } catch (error) {
       console.error("Lỗi khi lưu món ăn:", error);
-      alert("Có lỗi xảy ra khi lưu món ăn!");
+      setErr("Có lỗi xảy ra khi lưu món ăn!");
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (dishId) => {
+    if (!dishId || dishId <= 0) {
+      setErr("ID món ăn không hợp lệ!");
+      return;
+    }
+
     if (!window.confirm("Bạn có chắc chắn muốn xóa món ăn này?")) {
       return;
     }
@@ -193,7 +245,7 @@ const ChefDashboard = () => {
       setDishes(dishes.filter((d) => d.id !== dishId));
     } catch (error) {
       console.error("Lỗi khi xóa món ăn:", error);
-      alert("Có lỗi xảy ra khi xóa món ăn!");
+      setErr("Có lỗi xảy ra khi xóa món ăn!");
     }
   };
 
@@ -217,6 +269,8 @@ const ChefDashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 min-h-screen">
+      {err && <Alert variant="danger" className="mb-4">{err}</Alert>}
+
       {/* HEADER & TÌM KIẾM */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
         <div>
@@ -410,6 +464,8 @@ const ChefDashboard = () => {
 
             {/* Body Modal (Nội dung Form cuộn được) */}
             <div className="p-6 overflow-y-auto">
+              {err && <Alert variant="danger" className="mb-4">{err}</Alert>}
+
               <form id="dishForm" onSubmit={handleSubmit} className="space-y-5">
                 {/* Hàng 1: Tên món & Giá bán */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

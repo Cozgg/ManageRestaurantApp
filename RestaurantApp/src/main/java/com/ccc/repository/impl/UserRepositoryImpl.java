@@ -73,6 +73,13 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public long countUsers(Map<String, String> params) {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query q = s.createQuery("SELECT COUNT(u) FROM User u", Long.class);
+        return (Long) q.getSingleResult();
+    }
+
+    @Override
     public User getUserById(int userId) {
         Session s = this.factory.getObject().getCurrentSession();
         Query q = s.createNamedQuery("User.findById", User.class);

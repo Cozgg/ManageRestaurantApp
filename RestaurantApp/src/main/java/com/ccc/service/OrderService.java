@@ -23,6 +23,8 @@ public interface OrderService {
 
     List<OrderDto> getAllOrders(Map<String, String> params);
 
+    long countOrders(Map<String, String> params);
+
     OrderDetailDto getOrderById(int orderId);
 
     OrderDetailDto getOrderById(int orderId, User currentChef);

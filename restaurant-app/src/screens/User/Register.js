@@ -1,9 +1,10 @@
-import React, {useRef, useState} from "react";
-import {message} from "antd";
-import Apis, {endpoints} from "../../configs/Apis";
+import React, { useRef, useState } from "react";
+import { message } from "antd";
+import Apis, { endpoints } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
-import {Link, useNavigate} from "react-router-dom";
-import {Eye, EyeOff, ArrowLeft, Check, X} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, ArrowLeft, Check, X } from "lucide-react";
+import { Alert } from "react-bootstrap";
 
 const Register = () => {
   const nav = useNavigate();
@@ -22,6 +23,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
 
   const avatar = useRef();
 
@@ -37,29 +39,47 @@ const Register = () => {
     user.password === user.confirmPassword && user.password !== "";
 
   const handleChange = (e) => {
-    const {name, value} = e.target;
-    setUser((prev) => ({...prev, [name]: value}));
+    const { name, value } = e.target;
+    setUser((prev) => ({ ...prev, [name]: value }));
   };
 
   const validate = () => {
-    if (
-      !user.username ||
-      !user.password ||
-      !user.firstName ||
-      !user.lastName ||
-      !user.phone ||
-      !user.email
-    ) {
-      message.error("Vui lòng nhập đầy đủ thông tin!");
+    if (!user.username || user.username.trim().isEmpty()) {
+      setErr("Vui lòng nhập tên đăng nhập!");
+      return false;
+    }
+    if (!user.password || user.password.trim().isEmpty()) {
+      setErr("Vui lòng nhập mật khẩu!");
+      return false;
+    }
+    if (!user.firstName || user.firstName.trim().isEmpty()) {
+      setErr("Vui lòng nhập tên!");
+      return false;
+    }
+    if (!user.lastName || user.lastName.trim().isEmpty()) {
+      setErr("Vui lòng nhập họ!");
+      return false;
+    }
+    if (!user.phone || user.phone.trim().isEmpty()) {
+      setErr("Vui lòng nhập số điện thoại!");
+      return false;
+    }
+    if (!user.email || user.email.trim().isEmpty()) {
+      setErr("Vui lòng nhập email!");
       return false;
     }
     if (
       !passwordsMatch ||
       !Object.values(passwordRequirements).every(Boolean)
     ) {
-      message.error("Vui lòng đáp ứng yêu cầu mật khẩu!");
+      setErr("Vui lòng đáp ứng yêu cầu mật khẩu!");
       return false;
     }
+    if (!avatar.current || avatar.current.files.length === 0) {
+      setErr("Vui lòng chọn ảnh đại diện!");
+      return false;
+    }
+    setErr("");
     return true;
   };
 
@@ -68,6 +88,7 @@ const Register = () => {
     if (!validate()) return;
     try {
       setLoading(true);
+      setErr("");
       let form = new FormData();
       for (let key in user) {
         if (key !== "confirmPassword") {
@@ -89,7 +110,7 @@ const Register = () => {
         nav("/login");
       }
     } catch (error) {
-      message.error(error.response?.data?.message || "Đăng ký thất bại!");
+      setErr(error.response?.data?.message || "Đăng ký thất bại!");
     } finally {
       setLoading(false);
     }
@@ -115,6 +136,8 @@ const Register = () => {
               Tạo tài khoản mới để trải nghiệm eRestaurant!
             </p>
           </div>
+
+          {err && <Alert variant="danger" className="mb-4">{err}</Alert>}
 
           <form onSubmit={register} className="space-y-4">
             {/* HỌ VÀ TÊN (Chia 2 cột) */}

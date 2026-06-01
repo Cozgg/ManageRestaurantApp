@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { authApis, endpoints } from "../../configs/Apis";
 import cookies from "react-cookies";
 import { message } from "antd";
-import { Badge, Button, Card, Col, Container, Form, Image, Modal, Row, Star } from "react-bootstrap";
+import { Alert, Badge, Button, Card, Col, Container, Form, Image, Modal, Row, Star } from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 import { Star as StarIcon } from "lucide-react";
 const OrderDetail = () => {
@@ -22,6 +22,7 @@ const OrderDetail = () => {
   const [submittingRating, setSubmittingRating] = useState(false);
   const [dishRatings, setDishRatings] = useState({});
   const [myRatings, setMyRatings] = useState({});
+  const [err, setErr] = useState("");
 
   const loadOrderDetail = async (orderId) => {
     try {
@@ -92,39 +93,57 @@ const OrderDetail = () => {
     setSelectedDish(null);
     setRating(5);
     setRatingContent('');
+    setErr("");
   };
+
+  const validate = () => {
+    if (rating < 1 || rating > 5) {
+      setErr('Điểm đánh giá phải từ 1 đến 5!');
+      return false;
+    }
+
+    if (!ratingContent || ratingContent.trim().isEmpty()) {
+      setErr('Vui lòng nhập nội dung đánh giá!');
+      return false;
+    }
+
+    setErr("");
+    return true;
+  }
 
   const handleSubmitRating = async () => {
     if (!selectedDish) return;
 
-    setSubmittingRating(true);
-    try {
-      const token = cookies.load("token");
-      const params = new URLSearchParams();
-      params.append('point', rating);
-      params.append('content', ratingContent);
+    if (validate()) {
+      setSubmittingRating(true);
+      try {
+        const token = cookies.load("token");
+        const params = new URLSearchParams();
+        params.append('point', rating);
+        params.append('content', ratingContent.trim());
 
-      const myRating = myRatings[selectedDish.dishId];
-      if (myRating) {
-        await authApis(token).patch(endpoints["update-rating"](selectedDish.dishId), params, {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        });
-        message.success('Cập nhật đánh giá thành công!');
-      } else {
-        await authApis(token).post(endpoints["dish-rating"](selectedDish.dishId), params, {
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        });
-        message.success('Đánh giá thành công!');
+        const myRating = myRatings[selectedDish.dishId];
+        if (myRating) {
+          await authApis(token).patch(endpoints["update-rating"](selectedDish.dishId), params, {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          });
+          message.success('Cập nhật đánh giá thành công!');
+        } else {
+          await authApis(token).post(endpoints["dish-rating"](selectedDish.dishId), params, {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+          });
+          message.success('Đánh giá thành công!');
+        }
+
+        handleCloseRatingModal();
+        loadDishRatings(selectedDish.dishId);
+        loadMyRating(selectedDish.dishId);
+      } catch (error) {
+        console.error('Lỗi đánh giá:', error);
+        setErr('Có lỗi xảy ra khi đánh giá!');
+      } finally {
+        setSubmittingRating(false);
       }
-
-      handleCloseRatingModal();
-      loadDishRatings(selectedDish.dishId);
-      loadMyRating(selectedDish.dishId);
-    } catch (error) {
-      console.error('Lỗi đánh giá:', error);
-      message.error('Có lỗi xảy ra khi đánh giá!');
-    } finally {
-      setSubmittingRating(false);
     }
   };
 
@@ -262,6 +281,8 @@ const OrderDetail = () => {
               </Modal.Title>
             </Modal.Header>
             <Modal.Body className="bg-card">
+              {err && <Alert variant="danger" className="mb-3">{err}</Alert>}
+
               {selectedDish && (
                 <div className="mb-3">
                   <p className="text-muted mb-2">Món: <strong>{selectedDish.dishName}</strong></p>

@@ -101,6 +101,17 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public long countOrders(Map<String, String> params) {
+        Session s = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<Long> cq = b.createQuery(Long.class);
+        Root<Orders> root = cq.from(Orders.class);
+        cq.select(b.count(root));
+        Query<Long> q = s.createQuery(cq);
+        return q.getSingleResult();
+    }
+
+    @Override
     public Orders getOrderById(int orderId) {
         Session s = this.factory.getObject().getCurrentSession();
         return s.get(Orders.class, orderId);
@@ -148,7 +159,6 @@ public class OrderRepositoryImpl implements OrderRepository {
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<OrderDetail> cq = b.createQuery(OrderDetail.class);
         Root<OrderDetail> root = cq.from(OrderDetail.class);
-        //eager load luôn data dish, order tránh n+1 query
         root.fetch("dishId", JoinType.INNER);
         root.fetch("orderId", JoinType.INNER);
         cq.select(root).where(b.equal(root.get("orderId").get("id"), orderId));
@@ -162,7 +172,6 @@ public class OrderRepositoryImpl implements OrderRepository {
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<OrderDetail> cq = b.createQuery(OrderDetail.class);
         Root<OrderDetail> root = cq.from(OrderDetail.class);
-        //eager load luôn data dish, order tránh n+1 query
         root.fetch("dishId", JoinType.INNER);
         root.fetch("orderId", JoinType.INNER);
         cq.select(root).where(b.and(b.equal(root.get("orderId").get("id"), orderId),

@@ -60,9 +60,23 @@ public class UserController {
         params.put("page", String.valueOf(page));
         params.put("pageSize", String.valueOf(pageSize));
 
+        long count = this.userService.countUsers(params);
+        int totalPages = (int) Math.ceil(count * 1.0 / pageSize);
+
+        // Validate page không vượt quá totalPages
+        if (page > totalPages && totalPages > 0) {
+            page = totalPages;
+            params.put("page", String.valueOf(page));
+        }
+        if (page < 1) {
+            page = 1;
+            params.put("page", String.valueOf(page));
+        }
+
         model.addAttribute("users", this.userService.getUsers(params));
         model.addAttribute("currentPage", page);
         model.addAttribute("pageSize", pageSize);
+        model.addAttribute("totalPages", totalPages);
         return "manage-user";
     }
 
@@ -93,16 +107,31 @@ public class UserController {
         if (status != null && !status.isEmpty()) {
             params.put("status", status);
         }
+
+        int currentPage = 1;
         if (page != null && !page.isEmpty()) {
-            params.put("page", page);
+            currentPage = Integer.parseInt(page);
         }
+        params.put("page", String.valueOf(currentPage));
 
         long count = this.reservationService.countReservations(params);
         int pageSize = 6;
-        model.addAttribute("pages", Math.ceil(count * 1.0 / pageSize));
+        int totalPages = (int) Math.ceil(count * 1.0 / pageSize);
+
+        // Validate page không vượt quá totalPages
+        if (currentPage > totalPages && totalPages > 0) {
+            currentPage = totalPages;
+            params.put("page", String.valueOf(currentPage));
+        }
+        if (currentPage < 1) {
+            currentPage = 1;
+            params.put("page", String.valueOf(currentPage));
+        }
+
+        model.addAttribute("totalPages", totalPages);
         model.addAttribute("reservations", this.reservationService.getReservations(params));
         model.addAttribute("status", status);
-        model.addAttribute("currentPage", page != null ? Integer.parseInt(page) : 1);
+        model.addAttribute("currentPage", currentPage);
         return "manage-reservation";
     }
 
@@ -111,15 +140,29 @@ public class UserController {
             @RequestParam(value = "page", required = false) String page) {
         Map<String, String> params = new java.util.HashMap<>();
         params.put("active", "true");
+
+        int currentPage = 1;
         if (page != null && !page.isEmpty()) {
-            params.put("page", page);
+            currentPage = Integer.parseInt(page);
         }
+        params.put("page", String.valueOf(currentPage));
 
         long count = this.tableService.countTables(params);
         int pageSize = 12;
-        model.addAttribute("pages", Math.ceil(count * 1.0 / pageSize));
+        int totalPages = (int) Math.ceil(count * 1.0 / pageSize);
+
+        if (currentPage > totalPages && totalPages > 0) {
+            currentPage = totalPages;
+            params.put("page", String.valueOf(currentPage));
+        }
+        if (currentPage < 1) {
+            currentPage = 1;
+            params.put("page", String.valueOf(currentPage));
+        }
+
+        model.addAttribute("totalPages", totalPages);
         model.addAttribute("tables", this.tableService.getTables(params));
-        model.addAttribute("currentPage", page != null ? Integer.parseInt(page) : 1);
+        model.addAttribute("currentPage", currentPage);
 
         // Check trạng thái bàn (có khách hay trống)
         Map<Integer, Boolean> tableStatus = new java.util.HashMap<>();

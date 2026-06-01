@@ -88,16 +88,19 @@
 
             <!-- Pagination -->
             <div class="card-footer bg-light d-flex justify-content-between align-items-center py-3">
-                <span class="text-muted" th:text="'Trang ' + ${currentPage}"></span>
+                <span class="text-muted" th:text="'Trang ' + ${currentPage} + ' / ' + ${totalPages}"></span>
                 <nav>
                     <ul class="pagination pagination-sm mb-0">
                         <li class="page-item" th:class="${currentPage == 1} ? 'disabled' : ''">
                             <a class="page-link" th:href="@{/admin/users(page=${currentPage - 1}, pageSize=${pageSize})}">Trước</a>
                         </li>
-                        <li class="page-item active">
-                            <span class="page-link" th:text="${currentPage}"></span>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}">
+                            <a class="page-link" 
+                               th:classappend="${i == currentPage ? 'active' : ''}"
+                               th:href="@{/admin/users(page=${i}, pageSize=${pageSize})}" 
+                               th:text="${i}"></a>
                         </li>
-                        <li class="page-item">
+                        <li class="page-item" th:class="${currentPage == totalPages} ? 'disabled' : ''">
                             <a class="page-link" th:href="@{/admin/users(page=${currentPage + 1}, pageSize=${pageSize})}">Sau</a>
                         </li>
                     </ul>

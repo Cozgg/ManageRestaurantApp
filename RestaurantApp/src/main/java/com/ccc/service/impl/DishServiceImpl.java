@@ -10,8 +10,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ccc.dto.DishDto;
 import com.ccc.dto.UserDto;
@@ -22,8 +24,6 @@ import com.ccc.repository.DishRepository;
 import com.ccc.service.DishService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  *
@@ -78,7 +78,7 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public List<DishDto> getDishs(Map<String, String> params, User currentChef) {
-        if(currentChef == null){
+        if (currentChef == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đầu bếp hiện tại");
         }
         return this.dishRepo.getDishs(params, currentChef)
@@ -98,34 +98,64 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public DishDto addDish(Map<String, String> params, MultipartFile image, User chef) throws IOException {
+        String name = params.get("name");
+        if (name == null || name.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tên món ăn không được để trống");
+        }
+
+        String priceStr = params.get("price");
+        if (priceStr == null || priceStr.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giá bán không được để trống");
+        }
+        int price = Integer.parseInt(priceStr);
+        if (price <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giá bán phải lớn hơn 0");
+        }
+
+        String timePrepareStr = params.get("timePrepare");
+        if (timePrepareStr == null || timePrepareStr.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thời gian nấu không được để trống");
+        }
+        int timePrepare = Integer.parseInt(timePrepareStr);
+        if (timePrepare <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thời gian nấu phải lớn hơn 0");
+        }
+
+        String categoryIdStr = params.get("categoryId");
+        if (categoryIdStr == null || categoryIdStr.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Danh mục không được để trống");
+        }
+
+        String material = params.get("material");
+        if (material == null || material.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nguyên liệu không được để trống");
+        }
+
+        String description = params.get("description");
+        if (description == null || description.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mô tả không được để trống");
+        }
+
         String imageUrl = null;
         if (image != null && !image.isEmpty()) {
             imageUrl = uploadImage(image);
-        }
-        
-        Dish dish = Dish.builder()
-                .userId(chef)
-                .name(params.get("name"))
-                .price(Integer.valueOf(params.get("price")))
-                .description(params.get("description"))
-                .active(true)
-                .timePrepare(Integer.parseInt(params.getOrDefault("timePrepare", "0")))
-                .material(params.get("material"))
-                .image(imageUrl)
-                .build();
-        String categoryIdStr = params.get("categoryId");
-        if (categoryIdStr != null && !categoryIdStr.isEmpty()) {
-            Category category = new Category();
-            category.setId(Integer.valueOf(categoryIdStr));
-            dish.setCategoryId(category);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hình ảnh không được để trống");
         }
 
-        String userIdStr = params.get("userId");
-        if (userIdStr != null && !userIdStr.isEmpty()) {
-            User user = new User();
-            user.setId(Integer.valueOf(userIdStr));
-            dish.setUserId(user);
-        }
+        Dish dish = Dish.builder()
+                .userId(chef)
+                .name(name.trim())
+                .price(price)
+                .description(description.trim())
+                .active(true)
+                .timePrepare(timePrepare)
+                .material(material.trim())
+                .image(imageUrl)
+                .build();
+        Category category = new Category();
+        category.setId(Integer.valueOf(categoryIdStr));
+        dish.setCategoryId(category);
 
         this.dishRepo.saveDish(dish);
         return toDto(dish);
@@ -133,44 +163,55 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public DishDto updateDish(Integer id, Map<String, String> params, MultipartFile image) throws IOException {
+        if (id == null || id <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID món ăn không hợp lệ");
+        }
+
         Dish dish = this.dishRepo.getDishById(id);
         if (dish == null) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy món ăn");
         }
 
         String name = params.get("name");
-        if (name != null && !name.isEmpty()) {
-            dish.setName(name);
+        if (name != null && !name.trim().isEmpty()) {
+            dish.setName(name.trim());
         }
 
         String description = params.get("description");
-        if (description != null && !description.isEmpty()) {
-            dish.setDescription(description);
+        if (description != null && !description.trim().isEmpty()) {
+            dish.setDescription(description.trim());
         }
 
         String material = params.get("material");
-        if (material != null && !material.isEmpty()) {
-            dish.setMaterial(material);
+        if (material != null && !material.trim().isEmpty()) {
+            dish.setMaterial(material.trim());
         }
 
         String priceStr = params.get("price");
-        if (priceStr != null && !priceStr.isEmpty()) {
-            dish.setPrice(Integer.valueOf(priceStr));
+        if (priceStr != null && !priceStr.trim().isEmpty()) {
+            int price = Integer.parseInt(priceStr);
+            if (price <= 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giá bán phải lớn hơn 0");
+            }
+            dish.setPrice(price);
         }
 
         String timePrepareStr = params.get("timePrepare");
-        if (timePrepareStr != null && !timePrepareStr.isEmpty()) {
-            dish.setTimePrepare(Integer.parseInt(timePrepareStr));
+        if (timePrepareStr != null && !timePrepareStr.trim().isEmpty()) {
+            int timePrepare = Integer.parseInt(timePrepareStr);
+            if (timePrepare <= 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thời gian nấu phải lớn hơn 0");
+            }
+            dish.setTimePrepare(timePrepare);
         }
 
         String categoryIdStr = params.get("categoryId");
-        if (categoryIdStr != null && !categoryIdStr.isEmpty()) {
+        if (categoryIdStr != null && !categoryIdStr.trim().isEmpty()) {
             Category category = new Category();
             category.setId(Integer.valueOf(categoryIdStr));
             dish.setCategoryId(category);
         }
 
-        // Cập nhật ảnh nếu có file mới
         if (image != null && !image.isEmpty()) {
             dish.setImage(uploadImage(image));
         }
@@ -181,9 +222,13 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public boolean deleteDish(Integer id) {
+        if (id == null || id <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID món ăn không hợp lệ");
+        }
+
         Dish dish = this.dishRepo.getDishById(id);
         if (dish == null) {
-            return false;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy món ăn");
         }
         dish.setActive(false);
         this.dishRepo.updateDish(dish);

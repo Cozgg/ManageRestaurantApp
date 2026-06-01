@@ -52,6 +52,18 @@ public class OrderController {
         params.put("page", String.valueOf(page));
         params.put("pageSize", String.valueOf(pageSize));
 
+        long count = this.orderService.countOrders(params);
+        int totalPages = (int) Math.ceil(count * 1.0 / pageSize);
+
+        if (page > totalPages && totalPages > 0) {
+            page = totalPages;
+            params.put("page", String.valueOf(page));
+        }
+        if (page < 1) {
+            page = 1;
+            params.put("page", String.valueOf(page));
+        }
+
         // Admin xem tất cả orders, user chỉ xem orders của mình
         if (u.getUserRole() == com.ccc.enums.UserRole.ROLE_ADMIN) {
             model.addAttribute("orders", this.orderService.getAllOrders(params));
@@ -61,6 +73,7 @@ public class OrderController {
 
         model.addAttribute("currentPage", page);
         model.addAttribute("pageSize", pageSize);
+        model.addAttribute("totalPages", totalPages);
         return "manage-order";
     }
 
