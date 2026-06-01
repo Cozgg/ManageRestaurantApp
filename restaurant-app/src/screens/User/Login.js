@@ -1,12 +1,12 @@
-import React, { useContext, useState } from "react";
-import { MyUserContext } from "../../utils/contexts/MyUserContext";
-import { message } from "antd";
-import Apis, { authApis, endpoints } from "../../configs/Apis";
+import React, {useContext, useState} from "react";
+import {MyUserContext} from "../../utils/contexts/MyUserContext";
+import {message} from "antd";
+import Apis, {authApis, endpoints} from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {Link, useNavigate, useSearchParams} from "react-router-dom";
 import cookies from "react-cookies";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
-import { Alert } from "react-bootstrap";
+import {Eye, EyeOff, ArrowLeft} from "lucide-react";
+import {Alert} from "react-bootstrap";
 
 const Login = () => {
   const nav = useNavigate();
@@ -17,15 +17,15 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
-  const { dispatch } = useContext(MyUserContext);
+  const {dispatch} = useContext(MyUserContext);
   const [params] = useSearchParams();
 
   const validate = () => {
-    if (!user.username || user.username.trim().isEmpty()) {
+    if (!user.username || !user.username?.trim()) {
       setErr("Vui lòng nhập tên đăng nhập!");
       return false;
     }
-    if (!user.password || user.password.trim().isEmpty()) {
+    if (!user.password || !user.password?.trim()) {
       setErr("Vui lòng nhập mật khẩu!");
       return false;
     }
@@ -86,7 +86,11 @@ const Login = () => {
             </p>
           </div>
 
-          {err && <Alert variant="danger" className="mb-4">{err}</Alert>}
+          {err && (
+            <Alert variant="danger" className="mb-4">
+              {err}
+            </Alert>
+          )}
 
           <form onSubmit={login} className="space-y-5">
             {/* Username */}
@@ -97,7 +101,7 @@ const Login = () => {
               <input
                 type="text"
                 value={user.username}
-                onChange={(e) => setUser({ ...user, username: e.target.value })}
+                onChange={(e) => setUser({...user, username: e.target.value})}
                 placeholder="Nhập tài khoản của bạn"
                 className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
@@ -112,7 +116,7 @@ const Login = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   value={user.password}
-                  onChange={(e) => setUser({ ...user, password: e.target.value })}
+                  onChange={(e) => setUser({...user, password: e.target.value})}
                   placeholder="••••••••"
                   className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary pr-10"
                 />

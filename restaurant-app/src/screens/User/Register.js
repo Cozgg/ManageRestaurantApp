@@ -1,15 +1,14 @@
-import React, { useRef, useState } from "react";
-import { message } from "antd";
-import Apis, { endpoints } from "../../configs/Apis";
+import React, {useRef, useState} from "react";
+import {message} from "antd";
+import Apis, {endpoints} from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
-import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, ArrowLeft, Check, X } from "lucide-react";
-import { Alert } from "react-bootstrap";
+import {Link, useNavigate} from "react-router-dom";
+import {Eye, EyeOff, ArrowLeft, Check, X} from "lucide-react";
+import {Alert} from "react-bootstrap";
 
 const Register = () => {
   const nav = useNavigate();
 
-  // Giữ nguyên các field của bạn, thêm confirmPassword để làm UI
   const [user, setUser] = useState({
     username: "",
     password: "",
@@ -27,7 +26,6 @@ const Register = () => {
 
   const avatar = useRef();
 
-  // Logic kiểm tra mật khẩu an toàn
   const passwordRequirements = {
     length: user.password.length >= 8,
     uppercase: /[A-Z]/.test(user.password),
@@ -39,32 +37,32 @@ const Register = () => {
     user.password === user.confirmPassword && user.password !== "";
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUser((prev) => ({ ...prev, [name]: value }));
+    const {name, value} = e.target;
+    setUser((prev) => ({...prev, [name]: value}));
   };
 
   const validate = () => {
-    if (!user.username || user.username.trim().isEmpty()) {
+    if (!user.username || !user.username.trim()) {
       setErr("Vui lòng nhập tên đăng nhập!");
       return false;
     }
-    if (!user.password || user.password.trim().isEmpty()) {
+    if (!user.password || !user.password.trim()) {
       setErr("Vui lòng nhập mật khẩu!");
       return false;
     }
-    if (!user.firstName || user.firstName.trim().isEmpty()) {
+    if (!user.firstName || !user.firstName.trim()) {
       setErr("Vui lòng nhập tên!");
       return false;
     }
-    if (!user.lastName || user.lastName.trim().isEmpty()) {
+    if (!user.lastName || !user.lastName.trim()) {
       setErr("Vui lòng nhập họ!");
       return false;
     }
-    if (!user.phone || user.phone.trim().isEmpty()) {
+    if (!user.phone || !user.phone.trim()) {
       setErr("Vui lòng nhập số điện thoại!");
       return false;
     }
-    if (!user.email || user.email.trim().isEmpty()) {
+    if (!user.email || !user.email.trim()) {
       setErr("Vui lòng nhập email!");
       return false;
     }
@@ -137,7 +135,11 @@ const Register = () => {
             </p>
           </div>
 
-          {err && <Alert variant="danger" className="mb-4">{err}</Alert>}
+          {err && (
+            <Alert variant="danger" className="mb-4">
+              {err}
+            </Alert>
+          )}
 
           <form onSubmit={register} className="space-y-4">
             {/* HỌ VÀ TÊN (Chia 2 cột) */}

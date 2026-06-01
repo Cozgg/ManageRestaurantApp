@@ -1,14 +1,14 @@
-import { useContext, useState, useEffect } from "react";
-import { Button, Container, Nav, Navbar, Badge } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
-import { MyUserContext } from "../../utils/contexts/MyUserContext";
-import { database } from "../../firebaseConfig";
-import { ref, onValue, off } from "firebase/database";
+import {useContext, useState, useEffect} from "react";
+import {Button, Container, Nav, Navbar, Badge} from "react-bootstrap";
+import {Link, useNavigate} from "react-router-dom";
+import {MyUserContext} from "../../utils/contexts/MyUserContext";
+import {database} from "../../firebaseConfig";
+import {ref, onValue} from "firebase/database";
 import "./Chef.css";
-import { MyOrderSocketContext } from "../../utils/contexts/MyOrderSocketContext";
+import {MyOrderSocketContext} from "../../utils/contexts/MyOrderSocketContext";
 const ChefHeader = () => {
-  const { user } = useContext(MyUserContext);
-  const { unreadCount } = useContext(MyOrderSocketContext);
+  const {user} = useContext(MyUserContext);
+  const {unreadCount} = useContext(MyOrderSocketContext);
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
 
   // const [kw, setKw] = useState("");
@@ -17,12 +17,9 @@ const ChefHeader = () => {
   useEffect(() => {
     if (user) {
       const unreadRef = ref(database, `unread/${user.id}`);
-      const listener = onValue(unreadRef, (snapshot) => {
-        const count = snapshot.val() || 0;
-        setChatUnreadCount(count);
+      return onValue(unreadRef, (snapshot) => {
+        setChatUnreadCount(snapshot.val() || 0);
       });
-
-      return () => off(unreadRef);
     }
   }, [user]);
 
@@ -38,7 +35,7 @@ const ChefHeader = () => {
           as={Link}
           to="/chef"
           className="text-2xl font-bold text-success flex items-center gap-2 no-underline hover:no-underline"
-          style={{ color: "#27ae60" }}
+          style={{color: "#27ae60"}}
         >
           <span>eRestaurant</span>
         </Navbar.Brand>
@@ -92,7 +89,10 @@ const ChefHeader = () => {
               <i className="fas fa-comments"></i>
               <span>Tin nhắn</span>
               {chatUnreadCount > 0 && (
-                <Badge bg="danger" className="position-absolute top-0 start-100 translate-middle">
+                <Badge
+                  bg="danger"
+                  className="position-absolute top-0 start-100 translate-middle"
+                >
                   {chatUnreadCount}
                 </Badge>
               )}

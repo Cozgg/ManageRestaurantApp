@@ -23,6 +23,7 @@ import com.ccc.repository.DishRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
@@ -47,6 +48,8 @@ public class DishRepositoryImpl implements DishRepository {
         CriteriaBuilder b = session.getCriteriaBuilder();
         CriteriaQuery<Dish> q = b.createQuery(Dish.class);
         Root root = q.from(Dish.class);
+        root.fetch("categoryId", JoinType.LEFT);
+        root.fetch("userId", JoinType.LEFT);
         q.select(root);
 
         if (params != null) {

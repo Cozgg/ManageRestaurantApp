@@ -1,9 +1,8 @@
-import {useContext, useEffect, useState} from "react";
+import {useContext} from "react";
 import {MyUserContext} from "../../utils/contexts/MyUserContext";
 import {useNavigate} from "react-router-dom";
 import cookies from "react-cookies";
-import {authApis, endpoints} from "../../configs/Apis";
-import {Button, Card, Col, Container, Image, Row, Table} from "react-bootstrap";
+import {Container} from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
 import {LogOut, Phone, ShieldCheck} from "lucide-react";
 

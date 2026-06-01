@@ -40,8 +40,6 @@ const ThankYou = () => {
     if (resultCode === "0") {
       setStatus("success");
       dispatch({type: "CLEAR_CART"});
-      setTotalAmount(970000);
-      setPaymentMethod("Ví điện tử MoMo");
     } else if (resultCode) {
       setStatus("error");
     } else {

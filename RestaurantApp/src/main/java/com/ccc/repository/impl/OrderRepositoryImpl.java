@@ -159,8 +159,8 @@ public class OrderRepositoryImpl implements OrderRepository {
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<OrderDetail> cq = b.createQuery(OrderDetail.class);
         Root<OrderDetail> root = cq.from(OrderDetail.class);
-        root.fetch("dishId", JoinType.INNER);
-        root.fetch("orderId", JoinType.INNER);
+        root.fetch("dishId", JoinType.LEFT).fetch("userId", JoinType.LEFT);
+        root.fetch("orderId", JoinType.LEFT).fetch("userId", JoinType.LEFT);
         cq.select(root).where(b.equal(root.get("orderId").get("id"), orderId));
 
         return s.createQuery(cq).getResultList();

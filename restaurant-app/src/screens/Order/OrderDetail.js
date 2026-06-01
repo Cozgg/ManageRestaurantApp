@@ -1,11 +1,23 @@
-import { useEffect, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
-import { authApis, endpoints } from "../../configs/Apis";
+import {useEffect, useState} from "react";
+import {Link, useParams, useNavigate} from "react-router-dom";
+import {authApis, endpoints} from "../../configs/Apis";
 import cookies from "react-cookies";
-import { message } from "antd";
-import { Alert, Badge, Button, Card, Col, Container, Form, Image, Modal, Row, Star } from "react-bootstrap";
+import {message} from "antd";
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Image,
+  Modal,
+  Row,
+  Star,
+} from "react-bootstrap";
 import MySpinner from "../../components/MySpinner";
-import { Star as StarIcon } from "lucide-react";
+import {Star as StarIcon} from "lucide-react";
 const OrderDetail = () => {
   const params = useParams();
   const navigate = useNavigate();
@@ -18,7 +30,7 @@ const OrderDetail = () => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [selectedDish, setSelectedDish] = useState(null);
   const [rating, setRating] = useState(5);
-  const [ratingContent, setRatingContent] = useState('');
+  const [ratingContent, setRatingContent] = useState("");
   const [submittingRating, setSubmittingRating] = useState(false);
   const [dishRatings, setDishRatings] = useState({});
   const [myRatings, setMyRatings] = useState({});
@@ -44,7 +56,7 @@ const OrderDetail = () => {
 
   useEffect(() => {
     if (orderData && orderData.items) {
-      orderData.items.forEach(item => {
+      orderData.items.forEach((item) => {
         loadMyRating(item.dishId);
       });
     }
@@ -52,24 +64,28 @@ const OrderDetail = () => {
 
   const loadDishRatings = async (dishId) => {
     try {
-      const res = await authApis(cookies.load("token")).get(endpoints["dish-ratings"](dishId));
-      setDishRatings(prev => ({ ...prev, [dishId]: res.data }));
+      const res = await authApis(cookies.load("token")).get(
+        endpoints["dish-ratings"](dishId),
+      );
+      setDishRatings((prev) => ({...prev, [dishId]: res.data}));
     } catch (error) {
-      console.error('Lỗi tải đánh giá:', error);
+      console.error("Lỗi tải đánh giá:", error);
     }
   };
 
   const loadMyRating = async (dishId) => {
     try {
-      const res = await authApis(cookies.load("token")).get(endpoints["my-rating"](dishId));
+      const res = await authApis(cookies.load("token")).get(
+        endpoints["my-rating"](dishId),
+      );
       if (res.status === 200) {
-        setMyRatings(prev => ({ ...prev, [dishId]: res.data }));
+        setMyRatings((prev) => ({...prev, [dishId]: res.data}));
       }
     } catch (error) {
       if (error.response && error.response.status === 204) {
-        setMyRatings(prev => ({ ...prev, [dishId]: null }));
+        setMyRatings((prev) => ({...prev, [dishId]: null}));
       } else {
-        console.error('Lỗi tải đánh giá của bạn:', error);
+        console.error("Lỗi tải đánh giá của bạn:", error);
       }
     }
   };
@@ -83,7 +99,7 @@ const OrderDetail = () => {
       setRatingContent(myRating.content);
     } else {
       setRating(5);
-      setRatingContent('');
+      setRatingContent("");
     }
     setShowRatingModal(true);
   };
@@ -92,24 +108,24 @@ const OrderDetail = () => {
     setShowRatingModal(false);
     setSelectedDish(null);
     setRating(5);
-    setRatingContent('');
+    setRatingContent("");
     setErr("");
   };
 
   const validate = () => {
     if (rating < 1 || rating > 5) {
-      setErr('Điểm đánh giá phải từ 1 đến 5!');
+      setErr("Điểm đánh giá phải từ 1 đến 5!");
       return false;
     }
 
-    if (!ratingContent || ratingContent.trim().isEmpty()) {
-      setErr('Vui lòng nhập nội dung đánh giá!');
+    if (!ratingContent || !ratingContent.trim()) {
+      setErr("Vui lòng nhập nội dung đánh giá!");
       return false;
     }
 
     setErr("");
     return true;
-  }
+  };
 
   const handleSubmitRating = async () => {
     if (!selectedDish) return;
@@ -119,28 +135,36 @@ const OrderDetail = () => {
       try {
         const token = cookies.load("token");
         const params = new URLSearchParams();
-        params.append('point', rating);
-        params.append('content', ratingContent.trim());
+        params.append("point", rating);
+        params.append("content", ratingContent.trim());
 
         const myRating = myRatings[selectedDish.dishId];
         if (myRating) {
-          await authApis(token).patch(endpoints["update-rating"](selectedDish.dishId), params, {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-          });
-          message.success('Cập nhật đánh giá thành công!');
+          await authApis(token).patch(
+            endpoints["update-rating"](selectedDish.dishId),
+            params,
+            {
+              headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            },
+          );
+          message.success("Cập nhật đánh giá thành công!");
         } else {
-          await authApis(token).post(endpoints["dish-rating"](selectedDish.dishId), params, {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-          });
-          message.success('Đánh giá thành công!');
+          await authApis(token).post(
+            endpoints["dish-rating"](selectedDish.dishId),
+            params,
+            {
+              headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            },
+          );
+          message.success("Đánh giá thành công!");
         }
 
         handleCloseRatingModal();
         loadDishRatings(selectedDish.dishId);
         loadMyRating(selectedDish.dishId);
       } catch (error) {
-        console.error('Lỗi đánh giá:', error);
-        setErr('Có lỗi xảy ra khi đánh giá!');
+        console.error("Lỗi đánh giá:", error);
+        setErr("Có lỗi xảy ra khi đánh giá!");
       } finally {
         setSubmittingRating(false);
       }
@@ -148,10 +172,10 @@ const OrderDetail = () => {
   };
 
   const renderStars = (point) => {
-    return Array.from({ length: 5 }, (_, i) => (
+    return Array.from({length: 5}, (_, i) => (
       <StarIcon
         key={i}
-        className={`w-4 h-4 ${i < point ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+        className={`w-4 h-4 ${i < point ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
       />
     ));
   };
@@ -162,7 +186,7 @@ const OrderDetail = () => {
           <MySpinner />
         </div>
       ) : (
-        <Container className="my-5" style={{ maxWidth: "700px" }}>
+        <Container className="my-5" style={{maxWidth: "700px"}}>
           <Button
             variant="link"
             as={Link}
@@ -237,7 +261,9 @@ const OrderDetail = () => {
                         <Button
                           variant="outline-primary"
                           size="sm"
-                          onClick={() => navigate(`/chat?chefId=${item.chef.id}`)}
+                          onClick={() =>
+                            navigate(`/chat?chefId=${item.chef.id}`)
+                          }
                           className="d-flex align-items-center gap-2"
                         >
                           <i className="fas fa-comments"></i>
@@ -251,7 +277,9 @@ const OrderDetail = () => {
                             className="d-flex align-items-center gap-2"
                           >
                             <StarIcon className="w-4 h-4" />
-                            {myRatings[item.dishId] ? 'Cập nhật đánh giá' : 'Đánh giá'}
+                            {myRatings[item.dishId]
+                              ? "Cập nhật đánh giá"
+                              : "Đánh giá"}
                           </Button>
                         )}
                       </div>
@@ -274,40 +302,58 @@ const OrderDetail = () => {
           </Card>
 
           {/* MODAL ĐÁNH GIÁ */}
-          <Modal show={showRatingModal} onHide={handleCloseRatingModal} centered>
+          <Modal
+            show={showRatingModal}
+            onHide={handleCloseRatingModal}
+            centered
+          >
             <Modal.Header closeButton className="border-b border-border">
               <Modal.Title className="text-foreground font-bold">
                 Đánh giá món ăn
               </Modal.Title>
             </Modal.Header>
             <Modal.Body className="bg-card">
-              {err && <Alert variant="danger" className="mb-3">{err}</Alert>}
+              {err && (
+                <Alert variant="danger" className="mb-3">
+                  {err}
+                </Alert>
+              )}
 
               {selectedDish && (
                 <div className="mb-3">
-                  <p className="text-muted mb-2">Món: <strong>{selectedDish.dishName}</strong></p>
+                  <p className="text-muted mb-2">
+                    Món: <strong>{selectedDish.dishName}</strong>
+                  </p>
                 </div>
               )}
 
               <Form.Group className="mb-3">
-                <Form.Label className="text-foreground font-semibold text-sm">Số sao *</Form.Label>
+                <Form.Label className="text-foreground font-semibold text-sm">
+                  Số sao *
+                </Form.Label>
                 <div className="d-flex gap-2 mb-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
                       type="button"
                       onClick={() => setRating(star)}
-                      className={`p-1 border-0 bg-transparent transition-colors ${star <= rating ? 'text-yellow-400' : 'text-gray-300'
-                        }`}
+                      className={`p-1 border-0 bg-transparent transition-colors ${
+                        star <= rating ? "text-yellow-400" : "text-gray-300"
+                      }`}
                     >
-                      <StarIcon className="w-6 h-6" fill={star <= rating ? 'currentColor' : 'none'} />
+                      <StarIcon
+                        className="w-6 h-6"
+                        fill={star <= rating ? "currentColor" : "none"}
+                      />
                     </button>
                   ))}
                 </div>
               </Form.Group>
 
               <Form.Group className="mb-3">
-                <Form.Label className="text-foreground font-semibold text-sm">Nội dung đánh giá</Form.Label>
+                <Form.Label className="text-foreground font-semibold text-sm">
+                  Nội dung đánh giá
+                </Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
@@ -331,7 +377,7 @@ const OrderDetail = () => {
                   onClick={handleSubmitRating}
                   disabled={submittingRating}
                 >
-                  {submittingRating ? 'Đang gửi...' : 'Gửi đánh giá'}
+                  {submittingRating ? "Đang gửi..." : "Gửi đánh giá"}
                 </Button>
               </div>
             </Modal.Body>

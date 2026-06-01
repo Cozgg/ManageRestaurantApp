@@ -1,28 +1,14 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Tabs,
-  Tab,
-  Table,
-  Button,
-  Badge,
-  Alert,
-  InputGroup,
-  Form,
-  Modal,
-} from "react-bootstrap";
-import { MyUserContext } from "../../utils/contexts/MyUserContext";
-import Apis, { authApis, endpoints } from "../../configs/Apis";
+import React, {useState, useEffect, useContext, useRef} from "react";
+import {Alert} from "react-bootstrap";
+import {MyUserContext} from "../../utils/contexts/MyUserContext";
+import {authApis, endpoints} from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
-import { useSearchParams } from "react-router-dom";
+import {useSearchParams} from "react-router-dom";
 import cookies from "react-cookies";
-import { Edit2, Plus, Search, ShieldAlert, Trash2, X } from "lucide-react";
+import {Edit2, Plus, Search, ShieldAlert, Trash2, X} from "lucide-react";
 
 const ChefDashboard = () => {
-  const { user } = useContext(MyUserContext);
+  const {user} = useContext(MyUserContext);
   const [dishes, setDishes] = useState([]);
   const [page, setPage] = useState(1);
 
@@ -138,8 +124,8 @@ const ChefDashboard = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const {name, value} = e.target;
+    setFormData((prev) => ({...prev, [name]: value}));
   };
 
   const validate = () => {
@@ -173,14 +159,17 @@ const ChefDashboard = () => {
       return false;
     }
 
-    if (modalMode === "add" && (!imageDish.current || imageDish.current.files.length === 0)) {
+    if (
+      modalMode === "add" &&
+      (!imageDish.current || imageDish.current.files.length === 0)
+    ) {
       setErr("Vui lòng chọn hình ảnh!");
       return false;
     }
 
     setErr("");
     return true;
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -206,14 +195,14 @@ const ChefDashboard = () => {
 
       if (modalMode === "add") {
         await authApis(token).post(endpoints["chef-dishes"], formDataToSend, {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {"Content-Type": "multipart/form-data"},
         });
       } else if (modalMode === "edit" && selectedDish) {
         await authApis(token).patch(
           `${endpoints["chef-dishes"]}/${selectedDish.id}`,
           formDataToSend,
           {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: {"Content-Type": "multipart/form-data"},
           },
         );
       }
@@ -269,7 +258,11 @@ const ChefDashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 min-h-screen">
-      {err && <Alert variant="danger" className="mb-4">{err}</Alert>}
+      {err && (
+        <Alert variant="danger" className="mb-4">
+          {err}
+        </Alert>
+      )}
 
       {/* HEADER & TÌM KIẾM */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
@@ -464,7 +457,11 @@ const ChefDashboard = () => {
 
             {/* Body Modal (Nội dung Form cuộn được) */}
             <div className="p-6 overflow-y-auto">
-              {err && <Alert variant="danger" className="mb-4">{err}</Alert>}
+              {err && (
+                <Alert variant="danger" className="mb-4">
+                  {err}
+                </Alert>
+              )}
 
               <form id="dishForm" onSubmit={handleSubmit} className="space-y-5">
                 {/* Hàng 1: Tên món & Giá bán */}
