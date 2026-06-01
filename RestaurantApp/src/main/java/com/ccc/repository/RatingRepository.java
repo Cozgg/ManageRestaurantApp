@@ -17,6 +17,8 @@ public interface RatingRepository {
 
     Rating addRating(Rating r);
 
+    Rating updateRating(Rating r);
+
     List<Rating> getRatingsByDishId(int dishId);
 
     Rating getRatingByUserAndDish(User user, int dishId);

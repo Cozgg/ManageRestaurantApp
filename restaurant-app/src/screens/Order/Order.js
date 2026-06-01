@@ -1,6 +1,6 @@
-import {useContext, useState} from "react";
-import {MyOrderContext} from "../../utils/contexts/MyOrderContext";
-import {MyUserContext} from "../../utils/contexts/MyUserContext";
+import { useContext, useState } from "react";
+import { MyOrderContext } from "../../utils/contexts/MyOrderContext";
+import { MyUserContext } from "../../utils/contexts/MyUserContext";
 import {
   Alert,
   Button,
@@ -20,10 +20,10 @@ import {
   WalletOutlined,
 } from "@ant-design/icons";
 import "./Order.css";
-import {Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import cookies from "react-cookies";
-import {authApis, endpoints} from "../../configs/Apis";
-import {message, Popconfirm} from "antd";
+import { authApis, endpoints } from "../../configs/Apis";
+import { message, Popconfirm } from "antd";
 import MySpinner from "../../components/MySpinner";
 import {
   ArrowLeft,
@@ -37,10 +37,11 @@ import {
 } from "lucide-react";
 
 const Order = () => {
-  const {cart, dispatch} = useContext(MyOrderContext);
-  const {user} = useContext(MyUserContext);
+  const { cart, dispatch } = useContext(MyOrderContext);
+  const { user } = useContext(MyUserContext);
   const [loading, setLoading] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState("CASH");
+  const [err, setErr] = useState("");
 
   const total = cart.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -93,28 +94,50 @@ const Order = () => {
     }
   };
 
+  const validate = () => {
+    if (!cart || cart.length === 0) {
+      setErr("Giỏ hàng đang trống!");
+      return false;
+    }
+
+    if (total <= 0) {
+      setErr("Tổng tiền đơn hàng phải lớn hơn 0!");
+      return false;
+    }
+
+    if (!selectedPayment) {
+      setErr("Vui lòng chọn phương thức thanh toán!");
+      return false;
+    }
+
+    setErr("");
+    return true;
+  }
+
   const handleCheckout = async (paymentMethod) => {
-    const result = await pay(paymentMethod);
-    if (!result) return;
-    switch (paymentMethod) {
-      case "CASH":
-        dispatch({
-          type: "CLEAR_CART",
-        });
-        await nav(`/thank-you?orderId=${result}`);
-        break;
-      case "MOMO":
-        if (result.startsWith("http")) {
-          window.location.href = result;
-        } else {
-          message.error("Lỗi lấy link thanh toán MoMo");
-        }
-        break;
-      case "ZALOPAY":
-        message.success("Chức năng zalo pay sẽ sớm được ra mắt");
-        break;
-      default:
-        break;
+    if (validate()) {
+      const result = await pay(paymentMethod);
+      if (!result) return;
+      switch (paymentMethod) {
+        case "CASH":
+          dispatch({
+            type: "CLEAR_CART",
+          });
+          await nav(`/thank-you?orderId=${result}`);
+          break;
+        case "MOMO":
+          if (result.startsWith("http")) {
+            window.location.href = result;
+          } else {
+            message.error("Lỗi lấy link thanh toán MoMo");
+          }
+          break;
+        case "ZALOPAY":
+          message.success("Chức năng zalo pay sẽ sớm được ra mắt");
+          break;
+        default:
+          break;
+      }
     }
   };
 
@@ -147,6 +170,8 @@ const Order = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 min-h-screen">
+      {err && <Alert variant="danger" className="mb-4">{err}</Alert>}
+
       <Link
         to="/"
         className="inline-flex items-center gap-2 text-primary hover:text-primary/80 mb-6 font-medium no-underline"

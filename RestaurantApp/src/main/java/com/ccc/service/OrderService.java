@@ -23,6 +23,8 @@ public interface OrderService {
 
     List<OrderDto> getAllOrders(Map<String, String> params);
 
+    long countOrders(Map<String, String> params);
+
     OrderDetailDto getOrderById(int orderId);
 
     OrderDetailDto getOrderById(int orderId, User currentChef);
@@ -30,13 +32,9 @@ public interface OrderService {
     String addOrder(ItemDto items);
 
     boolean verifyMomoSignature(MomoIpnResponse payload);
-<<<<<<< Updated upstream
+
     boolean updateOrderStatus(int orderId, String status, Long transId);
+
     boolean updateOrderStatus(int orderId, String status);
-=======
 
-    void updateOrderStatus(int orderId, String status, Long transId);
-
-    void updateOrderStatus(int orderId, String status);
->>>>>>> Stashed changes
 }

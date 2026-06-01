@@ -4,16 +4,13 @@
  */
 package com.ccc.controllers;
 
-import com.ccc.dto.OrderDetailDto;
-import com.ccc.dto.PaymentEventDto;
-import com.ccc.pojo.User;
-import com.ccc.service.OrderService;
-import com.ccc.service.UserService;
 import java.security.Principal;
 import java.util.Map;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +19,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.ccc.dto.OrderDetailDto;
+import com.ccc.dto.PaymentEventDto;
 import com.ccc.pojo.User;
 import com.ccc.service.OrderService;
 import com.ccc.service.UserService;
@@ -54,6 +52,18 @@ public class OrderController {
         params.put("page", String.valueOf(page));
         params.put("pageSize", String.valueOf(pageSize));
 
+        long count = this.orderService.countOrders(params);
+        int totalPages = (int) Math.ceil(count * 1.0 / pageSize);
+
+        if (page > totalPages && totalPages > 0) {
+            page = totalPages;
+            params.put("page", String.valueOf(page));
+        }
+        if (page < 1) {
+            page = 1;
+            params.put("page", String.valueOf(page));
+        }
+
         // Admin xem tất cả orders, user chỉ xem orders của mình
         if (u.getUserRole() == com.ccc.enums.UserRole.ROLE_ADMIN) {
             model.addAttribute("orders", this.orderService.getAllOrders(params));
@@ -63,6 +73,7 @@ public class OrderController {
 
         model.addAttribute("currentPage", page);
         model.addAttribute("pageSize", pageSize);
+        model.addAttribute("totalPages", totalPages);
         return "manage-order";
     }
 

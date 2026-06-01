@@ -36,6 +36,13 @@ public class RatingRepositoryImpl implements RatingRepository {
     }
 
     @Override
+    public Rating updateRating(Rating r) {
+        Session s = this.factory.getObject().getCurrentSession();
+        s.merge(r);
+        return r;
+    }
+
+    @Override
     public List<Rating> getRatingsByDishId(int dishId) {
         Session s = this.factory.getObject().getCurrentSession();
         Query q = s.createQuery("SELECT r FROM Rating r WHERE r.dishId.id = :dishId ORDER BY r.createdAt DESC", Rating.class);

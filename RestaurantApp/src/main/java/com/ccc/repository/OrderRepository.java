@@ -22,6 +22,8 @@ public interface OrderRepository {
 
     List<Orders> getOrders(User u, Map<String, String> params);
 
+    long countOrders(Map<String, String> params);
+
     Orders getOrderById(int orderId);
 
     List<OrderDetail> getOrderDetailsByOrderId(int orderId, User currentChef);

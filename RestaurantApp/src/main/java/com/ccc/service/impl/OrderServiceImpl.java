@@ -97,6 +97,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public long countOrders(Map<String, String> params) {
+        return this.orderRepo.countOrders(params);
+    }
+
+    @Override
     public OrderDetailDto getOrderById(int orderId) {
         if (orderId <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id đơn hàng phải lớn hơn 0");
@@ -163,6 +168,12 @@ public class OrderServiceImpl implements OrderService {
         if (items.getPaymentMethod() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Vui lòng chọn phương thức thanh toán");
         }
+        if (items.getItems() == null || items.getItems().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Đơn hàng phải có ít nhất 1 món");
+        }
+        if (items.calculateTotalAmount() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tổng tiền đơn hàng phải lớn hơn 0");
+        }
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = this.userRepo.getUserByUsername(username);
         if (currentUser == null) {
@@ -198,7 +209,6 @@ public class OrderServiceImpl implements OrderService {
         try {
             String signatureFromMoMo = payload.getSignature();
 
-            // Xử lý null an toàn cho các trường có thể không tồn tại
             String amount = payload.getAmount().toString();
             String extraData = payload.getExtraData();
             String message = payload.getMessage();

@@ -79,7 +79,7 @@ public class ApiDishController {
             @RequestParam Map<String, String> params,
             @RequestParam(value = "image", required = false) MultipartFile image, Principal principal) throws IOException {
         User u = this.userService.getUserByUsername(principal.getName());
-        if(u.getUserRole() != UserRole.ROLE_CHEF){
+        if (u.getUserRole() != UserRole.ROLE_CHEF) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         DishDto created = this.dishService.addDish(params, image, u);
@@ -128,8 +128,37 @@ public class ApiDishController {
         return new ResponseEntity<>(r, HttpStatus.CREATED);
     }
 
+    @PatchMapping("/secure/dishes/{id}/rating")
+    public ResponseEntity<?> updateRating(@PathVariable(value = "id") Integer id,
+            @RequestParam Map<String, String> params,
+            Principal principal) {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+
+        Rating existingRating = this.ratingService.getRatingByUserAndDish(currentUser, id);
+        if (existingRating == null) {
+            return new ResponseEntity<>("Bạn chưa đánh giá món này!", HttpStatus.BAD_REQUEST);
+        }
+
+        params.put("dishId", id.toString());
+        Rating r = this.ratingService.updateRating(params, currentUser);
+        if (r == null) {
+            return new ResponseEntity<>("Cập nhật đánh giá thất bại!", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(r, HttpStatus.OK);
+    }
+
     @GetMapping("/dishes/{id}/rating")
     public ResponseEntity<List<Rating>> getRatings(@PathVariable(value = "id") Integer id) {
         return new ResponseEntity<>(this.ratingService.getRatingsByDishId(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/secure/dishes/{id}/my-rating")
+    public ResponseEntity<Rating> getMyRating(@PathVariable(value = "id") Integer id, Principal principal) {
+        User currentUser = this.userService.getUserByUsername(principal.getName());
+        Rating rating = this.ratingService.getRatingByUserAndDish(currentUser, id);
+        if (rating == null) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(rating, HttpStatus.OK);
     }
 }

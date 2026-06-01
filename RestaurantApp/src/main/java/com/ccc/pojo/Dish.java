@@ -159,4 +159,12 @@ public class Dish implements Serializable {
     public void setMaterial(String material) {
         this.material = material;
     }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
 }

@@ -14,13 +14,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ccc.dto.UserDto;
 import com.ccc.enums.UserRole;
@@ -31,7 +34,6 @@ import com.ccc.service.UserService;
 import com.ccc.utils.UserFactory;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -59,6 +61,40 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User addUser(Map<String, String> params, MultipartFile avatar) {
+        String username = params.get("username");
+        if (username == null || username.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tên đăng nhập không được để trống");
+        }
+
+        String password = params.get("password");
+        if (password == null || password.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mật khẩu không được để trống");
+        }
+
+        String firstName = params.get("firstName");
+        if (firstName == null || firstName.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tên không được để trống");
+        }
+
+        String lastName = params.get("lastName");
+        if (lastName == null || lastName.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Họ không được để trống");
+        }
+
+        String phone = params.get("phone");
+        if (phone == null || phone.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số điện thoại không được để trống");
+        }
+
+        String email = params.get("email");
+        if (email == null || email.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email không được để trống");
+        }
+
+        if (avatar == null || avatar.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ảnh đại diện không được để trống");
+        }
+
         UserRole role = UserRole.valueOf(params.getOrDefault("userRole", "ROLE_USER"));
         User u = UserFactory.createUser(params, role);
         u.setPassword(this.passwordEncoder.encode(params.get("password")));
@@ -70,6 +106,7 @@ public class UserServiceImpl implements UserService {
                 u.setAvatar(res.get("secure_url").toString());
             } catch (IOException ex) {
                 Logger.getLogger(UserServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi khi upload ảnh");
             }
         }
 
@@ -146,6 +183,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public long countUsers(Map<String, String> params) {
+        return this.userRepo.countUsers(params);
+    }
+
+    @Override
     public User getUserById(int userId) {
         return this.userRepo.getUserById(userId);
     }
@@ -196,29 +238,45 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User updateUser(int id, Map<String, String> params, MultipartFile avatar) {
-        User u = this.userRepo.getUserById(id);
-        if (u != null) {
-            if (params.containsKey("firstName")) {
-                u.setFirstName(params.get("firstName"));
-            }
-            if (params.containsKey("lastName")) {
-                u.setLastName(params.get("lastName"));
-            }
-            if (params.containsKey("phone")) {
-                u.setPhone(params.get("phone"));
-            }
-
-            if (avatar != null && !avatar.isEmpty()) {
-                try {
-                    Map res = this.cloudinary.uploader().upload(avatar.getBytes(),
-                            ObjectUtils.asMap("resource_type", "auto"));
-                    u.setAvatar(res.get("secure_url").toString());
-                } catch (IOException ex) {
-                    Logger.getLogger(UserServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            this.userRepo.updateUser(u);
+        if (id <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID người dùng không hợp lệ");
         }
+
+        User u = this.userRepo.getUserById(id);
+        if (u == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy người dùng");
+        }
+
+        if (params.containsKey("firstName")) {
+            String firstName = params.get("firstName");
+            if (firstName != null && !firstName.trim().isEmpty()) {
+                u.setFirstName(firstName.trim());
+            }
+        }
+        if (params.containsKey("lastName")) {
+            String lastName = params.get("lastName");
+            if (lastName != null && !lastName.trim().isEmpty()) {
+                u.setLastName(lastName.trim());
+            }
+        }
+        if (params.containsKey("phone")) {
+            String phone = params.get("phone");
+            if (phone != null && !phone.trim().isEmpty()) {
+                u.setPhone(phone.trim());
+            }
+        }
+
+        if (avatar != null && !avatar.isEmpty()) {
+            try {
+                Map res = this.cloudinary.uploader().upload(avatar.getBytes(),
+                        ObjectUtils.asMap("resource_type", "auto"));
+                u.setAvatar(res.get("secure_url").toString());
+            } catch (IOException ex) {
+                Logger.getLogger(UserServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi khi upload ảnh");
+            }
+        }
+        this.userRepo.updateUser(u);
         return u;
     }
 
