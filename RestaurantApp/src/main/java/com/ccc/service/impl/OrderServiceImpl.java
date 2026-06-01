@@ -31,6 +31,8 @@ import com.ccc.pojo.User;
 import com.ccc.repository.OrderRepository;
 import com.ccc.repository.UserRepository;
 import com.ccc.service.OrderService;
+import java.util.HashMap;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -56,6 +58,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getOrders(User u, Map<String, String> params) {
+
+        if (u == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Thông tin USER không hợp lệ");
+        }
+
+        if (params == null) {
+            params = new HashMap<>();
+        }
         List<Orders> orders = this.orderRepo.getOrders(u, params);
 
         return orders.stream().map(o -> {
@@ -70,6 +80,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDetailDto getOrderById(int orderId) {
+        if (orderId <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id đơn hàng phải lớn hơn 0");
+        }
         List<OrderDetail> details = this.orderRepo.getOrderDetailsByOrderId(orderId);
         if (details != null && !details.isEmpty()) {
             Orders o = details.get(0).getOrderId();
@@ -93,6 +106,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDetailDto getOrderById(int orderId, User currentChef) {
+
+        if (orderId <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID đơn hàng phải lớn hơn 0");
+        }
+        if (currentChef == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Không tìm thấy thông tin đầu bếp hiện tại");
+        }
+
         List<OrderDetail> details = this.orderRepo.getOrderDetailsByOrderId(orderId, currentChef);
         if (details != null && !details.isEmpty()) {
             Orders o = details.get(0).getOrderId();
@@ -115,12 +136,25 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public String addOrder(ItemDto items) {
+
+        if (items == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Dữ liệu đơn hàng không được để trống");
+        }
+        if (items.getPaymentMethod() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Vui lòng chọn phương thức thanh toán");
+        }
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = this.userRepo.getUserByUsername(username);
+        if (currentUser == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy tài khoản người dùng");
+        }
+
         Orders newOrder = new Orders();
         newOrder.setCreatedAt(new Date());
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        newOrder.setUserId(this.userRepo.getUserByUsername(username));
+        newOrder.setUserId(currentUser);
 
         newOrder.setPaymentMethod(items.getPaymentMethod());
         newOrder.setStatusPay("PENDING");
@@ -129,7 +163,7 @@ public class OrderServiceImpl implements OrderService {
         PaymentStrategy payment = this.strategies.get(items.getPaymentMethod().name());
 
         if (payment == null) {
-            throw new RuntimeException("Phương thức thanh toán không hợp lệ!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phương thức thanh toán " + items.getPaymentMethod().name() + " chưa được hỗ trợ");
         }
         int dbOrderId = saveOrder.getId();
         if (items.getPaymentMethod() == PaymentMethod.MOMO) {
@@ -200,11 +234,19 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public boolean updateOrderStatus(int orderId, String status, Long transId) {
+        Orders o = this.orderRepo.getOrderById(orderId);
+        if (o == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Đơn hàng không tồn tại");
+        }
         return this.orderRepo.updateOrderStatus(orderId, status, transId);
     }
 
     @Override
     public boolean updateOrderStatus(int orderId, String status) {
+        Orders o = this.orderRepo.getOrderById(orderId);
+        if (o == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Đơn hàng không tồn tại");
+        }
         return this.orderRepo.updateOrderStatus(orderId, status);
     }
 

@@ -25,11 +25,13 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ccc.dto.UserDto;
 import com.ccc.enums.UserRole;
 import com.ccc.pojo.User;
+import com.ccc.repository.DishRepository;
 import com.ccc.repository.UserRepository;
 import com.ccc.service.UserService;
 import com.ccc.utils.UserFactory;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -48,7 +50,7 @@ public class UserServiceImpl implements UserService {
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    private com.ccc.repository.DishRepository dishRepo;
+    private DishRepository dishRepo;
 
     @Override
     public User getUserByUsername(String username) {
@@ -187,7 +189,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public User updateUser(int id, Map<String, String> params, MultipartFile avatar) {
         User u = this.userRepo.getUserById(id);
         if (u != null) {
@@ -216,7 +218,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public void approveUser(int id) {
         User u = this.userRepo.getUserById(id);
         if (u != null && u.getUserRole() == UserRole.ROLE_USER) {

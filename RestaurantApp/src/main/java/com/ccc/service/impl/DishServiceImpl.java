@@ -22,6 +22,8 @@ import com.ccc.repository.DishRepository;
 import com.ccc.service.DishService;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  *
@@ -76,6 +78,9 @@ public class DishServiceImpl implements DishService {
 
     @Override
     public List<DishDto> getDishs(Map<String, String> params, User currentChef) {
+        if(currentChef == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đầu bếp hiện tại");
+        }
         return this.dishRepo.getDishs(params, currentChef)
                 .stream()
                 .map(this::toDto)
@@ -101,7 +106,7 @@ public class DishServiceImpl implements DishService {
         Dish dish = Dish.builder()
                 .userId(chef)
                 .name(params.get("name"))
-                .price(Integer.parseInt(params.get("price")))
+                .price(Integer.valueOf(params.get("price")))
                 .description(params.get("description"))
                 .active(true)
                 .timePrepare(Integer.parseInt(params.getOrDefault("timePrepare", "0")))
@@ -111,14 +116,14 @@ public class DishServiceImpl implements DishService {
         String categoryIdStr = params.get("categoryId");
         if (categoryIdStr != null && !categoryIdStr.isEmpty()) {
             Category category = new Category();
-            category.setId(Integer.parseInt(categoryIdStr));
+            category.setId(Integer.valueOf(categoryIdStr));
             dish.setCategoryId(category);
         }
 
         String userIdStr = params.get("userId");
         if (userIdStr != null && !userIdStr.isEmpty()) {
             User user = new User();
-            user.setId(Integer.parseInt(userIdStr));
+            user.setId(Integer.valueOf(userIdStr));
             dish.setUserId(user);
         }
 
@@ -150,7 +155,7 @@ public class DishServiceImpl implements DishService {
 
         String priceStr = params.get("price");
         if (priceStr != null && !priceStr.isEmpty()) {
-            dish.setPrice(Integer.parseInt(priceStr));
+            dish.setPrice(Integer.valueOf(priceStr));
         }
 
         String timePrepareStr = params.get("timePrepare");
@@ -161,7 +166,7 @@ public class DishServiceImpl implements DishService {
         String categoryIdStr = params.get("categoryId");
         if (categoryIdStr != null && !categoryIdStr.isEmpty()) {
             Category category = new Category();
-            category.setId(Integer.parseInt(categoryIdStr));
+            category.setId(Integer.valueOf(categoryIdStr));
             dish.setCategoryId(category);
         }
 
