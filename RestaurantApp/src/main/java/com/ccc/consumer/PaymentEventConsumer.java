@@ -30,7 +30,7 @@ public class PaymentEventConsumer {
             System.out.println("[Email] Đang gửi biên lai cho đơn hàng số: " + event.getOrderId());
         } catch (Exception e) {
             System.err.println("[Email] Lỗi hệ thống SMTP, dịch chuyển tin nhắn sang DLQ.");
-            throw new AmqpRejectAndDontRequeueException("SMTP Failure", e);
+            throw new RuntimeException("SMTP Failure", e);
         }
     }
     
@@ -48,7 +48,7 @@ public class PaymentEventConsumer {
 
         } catch (Exception e) {
             System.err.println("[Bếp] Lỗi khi phát tin WebSocket, đẩy vào DLQ.");
-            throw new AmqpRejectAndDontRequeueException("Lỗi WebSocket", e);
+            throw new RuntimeException("Lỗi WebSocket", e);
         }
     }
 
@@ -57,7 +57,7 @@ public class PaymentEventConsumer {
         try {
             System.out.println("[Log Doanh Thu] Đơn " + event.getOrderId() + " đã thanh toán: " + event.getAmount());
         } catch (Exception e) {
-            throw new AmqpRejectAndDontRequeueException("Analytics Logging Failure", e);
+            throw new RuntimeException("Analytics Logging Failure", e);
         }
     }
     
