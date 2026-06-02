@@ -34,7 +34,8 @@ public class RabbitMQConfig {
 
     @Bean
     public ConnectionFactory connectionFactory() {
-        CachingConnectionFactory factory = new CachingConnectionFactory("localhost");
+        String rabbitHost = System.getProperty("rabbitmq.host", "localhost");
+        CachingConnectionFactory factory = new CachingConnectionFactory(rabbitHost);
         factory.setPort(5672);
         factory.setUsername("admin");
         factory.setPassword("admin");
@@ -59,12 +60,12 @@ public class RabbitMQConfig {
         template.setMessageConverter(jsonMessageConverter());
         return template;
     }
-    
+
     @Bean
-    public RetryOperationsInterceptor retryInterceptor(){
+    public RetryOperationsInterceptor retryInterceptor() {
         return RetryInterceptorBuilder.stateless()
                 .maxAttempts(3)
-                .backOffOptions(2000,2.0, 10000)
+                .backOffOptions(2000, 2.0, 10000)
                 .recoverer(new RejectAndDontRequeueRecoverer())
                 .build();
     }
@@ -78,7 +79,7 @@ public class RabbitMQConfig {
         factory.setAdviceChain(retryInterceptor());
         return factory;
     }
-    
+
     // --- 1. ĐỊNH NGHĨA DEAD LETTER QUEUE (DLQ) ---
     // Nơi chứa các tin nhắn bị lỗi
     @Bean
@@ -96,17 +97,17 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(deadLetterQueue).to(deadLetterExchange).with("payment.dlq.key");
     }
 
-    @Bean 
+    @Bean
     public Binding bindSendEmail(@Qualifier("sendEmailQueue") Queue sendEmailQueue, FanoutExchange paymentSuccessExchange) {
         return BindingBuilder.bind(sendEmailQueue).to(paymentSuccessExchange);
     }
 
-    @Bean 
+    @Bean
     public Binding bindNotifyChef(@Qualifier("notifyChefQueue") Queue notifyChefQueue, FanoutExchange paymentSuccessExchange) {
         return BindingBuilder.bind(notifyChefQueue).to(paymentSuccessExchange);
     }
 
-    @Bean 
+    @Bean
     public Binding bindAnalytics(@Qualifier("analyticsQueue") Queue analyticsQueue, FanoutExchange paymentSuccessExchange) {
         return BindingBuilder.bind(analyticsQueue).to(paymentSuccessExchange);
     }
@@ -126,8 +127,19 @@ public class RabbitMQConfig {
                 .build();
     }
 
-    @Bean public Queue sendEmailQueue() { return createQueueWithDLQ("q.payment.send_email"); }
-    @Bean public Queue notifyChefQueue() { return createQueueWithDLQ("q.payment.notify_chef"); }
-    @Bean public Queue analyticsQueue() { return createQueueWithDLQ("q.payment.analytics"); }
+    @Bean
+    public Queue sendEmailQueue() {
+        return createQueueWithDLQ("q.payment.send_email");
+    }
+
+    @Bean
+    public Queue notifyChefQueue() {
+        return createQueueWithDLQ("q.payment.notify_chef");
+    }
+
+    @Bean
+    public Queue analyticsQueue() {
+        return createQueueWithDLQ("q.payment.analytics");
+    }
 
 }

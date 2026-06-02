@@ -4,9 +4,8 @@
  */
 package com.ccc.configs;
 
-import com.ccc.filters.JwtFilter;
-import com.ccc.filters.RateLimitFilter;
 import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -18,6 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.ccc.filters.JwtFilter;
+import com.ccc.filters.RateLimitFilter;
 
 /**
  *
@@ -31,7 +33,7 @@ public class ApiSecurityConfigs {
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
 
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .securityMatcher("/api/**")
+                .securityMatcher("/api/secure/**", "/api/users/**", "/api/dishes/**", "/ws/**")
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -54,7 +56,7 @@ public class ApiSecurityConfigs {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8080", "http://localhost:8081"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setExposedHeaders(List.of("Authorization"));

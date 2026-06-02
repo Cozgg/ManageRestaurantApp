@@ -4,10 +4,11 @@
  */
 package com.ccc.repository;
 
-import com.ccc.pojo.Dish;
-import com.ccc.pojo.User;
 import java.util.List;
 import java.util.Map;
+
+import com.ccc.pojo.Dish;
+import com.ccc.pojo.User;
 
 /**
  *
@@ -16,7 +17,7 @@ import java.util.Map;
 public interface DishRepository {
 
     List<Dish> getDishs(Map<String, String> params);
-    
+
     List<Dish> getDishs(Map<String, String> params, User currentUser);
 
     Dish getDishById(Integer id);
