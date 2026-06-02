@@ -1,5 +1,7 @@
 let myChartInstance = null;
 
+const BASE_URL = (typeof window.APP_CONTEXT !== 'undefined' ? window.APP_CONTEXT : '/RestaurantApp/').replace(/\/$/, '');
+
 function renderChart(ctx, type, labels, data, labelTitle, bgColor, borderColor) {
     if (myChartInstance != null) {
         myChartInstance.destroy();
@@ -44,11 +46,11 @@ function loadChartData() {
     };
 
     if (statType === 'REVENUE') {
-        url = `http://localhost:8080/RestaurantApp/api/admin/statistics/stat-revenue?time=${time}&year=${year}`;
+        url = `${BASE_URL}/api/admin/statistics/stat-revenue?time=${time}&year=${year}`;
     } else if (statType === 'DISHES') {
-        url = `http://localhost:8080/RestaurantApp/api/admin/statistics/dishes?top=5`;
+        url = `${BASE_URL}/api/admin/statistics/dishes?top=5`;
     } else if (statType === 'RESERVATIONS') {
-        url = `http://localhost:8080/RestaurantApp/api/admin/statistics/reservations?time=${time}&year=${year}`;
+        url = `${BASE_URL}/api/admin/statistics/reservations?time=${time}&year=${year}`;
     }
 
     fetch(url, { headers: headers })
@@ -87,67 +89,67 @@ function loadChartData() {
 
 function approveUser(userId) {
     if (confirm('Bạn có chắc muốn duyệt tài khoản Đầu bếp này?')) {
-        fetch(`http://localhost:8080/RestaurantApp/admin/users/${userId}/approve`, {
+        fetch(`${BASE_URL}/admin/users/${userId}/approve`, {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json'
             }
         })
-        .then(response => {
-            if (response.ok) {
-                alert('Đã duyệt tài khoản thành công!');
-                location.reload();
-            } else {
-                alert('Lỗi khi duyệt tài khoản!');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra khi kết nối server!');
-        });
+            .then(response => {
+                if (response.ok) {
+                    alert('Đã duyệt tài khoản thành công!');
+                    location.reload();
+                } else {
+                    alert('Lỗi khi duyệt tài khoản!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi kết nối server!');
+            });
     }
 }
 
 function deleteUser(userId) {
     if (confirm('Bạn có chắc muốn xóa người dùng này?')) {
-        fetch(`http://localhost:8080/RestaurantApp/admin/users/${userId}`, {
+        fetch(`${BASE_URL}/admin/users/${userId}`, {
             method: 'DELETE',
             credentials: 'same-origin'
         })
-        .then(response => {
-            if (response.ok) {
-                alert('Đã xóa người dùng thành công!');
-                location.reload();
-            } else {
-                alert('Lỗi khi xóa người dùng!');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra khi kết nối server!');
-        });
+            .then(response => {
+                if (response.ok) {
+                    alert('Đã xóa người dùng thành công!');
+                    location.reload();
+                } else {
+                    alert('Lỗi khi xóa người dùng!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi kết nối server!');
+            });
     }
 }
 
 function confirmOrder(orderId) {
     if (confirm('Bạn có chắc muốn xác nhận đơn hàng này?')) {
-        fetch(`http://localhost:8080/RestaurantApp/admin/orders/${orderId}/confirm`, {
+        fetch(`${BASE_URL}/admin/orders/${orderId}/confirm`, {
             method: 'POST',
             credentials: 'same-origin'
         })
-        .then(response => {
-            if (response.ok) {
-                alert('Đã xác nhận thành công!');
-                location.reload();
-            } else {
-                alert('Lỗi khi xác nhận!');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Có lỗi xảy ra khi kết nối server!');
-        });
+            .then(response => {
+                if (response.ok) {
+                    alert('Đã xác nhận thành công!');
+                    location.reload();
+                } else {
+                    alert('Lỗi khi xác nhận!');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi kết nối server!');
+            });
     }
 }
 

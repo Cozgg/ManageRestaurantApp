@@ -1,6 +1,26 @@
 services:
+  mysql:
+    image: mysql:8.0
+    container_name: restaurant-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: restaurantdb
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./restaurantdb.sql:/docker-entrypoint-initdb.d/01-restaurantdb.sql:ro
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   rabbitmq:
     image: rabbitmq:3-management
+    container_name: restaurant-rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -9,10 +29,33 @@ services:
       RABBITMQ_DEFAULT_PASS: admin
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - app-network
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 30s
       timeout: 10s
       retries: 5
+
+  backend:
+    build: ./RestaurantApp
+    container_name: restaurant-backend
+    ports:
+      - "8081:8080"
+    environment:
+      JAVA_OPTS: "-Dhibernate.connection.url=jdbc:mysql://mysql:3306/restaurantdb -Dhibernate.connection.username=root -Dhibernate.connection.password=123456 -Drabbitmq.host=rabbitmq"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
 volumes:
+  mysql-data:
   rabbitmq-data:

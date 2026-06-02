@@ -54,6 +54,9 @@
     </section>
 
     <div th:replace="~{base :: footer}"></div>
+    <script th:inline="javascript">
+        window.APP_CONTEXT = /*[[@{/}]]*/ '/';
+    </script>
     <script th:src="@{/js/script.js}"></script>
 
 </body>

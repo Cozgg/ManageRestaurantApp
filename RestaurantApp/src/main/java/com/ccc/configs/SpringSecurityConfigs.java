@@ -4,26 +4,21 @@
  */
 package com.ccc.configs;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 /**
  *
@@ -59,11 +54,11 @@ public class SpringSecurityConfigs {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.securityMatcher("/admin/**", "/", "/login").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
+        http.securityMatcher("/admin/**", "/", "/login", "/api/admin/**").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/admin/login").permitAll()
                 .requestMatchers("/", "/admin").hasRole("ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/admin/**").hasRole("AMDIN")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
         ).formLogin(form -> form.loginPage("/admin/login")
                 .loginProcessingUrl("/login")

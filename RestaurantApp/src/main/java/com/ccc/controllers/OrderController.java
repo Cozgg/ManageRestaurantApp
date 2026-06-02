@@ -64,7 +64,6 @@ public class OrderController {
             params.put("page", String.valueOf(page));
         }
 
-        // Admin xem tất cả orders, user chỉ xem orders của mình
         if (u.getUserRole() == com.ccc.enums.UserRole.ROLE_ADMIN) {
             model.addAttribute("orders", this.orderService.getAllOrders(params));
         } else {
