@@ -4,9 +4,13 @@
  */
 package com.ccc.pojo;
 
+import java.io.Serializable;
+import java.util.Set;
+
 import com.ccc.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,8 +25,13 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  *
@@ -41,6 +50,13 @@ import java.util.Set;
     @NamedQuery(name = "User.findByAvatar", query = "SELECT u FROM User u WHERE u.avatar = :avatar"),
     @NamedQuery(name = "User.findByUserRole", query = "SELECT u FROM User u WHERE u.userRole = :userRole")})
 @JsonIgnoreProperties(value = {"dishSet", "ratingSet", "reservationSet", "ordersSet"})
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"dishSet", "ratingSet", "reservationSet", "ordersSet"})
 public class User implements Serializable {
 
     @Basic(optional = false)
@@ -88,6 +104,7 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Integer id;
     @OneToMany(mappedBy = "userId")
     private Set<Dish> dishSet;
@@ -97,170 +114,5 @@ public class User implements Serializable {
     private Set<Reservation> reservationSet;
     @OneToMany(mappedBy = "userId")
     private Set<Orders> ordersSet;
-
-    public User() {
-    }
-
-    public User(Integer id) {
-        this.id = id;
-    }
-
-    public User(Integer id, String username, String firstName, String lastName, String phone, String avatar) {
-        this.id = id;
-        this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phone = phone;
-        this.avatar = avatar;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-
-    public Set<Dish> getDishSet() {
-        return dishSet;
-    }
-
-    public void setDishSet(Set<Dish> dishSet) {
-        this.dishSet = dishSet;
-    }
-
-    public Set<Rating> getRatingSet() {
-        return ratingSet;
-    }
-
-    public void setRatingSet(Set<Rating> ratingSet) {
-        this.ratingSet = ratingSet;
-    }
-
-    public Set<Reservation> getReservationSet() {
-        return reservationSet;
-    }
-
-    public void setReservationSet(Set<Reservation> reservationSet) {
-        this.reservationSet = reservationSet;
-    }
-
-    public Set<Orders> getOrdersSet() {
-        return ordersSet;
-    }
-
-    public void setOrdersSet(Set<Orders> ordersSet) {
-        this.ordersSet = ordersSet;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof User)) {
-            return false;
-        }
-        User other = (User) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.ccc.pojo.User[ id=" + id + " ]";
-    }
-    
-    public UserRole getUserRole() {
-        return userRole;
-    }
-    public void setUserRole(UserRole userRole) {
-        this.userRole = userRole;
-    }
-    public Boolean getActive() {
-        return active;
-    }
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-    /**
-     * @return the active
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    /**
-     * @return the email
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * @param email the email to set
-     */
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
 }

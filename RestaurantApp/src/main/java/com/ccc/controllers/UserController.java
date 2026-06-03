@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ccc.dto.UserDto;
 import com.ccc.repository.ReservationRepository;
@@ -63,7 +64,6 @@ public class UserController {
         long count = this.userService.countUsers(params);
         int totalPages = (int) Math.ceil(count * 1.0 / pageSize);
 
-        // Validate page không vượt quá totalPages
         if (page > totalPages && totalPages > 0) {
             page = totalPages;
             params.put("page", String.valueOf(page));
@@ -118,7 +118,6 @@ public class UserController {
         int pageSize = 6;
         int totalPages = (int) Math.ceil(count * 1.0 / pageSize);
 
-        // Validate page không vượt quá totalPages
         if (currentPage > totalPages && totalPages > 0) {
             currentPage = totalPages;
             params.put("page", String.valueOf(currentPage));
@@ -164,7 +163,6 @@ public class UserController {
         model.addAttribute("tables", this.tableService.getTables(params));
         model.addAttribute("currentPage", currentPage);
 
-        // Check trạng thái bàn (có khách hay trống)
         Map<Integer, Boolean> tableStatus = new java.util.HashMap<>();
         Date now = new Date();
         Date twoHoursLater = new Date(System.currentTimeMillis() + 2 * 60 * 60 * 1000);
@@ -205,9 +203,15 @@ public class UserController {
     }
 
     @PostMapping("/walk-in")
-    public String createWalkIn(@RequestParam Map<String, String> params) {
-        this.reservationService.createWalkInReservation(params);
-        return "redirect:/admin/tables";
+    public String createWalkIn(@RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
+        try {
+            this.reservationService.createWalkInReservation(params);
+            redirectAttributes.addFlashAttribute("success", "Đã đặt bàn thành công!");
+            return "redirect:/admin/tables";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/admin/tables";
+        }
     }
 
     @GetMapping("/available-tables")

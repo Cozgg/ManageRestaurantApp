@@ -68,7 +68,6 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
         Query query = s.createQuery(q);
 
-        // Logic phân trang
         if (params != null) {
             String page = params.get("page");
             if (page != null && !page.isEmpty()) {

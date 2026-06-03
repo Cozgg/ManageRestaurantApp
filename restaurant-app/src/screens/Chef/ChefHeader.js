@@ -1,17 +1,16 @@
-import {useContext, useState, useEffect} from "react";
-import {Button, Container, Nav, Navbar, Badge} from "react-bootstrap";
-import {Link, useNavigate} from "react-router-dom";
-import {MyUserContext} from "../../utils/contexts/MyUserContext";
-import {database} from "../../firebaseConfig";
-import {ref, onValue} from "firebase/database";
+import { useContext, useState, useEffect } from "react";
+import { Button, Container, Nav, Navbar, Badge } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { MyUserContext } from "../../utils/contexts/MyUserContext";
+import { database } from "../../firebaseConfig";
+import { ref, onValue } from "firebase/database";
 import "./Chef.css";
-import {MyOrderSocketContext} from "../../utils/contexts/MyOrderSocketContext";
+import { MyOrderSocketContext } from "../../utils/contexts/MyOrderSocketContext";
 const ChefHeader = () => {
-  const {user} = useContext(MyUserContext);
-  const {unreadCount} = useContext(MyOrderSocketContext);
+  const { user } = useContext(MyUserContext);
+  const { unreadCount } = useContext(MyOrderSocketContext);
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
 
-  // const [kw, setKw] = useState("");
   const nav = useNavigate();
 
   useEffect(() => {
@@ -35,7 +34,7 @@ const ChefHeader = () => {
           as={Link}
           to="/chef"
           className="text-2xl font-bold text-success flex items-center gap-2 no-underline hover:no-underline"
-          style={{color: "#27ae60"}}
+          style={{ color: "#27ae60" }}
         >
           <span>eRestaurant</span>
         </Navbar.Brand>

@@ -1,9 +1,9 @@
-import React, {useContext, useEffect, useState} from "react";
-import {MyUserContext} from "../../utils/contexts/MyUserContext";
+import React, { useContext, useEffect, useState } from "react";
+import { MyUserContext } from "../../utils/contexts/MyUserContext";
 import cookies from "react-cookies";
-import {useNavigate, Link} from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import MySpinner from "../../components/MySpinner";
-import {authApis, endpoints} from "../../configs/Apis";
+import { authApis, endpoints } from "../../configs/Apis";
 import {
   ArrowLeft,
   Phone,
@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 const Profile = () => {
-  const {user} = useContext(MyUserContext);
+  const { user } = useContext(MyUserContext);
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState([]);
   const [page, setPage] = useState(1);
@@ -64,7 +64,6 @@ const Profile = () => {
     );
   }
 
-  // Helper để lấy text hiển thị vai trò
   const getRoleText = (role) => {
     if (role === "ROLE_CHEF") return "Đầu bếp";
     if (role === "ROLE_USER") return "Khách hàng";
@@ -81,10 +80,8 @@ const Profile = () => {
       </Link>
 
       <div className="grid md:grid-cols-3 gap-8">
-        {/* ================= CỘT TRÁI: THÔNG TIN USER ================= */}
         <div className="md:col-span-1">
           <div className="bg-card border border-border rounded-xl shadow-sm p-6 text-center h-full">
-            {/* Avatar */}
             <div className="w-32 h-32 mx-auto mb-4 relative">
               <img
                 src={user.avatar || "https://via.placeholder.com/150"}
@@ -230,13 +227,12 @@ const Profile = () => {
 
                             <td className="py-4 px-4">
                               <span
-                                className={`inline-flex px-2.5 py-1 rounded-full text-xs font-bold ${
-                                  order.statusPay === "COMPLETED"
+                                className={`inline-flex px-2.5 py-1 rounded-full text-xs font-bold ${order.statusPay === "COMPLETED"
                                     ? "bg-green-100 text-green-700"
                                     : order.statusPay === "PENDING"
                                       ? "bg-yellow-100 text-yellow-700"
                                       : "bg-red-100 text-red-700"
-                                }`}
+                                  }`}
                               >
                                 {order.statusPay}
                               </span>

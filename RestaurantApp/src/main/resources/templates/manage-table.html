@@ -7,6 +7,16 @@
 <body>
     <div th:replace="~{base :: header}"></div>
 
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
     <section class="container mt-4 mb-5">
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-header bg-black text-white py-3">

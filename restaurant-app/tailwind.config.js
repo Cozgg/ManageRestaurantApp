@@ -7,11 +7,11 @@ module.exports = {
         background: "#ffffff",
         foreground: "#111827",
         primary: {
-          DEFAULT: "#27AE60", // Màu xanh lá chủ đạo
+          DEFAULT: "#27AE60",
           foreground: "#ffffff",
         },
         accent: {
-          DEFAULT: "#FF7A00", // Màu cam điểm nhấn
+          DEFAULT: "#FF7A00",
           foreground: "#ffffff",
         },
         muted: {

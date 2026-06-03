@@ -1,14 +1,14 @@
-import React, {useState, useEffect, useContext, useRef} from "react";
-import {Alert} from "react-bootstrap";
-import {MyUserContext} from "../../utils/contexts/MyUserContext";
-import {authApis, endpoints} from "../../configs/Apis";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { Alert } from "react-bootstrap";
+import { MyUserContext } from "../../utils/contexts/MyUserContext";
+import { authApis, endpoints } from "../../configs/Apis";
 import MySpinner from "../../components/MySpinner";
-import {useSearchParams} from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import cookies from "react-cookies";
-import {Edit2, Plus, Search, ShieldAlert, Trash2, X} from "lucide-react";
+import { Edit2, Plus, Search, ShieldAlert, Trash2, X } from "lucide-react";
 
 const ChefDashboard = () => {
-  const {user} = useContext(MyUserContext);
+  const { user } = useContext(MyUserContext);
   const [dishes, setDishes] = useState([]);
   const [page, setPage] = useState(1);
 
@@ -16,9 +16,8 @@ const ChefDashboard = () => {
   const [keyword, setKeyword] = useState("");
   const [q] = useSearchParams();
 
-  // Modal states
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState("add"); // 'add' or 'edit'
+  const [modalMode, setModalMode] = useState("add");
   const [selectedDish, setSelectedDish] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -124,8 +123,8 @@ const ChefDashboard = () => {
   };
 
   const handleInputChange = (e) => {
-    const {name, value} = e.target;
-    setFormData((prev) => ({...prev, [name]: value}));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const validate = () => {
@@ -195,14 +194,14 @@ const ChefDashboard = () => {
 
       if (modalMode === "add") {
         await authApis(token).post(endpoints["chef-dishes"], formDataToSend, {
-          headers: {"Content-Type": "multipart/form-data"},
+          headers: { "Content-Type": "multipart/form-data" },
         });
       } else if (modalMode === "edit" && selectedDish) {
         await authApis(token).patch(
           `${endpoints["chef-dishes"]}/${selectedDish.id}`,
           formDataToSend,
           {
-            headers: {"Content-Type": "multipart/form-data"},
+            headers: { "Content-Type": "multipart/form-data" },
           },
         );
       }
@@ -343,7 +342,6 @@ const ChefDashboard = () => {
                     key={dish.id}
                     className="hover:bg-secondary/30 transition-colors"
                   >
-                    {/* Cột 1: Ảnh + Tên + Nguyên liệu */}
                     <td className="py-3 px-5">
                       <div className="flex items-center gap-4">
                         <img
@@ -596,7 +594,7 @@ const ChefDashboard = () => {
               </button>
               <button
                 type="submit"
-                form="dishForm" // Thuộc tính HTML5 giúp kích hoạt submit của Form ở trên
+                form="dishForm"
                 disabled={submitting}
                 className="px-6 py-2.5 rounded-xl font-bold text-primary-foreground bg-primary hover:bg-primary/90 transition-colors disabled:opacity-70 flex items-center justify-center min-w-[140px] shadow-sm"
               >

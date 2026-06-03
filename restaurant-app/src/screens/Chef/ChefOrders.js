@@ -1,12 +1,12 @@
-import {useContext, useEffect, useState} from "react";
-import {MyUserContext} from "../../utils/contexts/MyUserContext";
+import { useContext, useEffect, useState } from "react";
+import { MyUserContext } from "../../utils/contexts/MyUserContext";
 import cookies from "react-cookies";
-import {authApis, endpoints} from "../../configs/Apis";
-import {ArrowRight, ChefHat, Clock, ShieldAlert, UserIcon} from "lucide-react";
+import { authApis, endpoints } from "../../configs/Apis";
+import { ArrowRight, ChefHat, Clock, ShieldAlert, UserIcon } from "lucide-react";
 import MySpinner from "../../components/MySpinner";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const ChefOrders = () => {
-  const {user} = useContext(MyUserContext);
+  const { user } = useContext(MyUserContext);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [orders, setOrders] = useState([]);
@@ -69,10 +69,9 @@ const ChefOrders = () => {
     });
   };
 
-  // Hàm format ngày rút gọn (VD: 25/05)
   const formatDate = (timestamp) => {
     const date = new Date(timestamp);
-    return date.toLocaleDateString("vi-VN", {day: "2-digit", month: "2-digit"});
+    return date.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
   };
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 min-h-screen">

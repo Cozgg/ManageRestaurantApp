@@ -4,7 +4,11 @@
  */
 package com.ccc.pojo;
 
+import java.io.Serializable;
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,8 +25,13 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  *
@@ -36,6 +45,13 @@ import java.util.Date;
     @NamedQuery(name = "Rating.findByPoint", query = "SELECT r FROM Rating r WHERE r.point = :point"),
     @NamedQuery(name = "Rating.findByCreatedAt", query = "SELECT r FROM Rating r WHERE r.createdAt = :createdAt")})
 @JsonIgnoreProperties(value = {"dishId", "userId"})
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"dishId", "userId"})
 public class Rating implements Serializable {
 
     @Basic(optional = false)
@@ -52,6 +68,7 @@ public class Rating implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Integer id;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -63,91 +80,4 @@ public class Rating implements Serializable {
     @ManyToOne
     private User userId;
 
-    public Rating() {
-    }
-
-    public Rating(Integer id) {
-        this.id = id;
-    }
-
-    public Rating(Integer id, int point) {
-        this.id = id;
-        this.point = point;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-
-    public Dish getDishId() {
-        return dishId;
-    }
-
-    public void setDishId(Dish dishId) {
-        this.dishId = dishId;
-    }
-
-    public User getUserId() {
-        return userId;
-    }
-
-    public void setUserId(User userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Rating)) {
-            return false;
-        }
-        Rating other = (Rating) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.ccc.pojo.Rating[ id=" + id + " ]";
-    }
-
-    public int getPoint() {
-        return point;
-    }
-
-    public void setPoint(int point) {
-        this.point = point;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-    
 }

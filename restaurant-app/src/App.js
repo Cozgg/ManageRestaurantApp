@@ -41,7 +41,7 @@ const App = () => {
   useEffect(() => {
     if (!user || user.userRole !== "ROLE_CHEF") return;
 
-    const socket = new SockJS("http://localhost:8080/RestaurantApp/ws");
+    const socket = new SockJS("https://api.erestaurant.me/ws");
     const stompClient = new Client({
       webSocketFactory: () => socket,
       onConnect: () => {
