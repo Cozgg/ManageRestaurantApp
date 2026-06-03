@@ -20,6 +20,13 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.Collections;
+import java.util.List;
+import java.util.Arrays;
+
 /**
  *
  * @author Admin
@@ -53,12 +60,28 @@ public class SpringSecurityConfigs {
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true); 
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.securityMatcher("/admin/**", "/", "/login", "/api/admin/**").csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
+        http.securityMatcher("/admin/**", "/", "/login", "/api/admin/**", "/logout", "/api/secure/**")
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/admin/login").permitAll()
                 .requestMatchers("/", "/admin").hasRole("ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/secure/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
         ).formLogin(form -> form.loginPage("/admin/login")
                 .loginProcessingUrl("/login")

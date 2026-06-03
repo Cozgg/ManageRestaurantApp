@@ -1,6 +1,7 @@
 let myChartInstance = null;
 
 const BASE_URL = (typeof window.APP_CONTEXT !== 'undefined' ? window.APP_CONTEXT : '/RestaurantApp/').replace(/\/$/, '');
+const BASE_URL2 = "https://api.erestaurant.me";
 
 function renderChart(ctx, type, labels, data, labelTitle, bgColor, borderColor) {
     if (myChartInstance != null) {
@@ -134,7 +135,7 @@ function deleteUser(userId) {
 
 function confirmOrder(orderId) {
     if (confirm('Bạn có chắc muốn xác nhận đơn hàng này?')) {
-        fetch(`${BASE_URL}/admin/orders/${orderId}/confirm`, {
+        fetch(`${BASE_URL2}/admin/orders/${orderId}/confirm`, {
             method: 'POST',
             credentials: 'same-origin'
         })

@@ -19,3 +19,4 @@ restaurant-app/node_modules/
 *.rar
 hs_err_pid*
 replay_pid*
+.env

@@ -43,6 +43,7 @@ services:
     ports:
       - "8081:8080"
     environment:
+      TZ: "Asia/Ho_Chi_Minh"
       JAVA_OPTS: "-Dhibernate.connection.url=jdbc:mysql://mysql:3306/restaurantdb -Dhibernate.connection.username=root -Dhibernate.connection.password=123456 -Drabbitmq.host=rabbitmq"
     depends_on:
       mysql:
@@ -51,6 +52,16 @@ services:
         condition: service_healthy
     networks:
       - app-network
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: restaurant_tunnel
+    restart: unless-stopped
+    command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    # command: tunnel --url http://backend:8080
+    networks:
+      - app-network
+    depends_on:
+      - backend
 
 networks:
   app-network:
@@ -59,3 +70,4 @@ networks:
 volumes:
   mysql-data:
   rabbitmq-data:
+
