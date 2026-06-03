@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ccc.pojo.User;
 import com.ccc.service.UserService;
 import com.ccc.utils.JwtUtils;
+import java.util.HashMap;
 
 /**
  *
@@ -69,13 +70,46 @@ public class ApiUserController {
                 User uAuth = this.userService.getUserByUsername(u.getUsername());
                 String role = uAuth.getUserRole().toString();
                 String token = JwtUtils.generateToken(u.getUsername(), role);
-                return ResponseEntity.ok().body(Collections.singletonMap("token", token));
+                String refreshToken = JwtUtils.generateRefreshToken(u.getUsername());
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("accessToken", token);
+                tokens.put("refreshToken", refreshToken);
+                return ResponseEntity.ok().body(tokens);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
         } catch (jakarta.persistence.NoResultException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Tài khoản không tồn tại");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
+        }
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Thiếu Refresh Token");
+        }
+
+        try {
+            String username = JwtUtils.validateRefreshTokenAndGetUsername(refreshToken);
+            if (username != null) {
+                User user = this.userService.getUserByUsername(username);
+
+                if (user != null && (user.getActive() == null || user.getActive())) {
+                    String newAccessToken = JwtUtils.generateToken(username, user.getUserRole().toString());
+                    String newRefreshToken = JwtUtils.generateRefreshToken(username);
+
+                    Map<String, String> tokens = new java.util.HashMap<>();
+                    tokens.put("accessToken", newAccessToken);
+                    tokens.put("refreshToken", newRefreshToken);
+
+                    return ResponseEntity.ok().body(tokens);
+                }
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh Token không hợp lệ hoặc đã hết hạn");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Lỗi hệ thống khi xử lý Token");
         }
     }
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import cookies from "react-cookies";
 export const endpoints = {
   categories: "/categories",
   dishes: "/dishes",
@@ -25,7 +25,6 @@ export const endpoints = {
 export default axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
 });
-
 export const authApis = (token) => {
   const instance = axios.create({
     baseURL: process.env.REACT_APP_BASE_URL,
@@ -34,24 +33,46 @@ export const authApis = (token) => {
     },
   });
 
-  // instance.interceptors.response.use(
-  //   (response) => response,
-  //   async (error) => {
-  //     const originalRequest = error.config;
+  instance.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const originalRequest = error.config;
 
-  //     if (error.response && error.response.status === 401 && !originalRequest._retry) {
-  //       originalRequest._retry = true;
-  //       const newToken = await refreshAccessToken();
+      if (
+        error.response &&
+        error.response.status === 401 &&
+        !originalRequest._retry
+      ) {
+        originalRequest._retry = true;
 
-  //       if (newToken) {
-  //         originalRequest.headers.Authorization = `Bearer ${newToken}`;
-  //         return instance(originalRequest);
-  //       }
-  //     }
+        try {
+          const refreshToken = cookies.load("refreshToken");
+          if (refreshToken) {
+            const res = await axios.post(
+              `${process.env.REACT_APP_BASE_URL}/refresh-token`,
+              {
+                refreshToken,
+              },
+            );
+            if (res.status === 200 && res.data.accessToken) {
+              const newToken = res.data.accessToken;
+              cookies.save("token", newToken, {path: "/"});
+              cookies.save("refreshToken", res.data.refreshToken, {path: "/"});
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              return instance(originalRequest);
+            }
+          }
+        } catch (refreshErr) {
+          console.error("Refresh token expired or failed", refreshErr);
+          cookies.remove("token");
+          cookies.remove("refreshToken");
+          window.location.href = "/login";
+        }
+      }
 
-  //     return Promise.reject(error);
-  //   }
-  // );
+      return Promise.reject(error);
+    },
+  );
 
   return instance;
 };

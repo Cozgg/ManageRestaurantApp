@@ -21,15 +21,37 @@ import java.util.Date;
 public class JwtUtils {
     // SECRET nên được lưu bằng biến môi trường,
     private static final String SECRET = "12345678901234567890123456789012"; // 32 ký tự (AES key)
-    private static final long EXPIRATION_MS = 86400000; // 1 ngày
+    private static final long ACCESS_EXPIRATION_MS = 86400000; // 1 ngày
+    private static final long REFRESH_EXPIRATION_MS = 604800000; // 7 ngày
 
     public static String generateToken(String username, String role) throws Exception {
         JWSSigner signer = new MACSigner(SECRET);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .claim("role", role)
+                .claim("type", "ACCESS")
                 .subject(username)
-                .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_MS))
+                .expirationTime(new Date(System.currentTimeMillis() + ACCESS_EXPIRATION_MS))
+                .issueTime(new Date())
+                .build();
+
+        SignedJWT signedJWT = new SignedJWT(
+                new JWSHeader(JWSAlgorithm.HS256),
+                claimsSet
+        );
+
+        signedJWT.sign(signer);
+
+        return signedJWT.serialize();
+    }
+    
+    public static String generateRefreshToken(String username) throws Exception {
+        JWSSigner signer = new MACSigner(SECRET);
+
+        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                .claim("type", "REFRESH")
+                .subject(username)
+                .expirationTime(new Date(System.currentTimeMillis() + REFRESH_EXPIRATION_MS))
                 .issueTime(new Date())
                 .build();
 
@@ -48,9 +70,26 @@ public class JwtUtils {
         JWSVerifier verifier = new MACVerifier(SECRET);
 
         if (signedJWT.verify(verifier)) {
-            Date expiration = signedJWT.getJWTClaimsSet().getExpirationTime();
-            if (expiration.after(new Date())) {
-                return signedJWT.getJWTClaimsSet().getSubject();
+            JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
+            Date expiration = claims.getExpirationTime();
+            String type = claims.getStringClaim("type");
+            if (expiration.after(new Date()) && "ACCESS".equals(type)) {
+                return claims.getSubject();
+            }
+        }
+        return null;
+    }
+    
+    public static String validateRefreshTokenAndGetUsername(String token) throws Exception {
+        SignedJWT signedJWT = SignedJWT.parse(token);
+        JWSVerifier verifier = new MACVerifier(SECRET);
+
+        if (signedJWT.verify(verifier)) {
+            JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
+            Date expiration = claims.getExpirationTime();
+            String type = claims.getStringClaim("type");
+            if (expiration.after(new Date()) && "REFRESH".equals(type)) {
+                return claims.getSubject();
             }
         }
         return null;

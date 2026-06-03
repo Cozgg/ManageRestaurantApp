@@ -45,6 +45,7 @@ public class JwtFilter implements Filter {
                     if (username != null) {
                         httpRequest.setAttribute("username", username);
                         String role = JwtUtils.getRoleFromToken(token);
+                        
                         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
                         SecurityContextHolder.getContext().setAuthentication(authentication);
