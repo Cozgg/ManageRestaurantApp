@@ -1,21 +1,21 @@
 import "./App.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { Container } from "react-bootstrap";
+import {Container} from "react-bootstrap";
 import Home from "./screens/Home/Home";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { MyOrderProvider } from "./utils/contexts/MyOrderContext";
-import { MyCompareContext } from "./utils/contexts/MyCompareContext";
-import { MyOrderSocketContext } from "./utils/contexts/MyOrderSocketContext";
+import {MyOrderProvider} from "./utils/contexts/MyOrderContext";
+import {MyCompareContext} from "./utils/contexts/MyCompareContext";
+import {MyOrderSocketContext} from "./utils/contexts/MyOrderSocketContext";
 import MyCompareReducer from "./utils/reducers/MyCompareReducer";
 import Order from "./screens/Order/Order";
 import ThankYou from "./screens/Order/ThankYou";
 import Login from "./screens/User/Login";
 import Register from "./screens/User/Register";
-import { MyUserContext } from "./utils/contexts/MyUserContext";
+import {MyUserContext} from "./utils/contexts/MyUserContext";
 import MyUserReducer from "./utils/reducers/MyUserReducer";
-import { useEffect, useReducer, useState } from "react";
+import {useEffect, useReducer, useState} from "react";
 import Profile from "./screens/User/Profile";
 import Compare from "./screens/Compare/Compare";
 import Reservation from "./screens/Reservation/Reservation";
@@ -28,15 +28,34 @@ import ChefProfile from "./screens/Chef/ChefProfile";
 import ChefOrderDetail from "./screens/Chef/ChefOrderDetail";
 import RealtimeOrders from "./screens/Chef/RealtimeOrders";
 import SockJS from "sockjs-client";
-import { Client } from "@stomp/stompjs";
+import {Client} from "@stomp/stompjs";
 import ChefOrders from "./screens/Chef/ChefOrders";
-
+import cookies from "react-cookies";
+import {authApis, endpoints} from "./configs/Apis";
 const App = () => {
   const [user, dispatch] = useReducer(MyUserReducer, null);
   const [compareList, compareDispatch] = useReducer(MyCompareReducer, []);
 
   const [orders, setOrders] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const autoLogin = async () => {
+      const token = cookies.load("token");
+      if (token) {
+        try {
+          let res = await authApis(token).get(endpoints["profile"]);
+          dispatch({
+            type: "login",
+            payload: res.data,
+          });
+        } catch (error) {
+          console.error("Tự động đăng nhập thất bại:", error);
+        }
+      }
+    };
+    autoLogin();
+  }, []);
 
   useEffect(() => {
     if (!user || user.userRole !== "ROLE_CHEF") return;
@@ -58,10 +77,10 @@ const App = () => {
   }, [user]);
   return (
     <BrowserRouter>
-      <MyUserContext.Provider value={{ user, dispatch }}>
+      <MyUserContext.Provider value={{user, dispatch}}>
         <MyCompareContext.Provider value={[compareList, compareDispatch]}>
           <MyOrderSocketContext.Provider
-            value={{ orders, unreadCount, setUnreadCount }}
+            value={{orders, unreadCount, setUnreadCount}}
           >
             <MyOrderProvider>
               <Container>

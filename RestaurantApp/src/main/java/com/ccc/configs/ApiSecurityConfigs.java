@@ -33,7 +33,7 @@ public class ApiSecurityConfigs {
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
 
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .securityMatcher("/api/secure/**", "/api/users/**", "/api/dishes/**", "/ws/**", "/api/**")
+                .securityMatcher("/ws/**", "/api/**")
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -43,7 +43,7 @@ public class ApiSecurityConfigs {
                 .requestMatchers("/api/secure/table/**").hasRole("ADMIN")
                 .requestMatchers("/api/users/*/approve").hasRole("ADMIN")
                 .requestMatchers("/api/secure/**").authenticated()
-                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers("/ws/**", "/api/refresh-token").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().permitAll()
                 ).addFilterBefore(new JwtFilter(), UsernamePasswordAuthenticationFilter.class)

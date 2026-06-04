@@ -40,9 +40,12 @@ const Login = () => {
       setLoading(true);
       setErr("");
       let res = await Apis.post(endpoints["login"], user);
-      const token = res.data.token;
-      cookies.save("token", res.data.token);
+      const token = res.data.accessToken || res.data.token;
       if (res.status === 200) {
+        cookies.save("token", token, {path: "/"});
+        if (res.data.refreshToken) {
+          cookies.save("refreshToken", res.data.refreshToken, {path: "/"});
+        }
         message.success("Đăng nhập thành công");
         let profileRes = await authApis(token).get(endpoints["profile"]);
         const userProfile = profileRes.data;
