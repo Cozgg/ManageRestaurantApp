@@ -47,11 +47,11 @@ function loadChartData() {
     };
 
     if (statType === 'REVENUE') {
-        url = `${BASE_URL}/api/admin/statistics/stat-revenue?time=${time}&year=${year}`;
+        url = `${BASE_URL}/admin/statistics/stat-revenue?time=${time}&year=${year}`;
     } else if (statType === 'DISHES') {
-        url = `${BASE_URL}/api/admin/statistics/dishes?top=5`;
+        url = `${BASE_URL}/admin/statistics/dishes?top=5`;
     } else if (statType === 'RESERVATIONS') {
-        url = `${BASE_URL}/api/admin/statistics/reservations?time=${time}&year=${year}`;
+        url = `${BASE_URL}/admin/statistics/reservations?time=${time}&year=${year}`;
     }
 
     fetch(url, { headers: headers })

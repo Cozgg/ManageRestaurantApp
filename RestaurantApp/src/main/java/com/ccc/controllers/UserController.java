@@ -178,7 +178,7 @@ public class UserController {
 
         return "manage-table";
     }
-
+    
     @DeleteMapping("/users/{id}")
     @ResponseBody
     @ResponseStatus(HttpStatus.NO_CONTENT)

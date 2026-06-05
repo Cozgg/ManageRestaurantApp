@@ -56,7 +56,7 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: restaurant_tunnel
     restart: unless-stopped
-    command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    command: tunnel run --token eyJhIjoiMDQ0MTc4ZDIwNDE5MGIxYTBmYjRiMDUwNDE3MWMyYmMiLCJ0IjoiNWRmY2I4NzYtZjlhNy00ZmQ5LTk2YjYtMmE0YjdmOWQ4MjRhIiwicyI6Ik1HSXhZak0wTjJZdE9Ua3lNUzAwT1RsaExXSTFZVGt0WlRnM04yVXlNelV4TnpVeiJ9
     # command: tunnel --url http://backend:8080
     networks:
       - app-network
