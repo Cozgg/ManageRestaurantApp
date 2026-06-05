@@ -1,16 +1,15 @@
-import React, {useState, useEffect, useRef, useContext} from "react";
-import {database} from "../../firebaseConfig";
-import {ref, push, onValue, update, set, off, get} from "firebase/database";
-import {Alert} from "react-bootstrap";
-import {MyUserContext} from "../../utils/contexts/MyUserContext";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { database } from "../../firebaseConfig";
+import { ref, push, onValue, update, set, off, get } from "firebase/database";
+import { Alert } from "react-bootstrap";
+import { MyUserContext } from "../../utils/contexts/MyUserContext";
 import MySpinner from "../../components/MySpinner";
-import {Link, useNavigate, useSearchParams} from "react-router-dom";
-import {authApis, endpoints} from "../../configs/Apis";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { authApis, endpoints } from "../../configs/Apis";
 import cookies from "react-cookies";
-import {ArrowLeft, MessageCircle, Send, UserIcon} from "lucide-react";
+import { ArrowLeft, MessageCircle, Send, UserIcon } from "lucide-react";
 const Chat = () => {
-  // 1. LẤY USER TỪ CONTEXT
-  const {user} = useContext(MyUserContext);
+  const { user } = useContext(MyUserContext);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const targetChefId = searchParams.get("chefId");
@@ -58,7 +57,7 @@ const Chat = () => {
     if (user && targetChefId) {
       if (conversations.length === 0 && !loading) {
         createConversationWithChef(targetChefId);
-        navigate("/chat", {replace: true});
+        navigate("/chat", { replace: true });
       } else if (conversations.length > 0) {
         const existingConv = conversations.find((conv) => {
           const participants = Array.isArray(conv.participants)
@@ -76,7 +75,7 @@ const Chat = () => {
         } else {
           createConversationWithChef(targetChefId);
         }
-        navigate("/chat", {replace: true});
+        navigate("/chat", { replace: true });
       }
     }
   }, [conversations, targetChefId, user, navigate, loading]);
@@ -116,12 +115,11 @@ const Chat = () => {
             value !== null &&
             !Array.isArray(value)
           ) {
-            const conv = {id: key};
+            const conv = { id: key };
             Object.keys(value).forEach((prop) => {
               try {
                 conv[prop] = value[prop];
               } catch (e) {
-                // Skip properties that can't be copied
               }
             });
             if (
@@ -178,11 +176,11 @@ const Chat = () => {
             value !== null &&
             !Array.isArray(value)
           ) {
-            const msg = {id: key};
+            const msg = { id: key };
             Object.keys(value).forEach((prop) => {
               try {
                 msg[prop] = value[prop];
-              } catch (e) {}
+              } catch (e) { }
             });
             msgs.push(msg);
           }
@@ -234,10 +232,10 @@ const Chat = () => {
 
       const otherUserId =
         selectedConversation.participants &&
-        Array.isArray(selectedConversation.participants)
+          Array.isArray(selectedConversation.participants)
           ? selectedConversation.participants.find(
-              (id) => String(id) !== String(user.id),
-            )
+            (id) => String(id) !== String(user.id),
+          )
           : null;
 
       if (otherUserId) {
@@ -302,7 +300,7 @@ const Chat = () => {
       };
 
       await set(newConvRef, participantsData);
-      setSelectedConversation({id: newConvRef.key, ...participantsData});
+      setSelectedConversation({ id: newConvRef.key, ...participantsData });
     } catch (error) {
       console.error("Error creating conversation:", error);
       setError("Không thể tạo cuộc trò chuyện");
@@ -378,11 +376,10 @@ const Chat = () => {
                       setSelectedConversation(conv);
                       loadMessages(conv.id);
                     }}
-                    className={`w-full text-left p-4 border-b border-border transition-colors hover:bg-secondary/50 flex justify-between items-center ${
-                      selectedConversation?.id === conv.id
+                    className={`w-full text-left p-4 border-b border-border transition-colors hover:bg-secondary/50 flex justify-between items-center ${selectedConversation?.id === conv.id
                         ? "bg-primary/5 border-l-4 border-l-primary"
                         : "border-l-4 border-l-transparent"
-                    }`}
+                      }`}
                   >
                     <div>
                       <div
@@ -445,21 +442,19 @@ const Chat = () => {
                         className={`flex ${isMine ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[80%] md:max-w-[70%] px-4 py-2.5 rounded-2xl ${
-                            isMine
+                          className={`max-w-[80%] md:max-w-[70%] px-4 py-2.5 rounded-2xl ${isMine
                               ? "bg-primary text-primary-foreground rounded-br-sm"
                               : "bg-background border border-border text-foreground rounded-bl-sm shadow-sm"
-                          }`}
+                            }`}
                         >
                           <p className="m-0 break-words text-sm">
                             {msg.message}
                           </p>
                           <p
-                            className={`text-[10px] mt-1 m-0 ${
-                              isMine
+                            className={`text-[10px] mt-1 m-0 ${isMine
                                 ? "text-primary-foreground/70 text-right"
                                 : "text-muted-foreground text-left"
-                            }`}
+                              }`}
                           >
                             {formatTime(msg.timestamp)}
                           </p>

@@ -1,12 +1,12 @@
-import {useContext, useEffect, useState, useRef} from "react";
-import Apis, {endpoints} from "../configs/Apis";
-import {Link, NavLink, useNavigate} from "react-router-dom";
-import {MyOrderContext} from "../utils/contexts/MyOrderContext";
-import {MyUserContext} from "../utils/contexts/MyUserContext";
-import {MyCompareContext} from "../utils/contexts/MyCompareContext";
+import { useContext, useEffect, useState, useRef } from "react";
+import Apis, { endpoints } from "../configs/Apis";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { MyOrderContext } from "../utils/contexts/MyOrderContext";
+import { MyUserContext } from "../utils/contexts/MyUserContext";
+import { MyCompareContext } from "../utils/contexts/MyCompareContext";
 import MySpinner from "../components/MySpinner";
-import {database} from "../firebaseConfig";
-import {ref, onValue, off} from "firebase/database";
+import { database } from "../firebaseConfig";
+import { ref, onValue, off } from "firebase/database";
 import "./Header.css";
 import {
   CalendarDays,
@@ -15,13 +15,13 @@ import {
   Scale,
   ShoppingCart,
   Menu,
-  X, // Import thêm icon cho Mobile Menu
+  X,
 } from "lucide-react";
 import cookies from "react-cookies";
 
 const Header = () => {
-  const {dispatch, user} = useContext(MyUserContext);
-  const {totalQuantity} = useContext(MyOrderContext);
+  const { dispatch, user } = useContext(MyUserContext);
+  const { totalQuantity } = useContext(MyOrderContext);
   const [compareList] = useContext(MyCompareContext);
 
   const [categories, setCategories] = useState([]);
@@ -29,7 +29,6 @@ const Header = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-  // 1. Hook quản lý trạng thái mở/đóng menu trên Mobile
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const unreadListenerRef = useRef(null);
@@ -105,9 +104,8 @@ const Header = () => {
             <NavLink
               to="/"
               end
-              className={({isActive}) =>
-                `text-success font-medium transition-colors no-underline hover:no-underline hover:text-primary ${
-                  isActive ? "text-primary font-bold" : "text-foreground"
+              className={({ isActive }) =>
+                `text-success font-medium transition-colors no-underline hover:no-underline hover:text-primary ${isActive ? "text-primary font-bold" : "text-foreground"
                 }`
               }
             >
@@ -124,9 +122,8 @@ const Header = () => {
                 <NavLink
                   key={c.id}
                   to={`/?cateId=${c.id}`}
-                  className={({isActive}) =>
-                    `font-medium transition-colors no-underline hover:no-underline hover:text-success ${
-                      isActive ? "text-success font-bold" : "text-foreground"
+                  className={({ isActive }) =>
+                    `font-medium transition-colors no-underline hover:no-underline hover:text-success ${isActive ? "text-success font-bold" : "text-foreground"
                     }`
                   }
                 >

@@ -4,63 +4,31 @@
  */
 package com.ccc.dto;
 
+import java.util.List;
+
 import com.ccc.enums.PaymentMethod;
 import com.ccc.pojo.OrderItem;
-import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
  * @author Admin
  */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ItemDto {
+
     private List<OrderItem> items;
     private PaymentMethod paymentMethod;
     private int totalAmount;
 
-    /**
-     * @return the items
-     */
-    public List<OrderItem> getItems() {
-        return items;
-    }
-
-    /**
-     * @param items the items to set
-     */
-    public void setItems(List<OrderItem> items) {
-        this.items = items;
-    }
-
-    /**
-     * @return the paymentMethod
-     */
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    /**
-     * @param paymentMethod the paymentMethod to set
-     */
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    /**
-     * @return the totalAmount
-     */
-    public int getTotalAmount() {
-        return totalAmount;
-    }
-
-    /**
-     * @param totalAmount the totalAmount to set
-     */
-    public void setTotalAmount(int totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-    
-    public int calculateTotalAmount(){
+    public int calculateTotalAmount() {
         return this.items.stream().mapToInt(i -> i.getPrice() * i.getQuantity()).sum();
     }
-    
 }

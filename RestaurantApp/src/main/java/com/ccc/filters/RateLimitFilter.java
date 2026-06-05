@@ -4,20 +4,22 @@
  */
 package com.ccc.filters;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.time.Duration;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  *
@@ -28,18 +30,15 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    //Login, Thanh toán - 10 req/phút - 5req/20s
     private Bucket createCriticalBucket() {
         return Bucket.builder().addLimit(Bandwidth.builder().capacity(10).refillGreedy(5, Duration.ofMinutes(1)).build())
                 .addLimit(Bandwidth.builder().capacity(5).refillGreedy(5, Duration.ofSeconds(20)).build()).build();
     }
 
-    //POST, PUT, DELETE - 20 req/phút
     private Bucket createWriteBucket() {
         return Bucket.builder().addLimit(Bandwidth.builder().capacity(20).refillGreedy(10, Duration.ofMinutes(1)).build()).build();
     }
 
-    //GET - 100 req/phút
     private Bucket createReadBucket() {
         return Bucket.builder().addLimit(Bandwidth.builder().capacity(100).refillGreedy(20, Duration.ofMinutes(1)).build()).build();
     }

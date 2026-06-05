@@ -22,8 +22,11 @@ import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  *
@@ -31,10 +34,13 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Table(name = "restaurant_table")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"reservationSet"})
 @NamedQueries({
     @NamedQuery(name = "RestaurantTable.findAll", query = "SELECT r FROM RestaurantTable r"),
     @NamedQuery(name = "RestaurantTable.findById", query = "SELECT r FROM RestaurantTable r WHERE r.id = :id"),
@@ -50,8 +56,9 @@ public class RestaurantTable implements Serializable {
     @Size(max = 100)
     @Column(name = "location")
     private String location;
-    
+
     @Column(name = "active")
+    @Builder.Default
     private Boolean active = true;
 
     private static final long serialVersionUID = 1L;
@@ -59,6 +66,7 @@ public class RestaurantTable implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Integer id;
     @Column(name = "capacity")
     private Integer capacity;
@@ -66,45 +74,4 @@ public class RestaurantTable implements Serializable {
     @OneToMany(mappedBy = "tableId")
     private Set<Reservation> reservationSet;
 
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof RestaurantTable)) {
-            return false;
-        }
-        RestaurantTable other = (RestaurantTable) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.ccc.pojo.RestaurantTable[ id=" + id + " ]";
-    }
-
-    public String getTableNumber() {
-        return tableNumber;
-    }
-
-    public void setTableNumber(String tableNumber) {
-        this.tableNumber = tableNumber;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
 }

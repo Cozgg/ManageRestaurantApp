@@ -24,8 +24,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  *
@@ -33,10 +36,13 @@ import lombok.NoArgsConstructor;
  */
 @Entity
 @Table(name = "dish")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"categoryId", "userId", "ratingSet", "orderDetailSet"})
 @NamedQueries({
     @NamedQuery(name = "Dish.findAll", query = "SELECT d FROM Dish d"),
     @NamedQuery(name = "Dish.findById", query = "SELECT d FROM Dish d WHERE d.id = :id"),
@@ -81,6 +87,7 @@ public class Dish implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Integer id;
     @Column(name = "price")
     private Integer price;
@@ -95,76 +102,4 @@ public class Dish implements Serializable {
     @OneToMany(mappedBy = "dishId")
     private Set<OrderDetail> orderDetailSet;
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Dish)) {
-            return false;
-        }
-        Dish other = (Dish) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.ccc.pojo.Dish[ id=" + id + " ]";
-    }
-
-    public int getTimePrepare() {
-        return timePrepare;
-    }
-
-    public void setTimePrepare(int timePrepare) {
-        this.timePrepare = timePrepare;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(String material) {
-        this.material = material;
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
 }

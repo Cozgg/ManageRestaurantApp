@@ -22,6 +22,12 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  *
@@ -37,6 +43,12 @@ import jakarta.validation.constraints.Size;
     @NamedQuery(name = "Reservation.findByCreatedAt", query = "SELECT r FROM Reservation r WHERE r.createdAt = :createdAt"),
     @NamedQuery(name = "Reservation.findByNumberPeople", query = "SELECT r FROM Reservation r WHERE r.numberPeople = :numberPeople"),
     @NamedQuery(name = "Reservation.findByStatus", query = "SELECT r FROM Reservation r WHERE r.status = :status")})
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Reservation implements Serializable {
 
     @Basic(optional = false)
@@ -55,6 +67,7 @@ public class Reservation implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
+    @EqualsAndHashCode.Include
     private Integer id;
     @Column(name = "start_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -71,114 +84,5 @@ public class Reservation implements Serializable {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
     private User userId;
-
-    public Reservation() {
-    }
-
-    public Reservation(Integer id) {
-        this.id = id;
-    }
-
-    public Reservation(Integer id, int numberPeople) {
-        this.id = id;
-        this.numberPeople = numberPeople;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public int getNumberPeople() {
-        return numberPeople;
-    }
-
-    public void setNumberPeople(int numberPeople) {
-        this.numberPeople = numberPeople;
-    }
-
-    public RestaurantTable getTableId() {
-        return tableId;
-    }
-
-    public void setTableId(RestaurantTable tableId) {
-        this.tableId = tableId;
-    }
-
-    public User getUserId() {
-        return userId;
-    }
-
-    public void setUserId(User userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Reservation)) {
-            return false;
-        }
-        Reservation other = (Reservation) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "com.ccc.pojo.Reservation[ id=" + id + " ]";
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
 
 }
