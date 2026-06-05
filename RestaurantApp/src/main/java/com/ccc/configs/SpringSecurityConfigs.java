@@ -73,14 +73,13 @@ public class SpringSecurityConfigs {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.securityMatcher("/admin/**", "/", "/login", "/api/admin/**", "/logout", "/api/secure/**")
+        http.securityMatcher("/admin/**", "/", "/login", "/logout")
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/admin/login").permitAll()
                 .requestMatchers("/", "/admin").hasRole("ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/secure/**").hasRole("ADMIN")
+                .requestMatchers("/api/users/*/approve").hasRole("ADMIN")
                 .anyRequest().permitAll()
         ).formLogin(form -> form.loginPage("/admin/login")
                 .loginProcessingUrl("/login")

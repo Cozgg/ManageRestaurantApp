@@ -20,7 +20,7 @@ import com.ccc.service.StatService;
  * @author Admin
  */
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/admin")
 public class ApiStatController {
 
     @Autowired
@@ -44,5 +44,4 @@ public class ApiStatController {
             @RequestParam(value = "year", defaultValue = "2026") int year) {
         return ResponseEntity.ok(this.statService.statsReservationsByTime(time, year));
     }
-
 }

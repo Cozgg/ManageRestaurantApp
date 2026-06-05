@@ -135,15 +135,7 @@ public class ApiUserController {
         return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
-    @PostMapping("/users/{id}/approve")
-    public ResponseEntity<?> approve(@PathVariable int id, Principal principal) {
-        User currentUser = this.userService.getUserByUsername(principal.getName());
-        if (currentUser.getUserRole() != com.ccc.enums.UserRole.ROLE_ADMIN) {
-            return new ResponseEntity<>("Bạn không có quyền duyệt người dùng", HttpStatus.FORBIDDEN);
-        }
-        this.userService.approveUser(id);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+    
 
     @GetMapping("/secure/admin/users")
     public ResponseEntity<List<User>> getUsers(@RequestParam Map<String, String> params, Principal principal) {

@@ -58,6 +58,7 @@ public class RestaurantTable implements Serializable {
     private String location;
 
     @Column(name = "active")
+    @Builder.Default
     private Boolean active = true;
 
     private static final long serialVersionUID = 1L;
