@@ -55,3 +55,7 @@ Dự án phần mềm hỗ trợ đặt bàn, quản lý thực đơn và trải
 * `/api/reservations`: Đặt bàn.
 * `/api/orders`: Quản lý gọi món và thanh toán.
 * `/api/ratings`: Chức năng đánh giá.
+
+## . 👨‍💻 Tác giả
+
+- **Thực hiện bởi:** [Cozg] & Team.
